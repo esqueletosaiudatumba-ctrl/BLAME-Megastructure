@@ -5,6 +5,8 @@ on:
     branches: [master]
     paths:
       - "mod/**"
+      - "tools/preview/**"
+      - "tools/verify/**"
       - ".github/workflows/build-blamegen.yml"
   workflow_dispatch:
 
