@@ -41,6 +41,18 @@ public final class TohaMonumentCheck {
         check(mouth.get(0, 300, Toha.CZ + 1286) == Mat.AIR,
                 "principal cave must remain open through the lower façade");
 
+        int openCaves = 0;
+        for (int i = 0; i < Toha.CAVE_X.length; i++) {
+            int x = Toha.CAVE_X[i];
+            int y = Toha.CAVE_Y[i] + Toha.CAVE_H[i] / 2;
+            int z = Toha.CZ + Toha.CAVE_FRONT[i] - 8;
+            Cube cave = new Cube(Math.floorDiv(x, 16), Math.floorDiv(y, 16), Math.floorDiv(z, 16));
+            toha.draw(cave);
+            if (cave.get(x, y, z) == Mat.AIR) openCaves++;
+            else check(false, "authored cave mouth " + i + " must remain open");
+        }
+        check(openCaves == 13, "all thirteen staggered cave mouths must remain traversable voids");
+
         Cube nave = new Cube(0, Math.floorDiv(800, 16),
                 Math.floorDiv(Toha.CZ + 100, 16));
         toha.draw(nave);
