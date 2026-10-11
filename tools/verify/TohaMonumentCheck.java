@@ -29,11 +29,20 @@ public final class TohaMonumentCheck {
         check(gate.get(0, 100, Toha.CZ + 2600) == Mat.AIR,
                 "the centre of the south gate must remain passable");
 
-        Cube shell = new Cube(Math.floorDiv(1750, 16), Math.floorDiv(300, 16),
-                Math.floorDiv(Toha.CZ + 1000, 16));
+        Cube shell = new Cube(Math.floorDiv(1100, 16), Math.floorDiv(300, 16),
+                Math.floorDiv(Toha.CZ + 1340, 16));
         toha.draw(shell);
-        check(Mat.isStructure(shell.get(1750, 300, Toha.CZ + 1000)),
-                "authored lower shell must occupy its designed sample");
+        check(Mat.isStructure(shell.get(1100, 300, Toha.CZ + 1340)),
+                "authored lower front wall must occupy its designed sample");
+
+        Cube underDeck = new Cube(0, 1, czCube);
+        toha.draw(underDeck);
+        check(underDeck.get(0, 20, Toha.CZ) == Mat.AIR,
+                "the precinct must not be filled as a 64-block solid slab");
+        Cube deckSupport = new Cube(0, 3, czCube);
+        toha.draw(deckSupport);
+        check(Mat.isStructure(deckSupport.get(0, 52, Toha.CZ)),
+                "the thin deck must rest on its orthogonal girder grid");
 
         Cube mouth = new Cube(0, Math.floorDiv(300, 16),
                 Math.floorDiv(Toha.CZ + 1286, 16));
