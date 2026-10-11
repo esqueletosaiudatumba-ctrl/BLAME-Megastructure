@@ -38,6 +38,14 @@ The façade contains thirteen authored apertures: five in the lower tier, four i
 
 The large lower central mouth is the primary arrival into the interior. Side mouths are deep service cavities. Upper mouths are smaller and more isolated so the façade does not read like a regular hotel or apartment tower. Each chamber has a fixed recessed AI control slab; the primary and crown chambers retain tiny live indicators, while the other panels stay dark.
 
+## Chamber mechanisms and upper mast
+
+The thirteen chamber AIs have fixed mechanical apparatus inside their cave volumes; these are deliberate, coordinate-authored parts of the monument, not a random prop scatter. Four authored machine grammars recur through the subordinate caves: hollow tapered spindles with bearing collars, exposed gyro rings held by service arms, open rectangular maintenance cages, and paired pressure vessels joined by low service bridges. Their dimensions follow the cave envelope so they remain attached to the chamber architecture.
+
+The principal cave is kept as a sightline into the gravity furnace. Its AI machinery is split into two flanking mechanisms rather than a centre-blocking prop. The recessed control panel and rare local status lights remain visible from the entry without turning the whole façade into a neon display.
+
+One off-axis service mast rises to Y≈1975, close to the ceiling but not merged into it. Long, heavy braces pin it back into the upper mass; a small cyan index lamp marks the mast near its crown. The mast intentionally breaks the otherwise stepped roofline, making the silhouette feel industrial and unbalanced rather than like a symmetrical temple.
+
 ## Interior
 
 The central hollow gravity furnace is the focal machine, rising to just below the artificial ceiling. It uses a thick tapered shell, a hollow bore, six stepped ring courses, and sparse service arms rather than neon ornament.
@@ -65,7 +73,7 @@ Material style resolution may weather the same surfaces differently per seed, bu
 ## Code and verification
 
 - Implementation: mod/src/main/java/blame/blamegen/core/Toha.java
-- World integration and generator version: mod/src/main/java/blame/blamegen/core/Megastructure.java
+- World integration and generator version (v11): mod/src/main/java/blame/blamegen/core/Megastructure.java
 - Landmark access: /blame tp toha-gate, /blame tp toha-south, /blame tp toha-north, /blame tp toha-east, /blame tp toha-west, /blame tp toha-center
 - Regression check: tools/verify/TohaMonumentCheck.java
 - The GitHub Actions workflow compiles the pure-Java core and runs the monument, determinism, seam, survey, and benchmark checks before attempting the Forge mod build.
