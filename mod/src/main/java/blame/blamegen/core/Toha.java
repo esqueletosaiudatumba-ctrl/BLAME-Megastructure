@@ -98,6 +98,7 @@ public final class Toha {
         carveCaves(c);
         drawNaveStructure(c);
         drawGravityFurnace(c);
+        drawCaveMachines(c);
         drawCaveFrames(c);
         drawCaveAIControls(c);
         drawExteriorSpines(c);
@@ -400,6 +401,88 @@ public final class Toha {
         c.box(-18, 1972, CZ - 582, 18, 2004, CZ - 546, Mat.SEA_LANTERN);
     }
 
+    /**
+     * Twelve cave AIs have their own chamber machine, and the principal cave
+     * frames the gravity furnace rather than obscuring it. These are fixed,
+     * authored mechanisms with different silhouettes, not a random prop set.
+     */
+    private void drawCaveMachines(Cube c) {
+        for (int i = 0; i < CAVE_X.length; i++) {
+            int x = CAVE_X[i];
+            int y = CAVE_Y[i] + CAVE_H[i] / 2;
+            int front = CZ + CAVE_FRONT[i];
+            int z = front - 380;
+            int r = Math.max(30, Math.min(110, CAVE_W[i] / 4));
+            int halfY = Math.max(48, CAVE_H[i] / 3);
+            int y0 = Math.max(CAVE_Y[i] + 16, y - halfY);
+            int y1 = Math.min(CAVE_Y[i] + CAVE_H[i] - 16, y + halfY);
+
+            if (i == 2) {
+                // The primary cave is a sightline to the central gravity furnace.
+                // Two side frames mark its AI's machinery while the middle stays open.
+                for (int side : new int[] {-1, 1}) {
+                    double sx = x + side * 150.5;
+                    c.taper(sx, z + 0.5, 30, 22, y0, y1, 24, Mat.S_TOHA_MASS);
+                    c.taper(sx, z + 0.5, 18, 12, y0 + 16, y1 - 16, 24, Mat.AIR);
+                    c.beam((int) sx, y0 + 12, z + 36, (int) sx, y1 - 10, z - 60, 7, Mat.CABLE);
+                    c.cylinder(sx, z + 0.5, 38, 30, 1, 1, y + 20, y + 28, 0, 0, Mat.S_TOHA_RING);
+                }
+                c.beam(x - 200, y + halfY - 8, z, x + 200, y + halfY - 8, z, 12, Mat.S_TOHA_PALE);
+                continue;
+            }
+
+            switch (i % 4) {
+                case 0: {
+                    // Tall tapered spindle with two heavy bearing collars.
+                    c.taper(x + 0.5, z + 0.5, r, Math.max(18, r * 0.55), y0, y1, 24, Mat.S_TOHA_MASS);
+                    c.taper(x + 0.5, z + 0.5, Math.max(12, r - 12),
+                            Math.max(8, r * 0.55 - 10), y0 + 12, y1 - 12, 24, Mat.AIR);
+                    c.cylinder(x + 0.5, z + 0.5, r + 18, r + 5, 1, 1, y0, y0 + 9, 0, 0, Mat.S_TOHA_PALE);
+                    c.cylinder(x + 0.5, z + 0.5, r + 14, r + 4, 1, 1, y1 - 8, y1, 0, 0, Mat.S_TOHA_RING);
+                    c.beam(x - r - 24, y, z + 40, x + r + 24, y, z + 40, 8, Mat.S_TOHA_MASS);
+                    break;
+                }
+                case 1: {
+                    // An exposed gyro-ring, held by two narrow load-bearing arms.
+                    c.cylinder(x + 0.5, z + 0.5, r + 24, r + 10, 1, 1, y - 18, y - 9, 0, 0, Mat.S_TOHA_PALE);
+                    c.cylinder(x + 0.5, z + 0.5, r + 30, r + 14, 1, 1, y + 8, y + 18, 0, 0, Mat.S_TOHA_RING);
+                    for (int side : new int[] {-1, 1}) {
+                        c.taper(x + side * (r + 10) + 0.5, z + 0.5, 18, 14,
+                                y0, y1, 20, Mat.S_TOHA_MASS);
+                        c.beam(x + side * (r + 10), y, z + 24,
+                                x + side * (r + 10), y, z - 80, 6, Mat.CABLE);
+                    }
+                    break;
+                }
+                case 2: {
+                    // Suspended rectangular service cage, open at the top and bottom.
+                    wallShell(c, x - r, y0, z - 42, x + r, y1, z + 42, 8, Mat.S_TOHA_MASS);
+                    c.box(x - r - 20, y0 + 12, z - 8, x - r - 12, y1 - 12, z + 8, Mat.S_TOHA_PALE);
+                    c.box(x + r + 12, y0 + 12, z - 8, x + r + 20, y1 - 12, z + 8, Mat.S_TOHA_PALE);
+                    c.beam(x - r, y1 + 36, z, x + r, y1 + 36, z, 10, Mat.S_TOHA_RING);
+                    c.beam(x - r - 8, y1 + 30, z, x - r - 8, y1 + 68, z - 48, 3, Mat.CABLE);
+                    c.beam(x + r + 8, y1 + 30, z, x + r + 8, y1 + 68, z - 48, 3, Mat.CABLE);
+                    break;
+                }
+                default: {
+                    // Paired pressure vessels linked by a low service bridge.
+                    int vesselR = Math.max(16, r * 35 / 100);
+                    for (int side : new int[] {-1, 1}) {
+                        double sx = x + side * r * 3.0 / 5.0 + 0.5;
+                        c.taper(sx, z + 0.5, vesselR + 8, vesselR, y0, y1, 24, Mat.S_TOHA_RING);
+                        c.taper(sx, z + 0.5, Math.max(8, vesselR - 8),
+                                Math.max(6, vesselR - 13), y0 + 10, y1 - 10, 24, Mat.AIR);
+                        c.cylinder(sx, z + 0.5, vesselR + 12, vesselR + 4, 1, 1,
+                                y - 6, y + 2, 0, 0, Mat.S_TOHA_PALE);
+                    }
+                    c.box(x - r, y - 10, z + 34, x + r, y - 2, z + 58, Mat.S_TOHA_MASS);
+                    c.beam(x - r, y + 16, z - 4, x + r, y + 16, z - 4, 6, Mat.CABLE);
+                    break;
+                }
+            }
+        }
+    }
+
     private void drawCaveFrames(Cube c) {
         for (int i = 0; i < CAVE_X.length; i++) {
             int x = CAVE_X[i], y = CAVE_Y[i], w = CAVE_W[i], h = CAVE_H[i];
@@ -468,6 +551,14 @@ public final class Toha {
         drawSpine(c, 1710, CZ - 1120, 1240, 150, 62);
         drawSpine(c, 1710, CZ - 250, 1630, 165, 60);
         drawSpine(c, 1710, CZ + 640, 1030, 130, 55);
+
+        // One off-axis mast rises nearly to the ceiling. Its height and position
+        // break the regular crown line and make Toha read as an industrial vessel.
+        drawSpine(c, 2040, CZ - 900, 1975, 210, 78);
+        c.beam(1990, 690, CZ + 840, 2040, 1810, CZ - 900, 30, Mat.S_TOHA_PALE);
+        c.beam(2160, 1060, CZ + 280, 2040, 1910, CZ - 900, 16, Mat.S_TOHA_RING);
+        c.beam(2040, 1840, CZ - 900, 900, 1780, CZ - 790, 24, Mat.S_TOHA_MASS);
+        c.box(2020, 1940, CZ - 920, 2060, 1952, CZ - 880, Mat.BIO_CYAN);
 
         // Large sloping buttresses tie the spines into the central shells.
         c.beam(-1830, 250, CZ + 680, -1320, 1110, CZ - 1120, 34, Mat.S_TOHA_MASS);
