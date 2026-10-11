@@ -1,6 +1,0 @@
-renderDistance:16
-gamma:0.6
-fov:0.25
-fancyGraphics:true
-ao:2
-clouds:0

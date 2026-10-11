@@ -1,1 +1,0 @@
-Run with Python 3 + Pillow to rebuild the generator kit. It uses a deterministic seed and emits legacy 1.12.2 /fill and /setblock function commands. By default it writes the kit and ZIP outputs alongside the script. Set BLAME_OUT_DIR to choose an output folder.

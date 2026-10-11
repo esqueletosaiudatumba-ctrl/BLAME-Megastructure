@@ -1,1 +1,7 @@
 build/
+
+# staging tree for handoff zips (rebuilt, never committed)
+_handoff_stage/
+build/
+mod/build/
+*.zip

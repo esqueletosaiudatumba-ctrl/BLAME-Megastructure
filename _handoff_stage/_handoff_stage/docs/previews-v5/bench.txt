@@ -1,1 +1,0 @@
-﻿random cubes: 0.261 ms/cube, arrival cubes: 0.481 ms/cube
