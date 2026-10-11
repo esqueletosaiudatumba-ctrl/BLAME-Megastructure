@@ -39,6 +39,12 @@ public final class TohaMonumentCheck {
         check(nave.get(0, 800, Toha.CZ + 100) == Mat.AIR,
                 "central nave must preserve a large open interior");
 
+        Cube aperture = new Cube(Math.floorDiv(-860, 16), Math.floorDiv(370, 16),
+                Math.floorDiv(Toha.CZ + 1310, 16));
+        toha.draw(aperture);
+        check(aperture.get(-860, 370, Toha.CZ + 1310) == Mat.AIR,
+                "the south façade needs a genuine, deep slit aperture");
+
         Cube engine = new Cube(Math.floorDiv(260, 16), Math.floorDiv(500, 16),
                 Math.floorDiv(Toha.CZ - 560, 16));
         toha.draw(engine);
