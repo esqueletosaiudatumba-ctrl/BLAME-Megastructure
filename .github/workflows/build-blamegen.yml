@@ -40,10 +40,9 @@ jobs:
           set +e
           # Render only the authored landmark so the arrival wall/lattice cannot occlude it.
           # Each view is independent: a slow perspective ray cast cannot suppress the plan/cut.
-          timeout 80s java -Xmx2g -cp build/pv Preview toha-persp toha-monument.png 0 800 2000 180 0 80 240 135 6000
-          echo "full silhouette render exit=$?"
-          timeout 80s java -Xmx2g -cp build/pv Preview toha-persp toha-facade.png 0 850 -900 180 0 86 240 135 4000
-          echo "front elevation render exit=$?"
+          # One wide 3D silhouette view from outside the south gate, at reduced sampling density.
+          timeout 75s java -Xmx2g -cp build/pv Preview toha-persp toha-monument.png 0 1000 -1000 180 0 80 160 90 3800
+          echo "wide silhouette render exit=$?"
           timeout 100s java -Xmx2g -cp build/pv Preview toha-section toha-cross-section.png -4603 0 1030 5000 2200 5
           echo "central cut render exit=$?"
           # Frontal elevation, one block behind the lower façade: the thirteen cave mouths are visible.
@@ -62,7 +61,6 @@ jobs:
           name: toha-monument-preview
           path: |
             toha-monument.png
-            toha-facade.png
             toha-oblique.png
             toha-cross-section.png
             toha-elevation.png
