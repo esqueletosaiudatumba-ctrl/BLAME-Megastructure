@@ -3,7 +3,7 @@ package blame.blamegen.core;
 /**
  * TOHA HEAVY INDUSTRIES — authored monument, not a district generator.
  *
- * A single deterministic architectural composition centred at (0, -90000):
+ * A single deterministic architectural composition centred at (0, -4608):
  * a 6.1 km precinct, a 3.9 km-wide stepped factory-fortress, a 2 km engine
  * stack, thirteen cave mouths, a hollow central nave, exterior machine spines,
  * and a five-frame processional causeway. All proportions and placements are
@@ -22,6 +22,20 @@ public final class Toha {
 
     private static final int GROUND = 64;
     public static final int TOP = 2030;
+
+    /**
+     * Front-facing orthographic review plane for each deliberately stepped shell.
+     * The tiers recede in depth, so a single fixed-Z slice cannot show the elevation.
+     */
+    public static int projectedFrontZ(int y) {
+        if (y < 640) return CZ + 1350;
+        if (y < 1020) return CZ + 1130;
+        if (y < 1450) return CZ + 850;
+        if (y < 1760) return CZ + 630;
+        if (y < 1880) return CZ + 430;
+        if (y < 1895) return CZ + 530;
+        return CZ + 310;
+    }
     private static final int NAVE_X = 1050;
     private static final int NAVE_BACK = -1050;
     private static final int NAVE_FRONT = 250;
