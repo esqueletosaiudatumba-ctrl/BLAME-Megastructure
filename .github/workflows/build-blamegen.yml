@@ -49,6 +49,9 @@ jobs:
           # Frontal elevation, one block behind the lower façade: the thirteen cave mouths are visible.
           timeout 60s java -Xmx2g -cp build/pv Preview toha-section toha-elevation.png -3259 0 1030 4400 2100 4
           echo "front elevation render exit=$?"
+          # Orthographic facade projection samples the stepped tiers at their real depth.
+          timeout 70s java -Xmx2g -cp build/pv Preview toha-elevation toha-front-elevation.png 0 1030 4400 2100 4
+          echo "tier-aware front elevation render exit=$?"
           timeout 100s java -Xmx2g -cp build/pv Preview toha-slice toha-plan.png 800 0 -4608 6500 8
           echo "plan render exit=$?"
 
@@ -63,6 +66,7 @@ jobs:
             toha-oblique.png
             toha-cross-section.png
             toha-elevation.png
+            toha-front-elevation.png
             toha-plan.png
           if-no-files-found: warn
 
