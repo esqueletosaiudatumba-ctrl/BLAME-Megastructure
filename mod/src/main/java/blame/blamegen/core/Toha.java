@@ -77,6 +77,7 @@ public final class Toha {
         drawMainShell(c);
         drawFacade(c);
         drawTerraceBands(c);
+        carveSlitApertures(c);
         carveNave(c);
         carveCaves(c);
         drawNaveStructure(c);
@@ -174,11 +175,7 @@ public final class Toha {
         facadeBand(c, -1320, 1320, 1020, 1410, 850);
         facadeBand(c, -1050, 1050, 1450, 1720, 630);
 
-        // Very sparse machinery slits on the broad south faces; openings are carved later.
-        slitBand(c, -1770, 1770, 250, 570, 1350);
-        slitBand(c, -1510, 1510, 700, 940, 1130);
-        slitBand(c, -1260, 1260, 1080, 1360, 850);
-        slitBand(c, -990, 990, 1490, 1680, 630);
+        // Narrow apertures are true void cuts applied after the surface bands.
 
         // Giant blind slots on both flanks continue the façade language around the mass.
         flankSlots(c, -1850, 1350, 200, 640);
@@ -191,17 +188,6 @@ public final class Toha {
         for (int x = Math.max(xMin, c.x0); x <= Math.min(xMax, c.x0 + 15); x++) {
             if (Math.floorMod(x - xMin, 112) >= 8) continue;
             c.box(x, yMin, CZ + front + 3, x + 5, yMax, CZ + front + 26, Mat.S_TOHA_MASS);
-        }
-    }
-
-    private void slitBand(Cube c, int xMin, int xMax, int yMin, int yMax, int front) {
-        if (!c.hits(xMin, yMin, CZ + front, xMax, yMax, CZ + front + 12)) return;
-        for (int y = Math.max(yMin + 30, c.y0); y < Math.min(yMax - 24, c.y0 + 16); y++) {
-            if (Math.floorMod(y - yMin, 112) >= 28) continue;
-            for (int x = Math.max(xMin + 24, c.x0); x <= Math.min(xMax - 24, c.x0 + 15); x++) {
-                if (Math.floorMod(x - xMin, 96) >= 6) continue;
-                c.box(x, y, CZ + front + 1, x + 3, y + 21, CZ + front + 5, Mat.S_DARK);
-            }
         }
     }
 
@@ -229,6 +215,32 @@ public final class Toha {
         c.box(halfX - t, y0, CZ + back, halfX, y1, CZ + front, material);
         c.box(-halfX, y0, CZ + back, halfX, y1, CZ + back + t, material);
         c.box(-halfX, y0, CZ + front - t, halfX, y1, CZ + front, material);
+    }
+
+    /**
+     * Real, narrow apertures in the south elevation. The x pitch and alternating
+     * row offsets are hand-set, not randomized. Each cut travels 84 blocks into
+     * the shell so that the opening reads as a deep black slot from far away.
+     */
+    private void carveSlitApertures(Cube c) {
+        apertureTier(c, -1700, 1700, 270, 575, 1350, 240, 112, 9, 46);
+        apertureTier(c, -1460, 1460, 700, 940, 1130, 220, 120, 9, 40);
+        apertureTier(c, -1200, 1200, 1080, 1360, 850, 200, 128, 8, 44);
+        apertureTier(c, -950, 950, 1500, 1690, 630, 180, 120, 7, 36);
+    }
+
+    private void apertureTier(Cube c, int xMin, int xMax, int yMin, int yMax,
+                              int front, int pitch, int rowPitch, int width, int height) {
+        int index = 0;
+        for (int x = xMin + pitch / 2; x <= xMax - pitch / 2; x += pitch, index++) {
+            int phase = (index & 1) == 0 ? 0 : rowPitch / 3;
+            for (int y = yMin + rowPitch / 2 + phase; y + height <= yMax; y += rowPitch) {
+                if (!c.hits(x - width / 2, y, CZ + front - 84,
+                            x + width / 2, y + height, CZ + front + 1)) continue;
+                c.box(x - width / 2, y, CZ + front - 84,
+                      x + width / 2, y + height, CZ + front + 1, Mat.AIR);
+            }
+        }
     }
 
     // ------------------------------------------------------------------
