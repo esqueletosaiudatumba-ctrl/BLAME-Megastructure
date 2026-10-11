@@ -8,11 +8,12 @@ A Forge 1.12.2 + CubicChunks project that procedurally generates an immense, det
 - [Agent instructions](AGENTS.md) — repository layout, hard rules, build/verification workflow.
 - [Current handoff](HANDOFF_2026-10-11.md) — latest project status and next steps.
 - [Build status](HANDOFF_BUILD_STATE.md) — current Forge/RFG build blocker and candidate fixes.
+- [Toha monument design](docs/TOHA_MONUMENT_DESIGN.md) — the fixed, manga-faithful megastructure landmark and its dimensions.
 - [Shader and view-distance notes](docs/SHADERS_AND_VIEW_DISTANCE.md) — rendering/performance context.
 
 ## Repository map
 
-- `mod/` — Forge 1.12.2 mod and pure-Java procedural world-generation core.
+- `mod/` — Forge 1.12.2 mod and pure-Java world-generation core, including the authored Toha Heavy Industries monument.
 - `tools/preview/` — offline renderer for inspecting generated geometry without launching Minecraft.
 - `tools/verify/` — determinism, containment/seam, and generator survey checks.
 - `tools/forge/` — build/remapping utilities.
