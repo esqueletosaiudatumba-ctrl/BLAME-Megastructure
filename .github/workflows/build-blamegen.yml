@@ -37,13 +37,15 @@ jobs:
         continue-on-error: true
         run: |
           # Wide shot from the open arrival basin: complete height + approach in frame.
-          timeout 150s java -cp build/pv Preview persp toha-monument.png 0 200 0 180 -4 80 400 225 4000
+          timeout 150s java -cp build/pv Preview persp toha-monument.png 0 200 -1450 180 -7 80 400 225 4000
           # Closer axial view through the south portal and into the principal cave.
-          timeout 150s java -cp build/pv Preview persp toha-facade.png 0 200 -1000 180 -4 80 400 225 3600
+          timeout 150s java -cp build/pv Preview persp toha-facade.png 0 150 -2150 180 -20 80 400 225 3200
           # Oblique view reveals the front elevation and the side shell in one silhouette.
-          timeout 150s java -cp build/pv Preview persp toha-oblique.png 2300 200 -800 137 -4 80 400 225 4000
+          timeout 150s java -cp build/pv Preview persp toha-oblique.png 2300 150 -2150 116 -6 80 400 225 4000
           # Vertical cut through the site's centre exposes the hollow nave and stepped shell.
           timeout 150s java -cp build/pv Preview section toha-cross-section.png -4608 0 1030 5000 2200 5
+          # Plan slice across the upper shell: checks the authored footprint and voids.
+          timeout 150s java -cp build/pv Preview slice toha-plan.png 1100 0 -4608 6500 8
 
       - name: Upload Toha monument views
         if: always()
@@ -55,6 +57,7 @@ jobs:
             toha-facade.png
             toha-oblique.png
             toha-cross-section.png
+            toha-plan.png
           if-no-files-found: warn
 
       - name: Build mod
