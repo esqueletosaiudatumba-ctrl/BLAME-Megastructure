@@ -33,3 +33,9 @@ strata floor, (6) cyberpunk lighting (neon glass over sea lanterns; no sunlight)
   bench 0.146 ms random / 0.362 ms arrival cube. Renders in `docs/previews-v5/`.
 - Remaining from the list above: strata floor (2), neon post-pass + new Mats (3), `/blame tp` (4),
   WorldEvents spawn on WorldEvent.Load (5). The Gradle mod-jar build still has to be run via CI.
+
+## Update (night time)
+- World clock is now locked to midnight (18000) instead of noon: set on world creation and re-applied on every
+  `WorldEvent.Load` so old saves switch too. Adapter code only; NOT compiled here (needs the CI Forge build).
+- Consequences to check in-game: the beach and bay have no sunlight now, so they rely on lamps/moon; the client fog
+  (`ClientEvents`) follows sky colour, which is near-black at night.
