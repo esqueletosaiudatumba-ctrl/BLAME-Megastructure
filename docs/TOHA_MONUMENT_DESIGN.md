@@ -36,7 +36,7 @@ The site is now next to the arrival basin rather than 90,000 blocks away. The em
 
 The façade contains thirteen authored apertures: five in the lower tier, four in the second, three in the third, and one isolated crown mouth. The openings have fixed centres, widths, heights, and face offsets. Their deep square cuts, dark inner reveals, heavy lintels, and sparse local lamps create a strong readable rhythm. They are architectural rooms/passages, not a random cave-placement algorithm.
 
-The large lower central mouth is the primary arrival into the interior. Side mouths are deep service cavities. Upper mouths are smaller and more isolated so the façade does not read like a regular hotel or apartment tower.
+The large lower central mouth is the primary arrival into the interior. Side mouths are deep service cavities. Upper mouths are smaller and more isolated so the façade does not read like a regular hotel or apartment tower. Each chamber has a fixed recessed AI control slab; the primary and crown chambers retain tiny live indicators, while the other panels stay dark.
 
 ## Interior
 
