@@ -5,6 +5,8 @@ does not have to reverse-engineer your session.
 
 ## The 60-second orientation
 
+**Creative north star:** before visual or world-content work, read the root-level `GRAND_GOAL_VISION.md`. It defines the intended atmosphere and includes embedded reference images. Keep its creative goals subordinate to the technical hard rules in this file.
+
 **What this is:** a Forge 1.12.2 mod (`blamegen`) that generates an infinite, deterministic,
 BLAME!-style megastructure via CubicChunks. Deterministic pure-Java core, thin MC adapter.
 
@@ -35,6 +37,7 @@ tools/
   verify/NbtRegistryFix.java           strips stale CubicChunks registries from level.dat
   package-instance.ps1, make-zip.ps1   packaging
 docs/
+  reference-images/                         user-supplied visual references embedded in GRAND_GOAL_VISION.md
   previews-v2|v3|v4/, previews-baseline/   schematic renders (NOT screenshots)
   SHADERS_AND_VIEW_DISTANCE.md         view distance / performance / shaders
   legacy/                              the old Python command-stream generator (do not revive)
