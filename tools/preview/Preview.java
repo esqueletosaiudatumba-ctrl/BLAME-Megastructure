@@ -132,8 +132,10 @@ public class Preview {
     }
 
     static boolean DARK;
+    static final boolean NIGHT = System.getenv("BLAME_NIGHT") != null;
 
     static int sky(double dy) {
+        if (NIGHT) return 0x090c14;
         if (DARK) return 0x0a0b0e;
         double t = Math.max(0, Math.min(1, dy * 0.5 + 0.5));
         int r = (int) (150 + (120 - 150) * t), g = (int) (185 + (165 - 185) * t), b = (int) (235 + (255 - 235) * t);
@@ -194,15 +196,16 @@ public class Preview {
             default: f = 0.65; break;
         }
         double light;
-        if (emissive(m)) light = 1.6;
+        if (emissive(m)) light = NIGHT ? 1.9 : 1.6;
         else {
             int nx = x, ny = y, nz = z;
             if (face == 1) nx--; else if (face == 2) nx++; else if (face == 3) ny--; else if (face == 4) ny++; else if (face == 5) nz--; else nz++;
-            light = skyOpen(nx, ny, nz) ? 1.0 : 0.22;
+            light = NIGHT ? 0.72 : skyOpen(nx, ny, nz) ? 1.0 : 0.22;
         }
         int r = (int) Math.min(255, ((c >> 16) & 255) * f * light);
         int g = (int) Math.min(255, ((c >> 8) & 255) * f * light);
         int b = (int) Math.min(255, (c & 255) * f * light);
+        if (NIGHT && !emissive(m)) { r = (int) (r * 0.62); g = (int) (g * 0.76); b = Math.min(255, (int) (b * 1.05)); }
         int col = r << 16 | g << 8 | b;
         if (water > 0) col = blend(col, 0x2d4bb0, Math.min(0.85, 0.3 + water / 12));
         return fogged(col, t / maxD, dy);
