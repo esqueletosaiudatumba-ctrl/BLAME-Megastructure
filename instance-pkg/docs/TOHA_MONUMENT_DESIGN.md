@@ -4,7 +4,7 @@
 
 Toha is one fixed architectural set piece, not the previous 150 km randomized industrial field. The surrounding BLAME! world remains deterministic and procedural; the Toha site itself is an authored silhouette with intentionally chosen dimensions, elevations, openings, and approach sequence.
 
-The target is manga-faithful architectural grammar: monumental stepped volumes, pale ruled concrete, near-black setbacks, deep cave-like voids, sparse slit apertures, heavy braces, mechanical ring courses, a long empty approach, and a core that nearly meets the dark ceiling. Avoid generic industrial-city repetition, randomized structures, billboard signage, saturated lights, or decorative clutter.
+The target is manga-faithful architectural grammar: monumental stepped volumes, pale ruled concrete, near-black setbacks, deep cave-like voids, sparse slit apertures, heavy braces, mechanical ring courses, a long empty approach, and a core that nearly meets the dark ceiling. The cave mouths are deliberately staggered rather than mirrored, with a heavy east-side transfer mass and a separate west-side cantilever to break the temple-like symmetry. Avoid generic industrial-city repetition, randomized structures, billboard signage, saturated lights, or decorative clutter.
 
 ## Fixed placement and scale
 
@@ -29,12 +29,12 @@ The site is now next to the arrival basin rather than 90,000 blocks away. The em
 4. **Upper shell:** a dark volume from Y=1020–1450, narrower again, with one continuous face and few apertures.
 5. **Crown:** a pale/dark stepped stack between Y=1450–1920, with a thin lip close to the artificial ceiling.
 6. **Core engine:** a hollow, tapered industrial shaft from Y=210 to Y=2030, with several concentric ring-courses and radial service arms.
-7. **Exterior spines:** six fixed, hollow tapered machines fused into the flanks, plus four smaller boundary pylons. They support the skyline without becoming a forest of unrelated towers.
+7. **Exterior spines:** six fixed, hollow tapered machines fused into the flanks, plus four smaller boundary pylons. A broad eastern transfer mass and a westward crown cantilever break the otherwise immense main shell. They support the skyline without becoming a forest of unrelated towers.
 8. **Terrace bands:** oversized horizontal collars at the main elevation changes. These emphasise constructional layers and interrupt the otherwise uninterrupted vertical faces.
 
 ## Thirteen fixed cave mouths
 
-The façade contains thirteen authored apertures: five in the lower tier, four in the second, three in the third, and one isolated crown mouth. The openings have fixed centres, widths, heights, and face offsets. Their deep square cuts, dark inner reveals, heavy lintels, and sparse local lamps create a strong readable rhythm. They are architectural rooms/passages, not a random cave-placement algorithm.
+The façade contains thirteen authored apertures: five in the lower tier, four in the second, three in the third, and one isolated crown mouth. Their horizontal centres, heights and widths are intentionally irregular; the grouping is legible from a distance without becoming a repeated window grid. The openings have fixed centres, widths, heights, and face offsets. Their deep square cuts, dark inner reveals, heavy lintels, and sparse local lamps create a strong readable rhythm. They are architectural rooms/passages, not a random cave-placement algorithm.
 
 The large lower central mouth is the primary arrival into the interior. Side mouths are deep service cavities. Upper mouths are smaller and more isolated so the façade does not read like a regular hotel or apartment tower. Each chamber has a fixed recessed AI control slab; the primary and crown chambers retain tiny live indicators, while the other panels stay dark.
 
