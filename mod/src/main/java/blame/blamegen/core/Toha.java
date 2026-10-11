@@ -17,8 +17,8 @@ package blame.blamegen.core;
 public final class Toha {
     public static final int CX = 0, CZ = -4608;
     public static final int HALF = 3072;
-    static final int X0 = CX - HALF, X1 = CX + HALF;
-    static final int Z0 = CZ - HALF, Z1 = CZ + HALF;
+    public static final int X0 = CX - HALF, X1 = CX + HALF;
+    public static final int Z0 = CZ - HALF, Z1 = CZ + HALF;
 
     private static final int GROUND = 64;
     private static final int TOP = 2030;
