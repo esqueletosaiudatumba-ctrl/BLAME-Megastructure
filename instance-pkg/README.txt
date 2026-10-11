@@ -36,8 +36,8 @@ deep slit apertures, thirteen AI cave chambers and control slabs, a hollow centr
 nave, a tapered gravity furnace, six fused machine spines, four precinct pylons,
 and a south processional causeway with a monumental portal.
 
-Read GRAND_GOAL_VISION.md in this package and docs/TOHA_MONUMENT_DESIGN.md
-in the source repository for the full design contract.
+Read GRAND_GOAL_VISION.md and docs/TOHA_MONUMENT_DESIGN.md inside this package for
+the full visual north star and authored monument design contract.
 
 FIXED: "Forge Mod Loader detected missing/unknown registrie(s)"
 ---------------------------------------------------------------
