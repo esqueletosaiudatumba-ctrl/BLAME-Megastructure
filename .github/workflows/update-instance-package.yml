@@ -39,6 +39,7 @@ jobs:
               root / "instance.cfg",
               root / "mmc-pack.json",
               root / "GRAND_GOAL_VISION.md",
+              root / "docs/TOHA_MONUMENT_DESIGN.md",
               root / "minecraft/config/cubicchunks.cfg",
               root / "minecraft/mods/CubicChunks-1.12.2-0.0.1301.0-SNAPSHOT-all.jar",
               root / "minecraft/saves/BLAME_Infinite_Megastructure/level.dat",
@@ -67,6 +68,7 @@ jobs:
               names = set(z.namelist())
               assert "minecraft/mods/blamegen-1.0.0.jar" in names
               assert "GRAND_GOAL_VISION.md" in names
+              assert "docs/TOHA_MONUMENT_DESIGN.md" in names
               assert all(f"docs/reference-images/ref-0{i}-" in "\n".join(names) for i in range(1, 5))
               assert z.testzip() is None
           print(f"Created {out} ({out.stat().st_size} bytes, {len(names)} files)")
