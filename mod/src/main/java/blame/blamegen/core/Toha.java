@@ -15,7 +15,7 @@ package blame.blamegen.core;
  * district selection, random tower placement, or illuminated billboard.
  */
 public final class Toha {
-    public static final int CX = 0, CZ = -90000;
+    public static final int CX = 0, CZ = -4608;
     public static final int HALF = 3072;
     static final int X0 = CX - HALF, X1 = CX + HALF;
     static final int Z0 = CZ - HALF, Z1 = CZ + HALF;
