@@ -250,7 +250,11 @@ public class Preview {
         }
         double light;
         if (emissive(m)) light = NIGHT ? 1.9 : 1.6;
-        else {
+        else if (TOHA_ONLY) {
+            // Isolated art review is a silhouette/material proof, not a skylight simulation.
+            // Avoid 5 x 400 voxel probes per pixel; face shading still keeps the volumes readable.
+            light = NIGHT ? 0.72 : 1.0;
+        } else {
             int nx = x, ny = y, nz = z;
             if (face == 1) nx--; else if (face == 2) nx++; else if (face == 3) ny--; else if (face == 4) ny++; else if (face == 5) nz--; else nz++;
             light = NIGHT ? 0.72 : skyOpen(nx, ny, nz) ? 1.0 : 0.22;
