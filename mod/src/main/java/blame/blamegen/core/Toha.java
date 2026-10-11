@@ -1,676 +1,420 @@
 package blame.blamegen.core;
 
 /**
- * TOHA HEAVY INDUSTRIES: a fixed industrial super-complex, 150 km x 150 km, roofed by the
- * strata ceiling. It sits north of the arrival basin; its south gate is at (CX, Z1).
+ * TOHA HEAVY INDUSTRIES — authored monument, not a district generator.
  *
- * Layout (all pure functions of position and seed, so cubes agree with each other):
- *  - a solid deck (y 0..63) across the whole square, with the lattice below y 0 untouched;
- *  - a 120-thick perimeter wall to y 1960 with a gate in every side, corner bastions, and a
- *    lit TOHA sign above the south gate facing the beach;
- *  - a 156 x 156 grid of plant cells (960 blocks) separated by lit roads. Every cell owns one
- *    district inside a 888 x 888 inner square (36-block margin), so a cube evaluates at most
- *    four cells: furnace stacks, machine halls, tank farms, cooling towers, pipework,
- *    gantry yards, slag canals, container yards. The outer ring of cells stays open as the
- *    perimeter corridor;
- *  - the Central Spire at the exact centre, rising to the strata roof.
+ * A single deterministic architectural composition centred at (0, -90000):
+ * a 6.1 km precinct, a 3.9 km-wide stepped factory-fortress, a 2 km engine
+ * stack, thirteen cave mouths, a hollow central nave, exterior machine spines,
+ * and a five-frame processional causeway. All proportions and placements are
+ * fixed. Only the material weathering resolved by Cube remains seed-dependent.
+ *
+ * The forms are designed for Minecraft-scale sightlines: a broad dark plinth,
+ * pale ruled shells, black setback bands, slit openings, enormous structural
+ * braces, and a nearly-ceiling-high core. There is no random cell grid, random
+ * district selection, random tower placement, or illuminated billboard.
  */
 public final class Toha {
     public static final int CX = 0, CZ = -90000;
-    public static final int HALF = 74880;
-    /** Region bounds: X0..X1-1, Z0..Z1-1. */
-    public static final int X0 = CX - HALF, X1 = CX + HALF, Z0 = CZ - HALF, Z1 = CZ + HALF;
-    static final int CELL = 960, NC = 2 * HALF / CELL; // 156 cells
-    static final int M = 36, N = CELL - 2 * M;         // inner square 888
-    static final int WALL = 120, WALL_TOP = 1960;
-    static final int DECK_TOP = 63, GROUND = 64;
-    static final int GATE_HALF = 400, GATE_H = 700;
-    static final int TOP_LIMIT = 2075;                 // strata underside is at least ~2080
-    static final int SPIRE_TOP = 2040;
+    public static final int HALF = 3072;
+    static final int X0 = CX - HALF, X1 = CX + HALF;
+    static final int Z0 = CZ - HALF, Z1 = CZ + HALF;
 
-    private static final String[][] FONT = {
-        {"11111", "00100", "00100", "00100", "00100", "00100", "00100"}, // T
-        {"01110", "10001", "10001", "10001", "10001", "10001", "01110"}, // O
-        {"10001", "10001", "10001", "11111", "10001", "10001", "10001"}, // H
-        {"01110", "10001", "10001", "11111", "10001", "10001", "10001"}  // A
+    private static final int GROUND = 64;
+    private static final int TOP = 2030;
+    private static final int NAVE_X = 1050;
+    private static final int NAVE_BACK = -1050;
+    private static final int NAVE_FRONT = 250;
+
+    // Thirteen fixed chambers: five at the foot, four in the second tier,
+    // three in the third, and one isolated chamber in the crown.
+    private static final int[] CAVE_X = {
+        -1350, -690, 0, 690, 1350,
+        -1100, -365, 365, 1100,
+        -740, 0, 740,
+        0
     };
-
-    private static final byte[] BOX_MATS = {
-        Mat.S_TOHA_MASS, Mat.TERRA_BLACK, Mat.S_DARK, Mat.S_TOHA_PALE,
-        Mat.CONC_GRAY, Mat.ANDESITE, Mat.CONC_BLACK, Mat.S_TOHA_MASS
+    private static final int[] CAVE_Y = {
+        150, 170, 130, 170, 150,
+        670, 690, 690, 670,
+        1050, 1025, 1050,
+        1475
     };
-    private static final byte[] PIPE_MATS = {Mat.CABLE, Mat.S_DARK, Mat.ANDESITE, Mat.S_TOHA_MASS};
-
-    private final long seed;
+    private static final int[] CAVE_W = {
+        180, 260, 480, 260, 180,
+        280, 260, 260, 280,
+        260, 420, 260,
+        300
+    };
+    private static final int[] CAVE_H = {
+        260, 280, 500, 280, 260,
+        250, 270, 270, 250,
+        300, 360, 300,
+        240
+    };
+    private static final int[] CAVE_FRONT = {
+        1350, 1350, 1350, 1350, 1350,
+        1130, 1130, 1130, 1130,
+        850, 850, 850,
+        630
+    };
 
     Toha(Megastructure m) {
-        this.seed = m.seed ^ 0x70A4EA5C0DEL;
+        // Intentionally no random geometry seed. The monument has one authored layout.
     }
 
-    /** Does this cube touch the complex footprint? */
+    /** The authored precinct replaces the old 150 km procedural field. */
     boolean overlaps(Cube c) {
-        return c.x0 + 15 >= X0 && c.x0 < X1 && c.z0 + 15 >= Z0 && c.z0 < Z1;
+        return c.x0 + 15 >= X0 && c.x0 < X1
+                && c.z0 + 15 >= Z0 && c.z0 < Z1;
     }
 
     void draw(Cube c) {
-        if (c.y0 > TOP_LIMIT) return;
-        deck(c);
-        wall(c);
-        spire(c);
-        if (!c.hitsY(GROUND, TOP_LIMIT)) return;
-        roads(c);
-        portals(c);
-        int i0 = Math.floorDiv(c.x0 - X0, CELL), i1 = Math.floorDiv(c.x0 + 15 - X0, CELL);
-        int j0 = Math.floorDiv(c.z0 - Z0, CELL), j1 = Math.floorDiv(c.z0 + 15 - Z0, CELL);
-        for (int j = j0; j <= j1; j++)
-            for (int i = i0; i <= i1; i++) cell(c, i, j);
+        if (c.y0 > TOP + 16 || c.y0 + 15 < 0) return;
+
+        drawFoundation(c);
+        drawOuterWalls(c);
+        drawMainShell(c);
+        drawFacade(c);
+        drawTerraceBands(c);
+        carveNave(c);
+        carveCaves(c);
+        drawNaveStructure(c);
+        drawEngine(c);
+        drawCaveFrames(c);
+        drawExteriorSpines(c);
+        drawApproach(c);
+        drawCourtyardPylons(c);
     }
 
-    // ------------------------------------------------------------------ deck and roads
+    // ------------------------------------------------------------------
+    // The precinct: a finite floor and low enclosure, leaving negative space
+    // between the boundary and the main mass so the building reads as a whole.
+    // ------------------------------------------------------------------
 
-    private void deck(Cube c) {
-        if (!c.hitsY(0, DECK_TOP)) return;
-        c.box(Math.max(c.x0, X0), 0, Math.max(c.z0, Z0), Math.min(c.x0 + 15, X1 - 1), DECK_TOP, Math.min(c.z0 + 15, Z1 - 1), Mat.S_TOHA_DECK);
+    private void drawFoundation(Cube c) {
+        if (!c.hitsY(0, 63)) return;
+        c.box(-2800, 0, CZ - 2800, 2800, 63, CZ + 2800, Mat.S_TOHA_DECK);
+
+        // Three inset, unlit perimeter courses make the floor feel machined.
+        if (c.hitsY(63, 63)) {
+            c.box(-2720, 63, CZ - 2720, 2720, 63, CZ - 2704, Mat.S_DARK);
+            c.box(-2720, 63, CZ + 2704, 2720, 63, CZ + 2720, Mat.S_DARK);
+            c.box(-2720, 63, CZ - 2720, -2704, 63, CZ + 2720, Mat.S_DARK);
+            c.box(2704, 63, CZ - 2720, 2720, 63, CZ + 2720, Mat.S_DARK);
+        }
     }
 
-    private void roads(Cube c) {
-        if (!c.hitsY(DECK_TOP, 96)) return;
-        boolean surface = c.hitsY(DECK_TOP, DECK_TOP);
+    private void drawOuterWalls(Cube c) {
+        int y0 = GROUND, y1 = 350;
+        // Rear wall and two long flanks.
+        c.box(-2750, y0, CZ - 2750, 2750, y1, CZ - 2716, Mat.S_TOHA_PALE);
+        c.box(-2750, y0, CZ - 2716, -2716, y1, CZ + 2750, Mat.S_TOHA_MASS);
+        c.box(2716, y0, CZ - 2716, 2750, y1, CZ + 2750, Mat.S_TOHA_MASS);
+
+        // South wall is deliberately split around the processional entrance.
+        c.box(-2750, y0, CZ + 2716, -700, y1, CZ + 2750, Mat.S_TOHA_PALE);
+        c.box(700, y0, CZ + 2716, 2750, y1, CZ + 2750, Mat.S_TOHA_PALE);
+
+        // Heavy, sparse buttresses on the walls. No perimeter clutter field.
+        for (int i = 0; i < 5; i++) {
+            int x = -2200 + i * 1100;
+            c.box(x - 18, 350, CZ - 2755, x + 18, 405, CZ - 2710, Mat.S_TOHA_MASS);
+            if (i != 2) {
+                c.box(x - 18, 350, CZ + 2710, x + 18, 405, CZ + 2755, Mat.S_TOHA_MASS);
+            }
+        }
+        for (int s = -1; s <= 1; s += 2) {
+            for (int i = 0; i < 5; i++) {
+                int z = CZ - 2200 + i * 1100;
+                c.box(s * 2710 - 28, 350, z - 18, s * 2755 + 28, 405, z + 18, Mat.S_TOHA_MASS);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Primary silhouette. These are authored volumes, nested and stepped,
+    // with no per-cell district selection.
+    // ------------------------------------------------------------------
+
+    private void drawMainShell(Cube c) {
+        // Broad footing: nearly 4 km wide, with a deep rear heel.
+        c.box(-2050, 64, CZ - 2200, 2050, 200, CZ + 1600, Mat.S_TOHA_PALE);
+        c.box(-2100, 180, CZ - 2220, 2100, 236, CZ + 1640, Mat.S_TOHA_MASS);
+
+        // The lower black body, broad shoulder, pale middle mass, and receding crown.
+        c.box(-1850, 200, CZ - 1900, 1850, 640, CZ + 1350, Mat.S_TOHA_MASS);
+        c.box(-1940, 600, CZ - 1980, 1940, 632, CZ + 1420, Mat.S_TOHA_PALE);
+
+        c.box(-1580, 640, CZ - 1700, 1580, 1020, CZ + 1130, Mat.S_TOHA_PALE);
+        c.box(-1660, 980, CZ - 1770, 1660, 1018, CZ + 1200, Mat.S_TOHA_MASS);
+
+        c.box(-1320, 1020, CZ - 1440, 1320, 1450, CZ + 850, Mat.S_TOHA_MASS);
+        c.box(-1390, 1408, CZ - 1510, 1390, 1448, CZ + 920, Mat.S_TOHA_PALE);
+
+        c.box(-1050, 1450, CZ - 1130, 1050, 1760, CZ + 630, Mat.S_TOHA_PALE);
+        c.box(-1150, 1724, CZ - 1230, 1150, 1758, CZ + 710, Mat.S_TOHA_MASS);
+        c.box(-800, 1760, CZ - 900, 800, 1880, CZ + 430, Mat.S_TOHA_MASS);
+
+        // A thin, dark crown lip, intentionally close to the immense ceiling above.
+        c.box(-900, 1870, CZ - 1010, 900, 1895, CZ + 530, Mat.S_TOHA_PALE);
+        c.box(-620, 1895, CZ - 790, 620, 1920, CZ + 310, Mat.S_TOHA_MASS);
+
+        // Rear counter-mass prevents this from reading as a flat stage façade.
+        c.box(-970, 440, CZ - 2240, 970, 1600, CZ - 1860, Mat.S_TOHA_PALE);
+        c.box(-1250, 760, CZ - 2280, 1250, 820, CZ - 1750, Mat.S_TOHA_MASS);
+        c.box(-820, 1290, CZ - 2160, 820, 1760, CZ - 1810, Mat.S_TOHA_MASS);
+    }
+
+    private void drawFacade(Cube c) {
+        // Thick vertical ribs and deep-set apertures are part of the silhouette,
+        // not random decoration. Their absolute pitch makes neighbouring cubes agree.
+        facadeBand(c, -1850, 1850, 200, 620, 1350);
+        facadeBand(c, -1580, 1580, 640, 1000, 1130);
+        facadeBand(c, -1320, 1320, 1020, 1410, 850);
+        facadeBand(c, -1050, 1050, 1450, 1720, 630);
+
+        // Very sparse machinery slits on the broad south faces; openings are carved later.
+        slitBand(c, -1770, 1770, 250, 570, 1350);
+        slitBand(c, -1510, 1510, 700, 940, 1130);
+        slitBand(c, -1260, 1260, 1080, 1360, 850);
+        slitBand(c, -990, 990, 1490, 1680, 630);
+
+        // Giant blind slots on both flanks continue the façade language around the mass.
+        flankSlots(c, -1850, 1350, 200, 640);
+        flankSlots(c, -1580, 1130, 640, 1020);
+        flankSlots(c, -1320, 850, 1020, 1450);
+    }
+
+    private void facadeBand(Cube c, int xMin, int xMax, int yMin, int yMax, int front) {
+        if (!c.hits(xMin, yMin, CZ + front, xMax, yMax, CZ + front + 24)) return;
+        for (int x = Math.max(xMin, c.x0); x <= Math.min(xMax, c.x0 + 15); x++) {
+            if (Math.floorMod(x - xMin, 112) >= 8) continue;
+            c.box(x, yMin, CZ + front + 3, x + 5, yMax, CZ + front + 26, Mat.S_TOHA_MASS);
+        }
+    }
+
+    private void slitBand(Cube c, int xMin, int xMax, int yMin, int yMax, int front) {
+        if (!c.hits(xMin, yMin, CZ + front, xMax, yMax, CZ + front + 12)) return;
+        for (int y = Math.max(yMin + 30, c.y0); y < Math.min(yMax - 24, c.y0 + 16); y++) {
+            if (Math.floorMod(y - yMin, 112) >= 28) continue;
+            for (int x = Math.max(xMin + 24, c.x0); x <= Math.min(xMax - 24, c.x0 + 15); x++) {
+                if (Math.floorMod(x - xMin, 96) >= 6) continue;
+                c.box(x, y, CZ + front + 1, x + 3, y + 21, CZ + front + 5, Mat.S_DARK);
+            }
+        }
+    }
+
+    private void flankSlots(Cube c, int halfWidth, int front, int yMin, int yMax) {
+        int xL = -halfWidth, xR = halfWidth;
         for (int z = c.z0; z < c.z0 + 16; z++) {
-            if (z < Z0 || z >= Z1) continue;
-            int lz = Math.floorMod(z - Z0, CELL);
-            boolean rz = lz < 28 || lz >= CELL - 28;
-            for (int x = c.x0; x < c.x0 + 16; x++) {
-                if (x < X0 || x >= X1) continue;
-                int lx = Math.floorMod(x - X0, CELL);
-                boolean rx = lx < 28 || lx >= CELL - 28;
-                if (!rx && !rz) continue;
-                if (surface) {
-                    byte m = Mat.S_DARK;
-                    // dashed centre lines along each road
-                    if (rx && !rz && (lx == 0 || lx == CELL - 1) && ((lz >> 3) & 1) == 0) m = Mat.CONC_LGRAY;
-                    if (rz && !rx && (lz == 0 || lz == CELL - 1) && ((lx >> 3) & 1) == 0) m = Mat.CONC_LGRAY;
-                    c.set(x, DECK_TOP, z, m);
-                }
-                // light poles at 96-block pitch on the road centre lines (not in intersections)
-                boolean pole = false;
-                int pitch = 0;
-                if (rx && !rz && (lx == 0 || lx == CELL - 1) && Math.floorMod(lz, 96) < 2) { pole = true; pitch = Math.floorDiv(lz, 96); }
-                if (rz && !rx && (lz == 0 || lz == CELL - 1) && Math.floorMod(lx, 96) < 2) { pole = true; pitch = Math.floorDiv(lx, 96); }
-                if (pole) {
-                    for (int y = GROUND; y <= 87; y++) c.set(x, y, z, Mat.ANDESITE);
-                    byte lamp = (pitch & 1) == 0 ? Mat.LAMP_AMBER : Mat.BIO_CYAN;
-                    for (int y = 88; y <= 90; y++) c.set(x, y, z, lamp);
-                }
+            int dz = z - CZ;
+            if (dz < -front - 200 || dz > front) continue;
+            if (Math.floorMod(dz + 2200, 192) >= 18) continue;
+            c.box(xL - 1, yMin + 45, z, xL + 3, yMax - 45, z + 1, Mat.COAL);
+            c.box(xR - 3, yMin + 45, z, xR + 1, yMax - 45, z + 1, Mat.COAL);
+        }
+    }
+
+    private void drawTerraceBands(Cube c) {
+        rectBand(c, 1980, -2020, 1460, 612, 640, Mat.S_TOHA_MASS);
+        rectBand(c, 1695, -1805, 1240, 992, 1018, Mat.S_TOHA_RING);
+        rectBand(c, 1430, -1545, 960, 1414, 1448, Mat.S_TOHA_MASS);
+        rectBand(c, 1190, -1260, 760, 1728, 1758, Mat.S_TOHA_RING);
+    }
+
+    private void rectBand(Cube c, int halfX, int back, int front, int y0, int y1, byte material) {
+        int t = 24;
+        c.box(-halfX, y0, CZ + back, -halfX + t, y1, CZ + front, material);
+        c.box(halfX - t, y0, CZ + back, halfX, y1, CZ + front, material);
+        c.box(-halfX, y0, CZ + back, halfX, y1, CZ + back + t, material);
+        c.box(-halfX, y0, CZ + front - t, halfX, y1, CZ + front, material);
+    }
+
+    // ------------------------------------------------------------------
+    // The interior is a single engineered nave, not empty solid blocks.
+    // The cave mouths open into the deep chamber or terminate in side chambers.
+    // ------------------------------------------------------------------
+
+    private void carveNave(Cube c) {
+        c.box(-NAVE_X, 190, CZ + NAVE_BACK, NAVE_X, 1720, CZ + NAVE_FRONT, Mat.AIR);
+    }
+
+    private void carveCaves(Cube c) {
+        for (int i = 0; i < CAVE_X.length; i++) {
+            int x = CAVE_X[i], y = CAVE_Y[i], w = CAVE_W[i], h = CAVE_H[i];
+            int front = CZ + CAVE_FRONT[i];
+            int back = CZ + CAVE_FRONT[i] - 1200;
+            c.box(x - w / 2, y, back, x + w / 2, y + h, front, Mat.AIR);
+        }
+    }
+
+    private void drawNaveStructure(Cube c) {
+        // Four structural piers, visible from each of the lower cave mouths.
+        int[] px = {-1000, -1000, 1000, 1000};
+        int[] pz = {-800, 120, -800, 120};
+        for (int i = 0; i < px.length; i++) {
+            int x = px[i], z = CZ + pz[i];
+            c.box(x - 28, 200, z - 28, x + 28, 1650, z + 28, Mat.S_TOHA_MASS);
+            for (int y = 320; y < 1600; y += 160) {
+                c.box(x - 44, y, z - 44, x + 44, y + 12, z + 44, Mat.S_TOHA_RING);
+            }
+        }
+
+        // Narrow half-platforms, leaving a long uninterrupted void around the engine.
+        int[] floors = {430, 790, 1150, 1490};
+        for (int y : floors) {
+            c.box(-920, y, CZ - 850, -570, y + 8, CZ + 180, Mat.S_TOHA_DECK);
+            c.box(570, y, CZ - 850, 920, y + 8, CZ + 180, Mat.S_TOHA_DECK);
+            c.box(-1020, y + 9, CZ - 850, -1012, y + 34, CZ + 180, Mat.IRON_BARS);
+            c.box(1012, y + 9, CZ - 850, 1020, y + 34, CZ + 180, Mat.IRON_BARS);
+        }
+
+        // Two enormous inclined braces and hanging service lines in the open volume.
+        c.beam(-1010, 330, CZ + 170, -620, 1540, CZ - 850, 26, Mat.S_TOHA_MASS);
+        c.beam(1010, 330, CZ + 170, 620, 1540, CZ - 850, 26, Mat.S_TOHA_MASS);
+        c.beam(-870, 1640, CZ - 830, -820, 630, CZ - 720, 2, Mat.CABLE);
+        c.beam(870, 1640, CZ - 830, 820, 630, CZ - 720, 2, Mat.CABLE);
+    }
+
+    private void drawEngine(Cube c) {
+        double x = CX + 0.5, z = CZ - 560 + 0.5;
+        // One continuous, hollow tapered furnace/spine nearly touches the ceiling.
+        c.taper(x, z, 320, 92, 210, TOP, 32, Mat.S_TOHA_RING);
+        c.taper(x, z, 274, 52, 230, TOP - 14, 32, Mat.AIR);
+
+        int[] ys = {410, 760, 1110, 1460, 1780, 1980};
+        int[] rs = {425, 390, 340, 290, 220, 125};
+        for (int i = 0; i < ys.length; i++) {
+            int y = ys[i], r = rs[i];
+            c.cylinder(x, z, r, r - 26, 1, 1, y, y + 18, 0, 0, Mat.S_TOHA_PALE);
+            c.cylinder(x, z, r + 5, r, 1, 1, y + 19, y + 26, 0, 0, Mat.S_TOHA_MASS);
+        }
+
+        // Four fixed radial service arms frame the crown without becoming a fantasy ornament.
+        c.beam(-600, 1770, CZ - 560, 600, 1770, CZ - 560, 24, Mat.S_TOHA_MASS);
+        c.beam(0, 1810, CZ - 1120, 0, 1810, CZ + 30, 22, Mat.S_TOHA_MASS);
+        c.box(-80, 1882, CZ - 650, 80, 1902, CZ - 470, Mat.BIO_CYAN);
+        c.box(-18, 1972, CZ - 582, 18, 2004, CZ - 546, Mat.SEA_LANTERN);
+    }
+
+    private void drawCaveFrames(Cube c) {
+        for (int i = 0; i < CAVE_X.length; i++) {
+            int x = CAVE_X[i], y = CAVE_Y[i], w = CAVE_W[i], h = CAVE_H[i];
+            int f = CZ + CAVE_FRONT[i];
+            int l = x - w / 2, r = x + w / 2, top = y + h;
+
+            // Deep outer reveals on all thirteen mouths.
+            c.box(l - 28, y - 22, f + 3, l - 8, top + 22, f + 28, Mat.S_TOHA_PALE);
+            c.box(r + 8, y - 22, f + 3, r + 28, top + 22, f + 28, Mat.S_TOHA_PALE);
+            c.box(l - 20, top + 8, f + 3, r + 20, top + 28, f + 28, Mat.S_TOHA_MASS);
+            c.box(l - 16, y - 14, f + 3, r + 16, y + 5, f + 28, Mat.S_TOHA_MASS);
+
+            // Inner black lip provides a readable, deep entrance in monochrome.
+            c.box(l - 7, y, f - 10, l + 6, top, f - 2, Mat.COAL);
+            c.box(r - 6, y, f - 10, r + 7, top, f - 2, Mat.COAL);
+            c.box(l, top - 8, f - 10, r, top + 4, f - 2, Mat.S_DARK);
+
+            // Only the principal lower and crown entries get restrained luminous cues.
+            if (i == 2) {
+                c.box(x - 65, top - 18, f + 29, x + 65, top - 12, f + 31, Mat.BIO_CYAN);
+            } else if (i == 12) {
+                c.box(x - 34, top - 18, f + 29, x + 34, top - 12, f + 31, Mat.SEA_LANTERN);
+            } else if (i == 5 || i == 8) {
+                c.box(l + 12, top - 18, f + 29, l + 42, top - 12, f + 31, Mat.LAMP_RED);
             }
         }
     }
 
-    // ------------------------------------------------------------------ perimeter wall and sign
+    // ------------------------------------------------------------------
+    // Exterior stacks and ribs create a recognisable long-range skyline.
+    // ------------------------------------------------------------------
 
-    private void wall(Cube c) {
-        boolean near = c.x0 < X0 + WALL || c.x0 + 15 >= X1 - WALL || c.z0 < Z0 + WALL || c.z0 + 15 >= Z1 - WALL;
-        // corner bastions reach 590 blocks in
-        boolean bast = c.x0 < X0 + 600 && c.z0 < Z0 + 600 || c.x0 + 15 >= X1 - 600 && c.z0 < Z0 + 600
-            || c.x0 < X0 + 600 && c.z0 + 15 >= Z1 - 600 || c.x0 + 15 >= X1 - 600 && c.z0 + 15 >= Z1 - 600;
-        if (!near && !bast) return;
-        if (near) {
-            byte w = Mat.S_TOHA_PALE;
-            c.box(X0, GROUND, Z0, X0 + WALL - 1, WALL_TOP, Z1 - 1, w);
-            c.box(X1 - WALL, GROUND, Z0, X1 - 1, WALL_TOP, Z1 - 1, w);
-            c.box(X0, GROUND, Z0, X1 - 1, WALL_TOP, Z0 + WALL - 1, w);
-            c.box(X0, GROUND, Z1 - WALL, X1 - 1, WALL_TOP, Z1 - 1, w);
-            // vertical grooves every 40 blocks on both faces of every wall
-            for (int x = c.x0; x < c.x0 + 16; x++) {
-                if (Math.floorMod(x - X0, 40) >= 4 || x < X0 || x >= X1) continue;
-                c.box(x, 200, Z0, x, 1900, Z0 + 2, Mat.AIR);
-                c.box(x, 200, Z0 + WALL - 3, x, 1900, Z0 + WALL - 1, Mat.AIR);
-                c.box(x, 200, Z1 - WALL, x, 1900, Z1 - WALL + 2, Mat.AIR);
-                c.box(x, 200, Z1 - 3, x, 1900, Z1 - 1, Mat.AIR);
-            }
-            for (int z = c.z0; z < c.z0 + 16; z++) {
-                if (Math.floorMod(z - Z0, 40) >= 4 || z < Z0 || z >= Z1) continue;
-                c.box(X0, 200, z, X0 + 2, 1900, z, Mat.AIR);
-                c.box(X0 + WALL - 3, 200, z, X0 + WALL - 1, 1900, z, Mat.AIR);
-                c.box(X1 - WALL, 200, z, X1 - WALL + 2, 1900, z, Mat.AIR);
-                c.box(X1 - 3, 200, z, X1 - 1, 1900, z, Mat.AIR);
-            }
-            // lit strips along the inside of the wall, every 160 blocks of height
-            for (int y = 320; y <= 1920; y += 320) {
-                if (!c.hitsY(y, y)) continue;
-                byte lamp = (y / 320 & 1) == 0 ? Mat.LAMP_AMBER : Mat.BIO_CYAN;
-                c.box(X0 + WALL, y, Z0 + WALL - 1, X1 - WALL - 1, y, Z0 + WALL - 1, lamp);
-                c.box(X0 + WALL, y, Z1 - WALL, X1 - WALL - 1, y, Z1 - WALL, lamp);
-                c.box(X0 + WALL - 1, y, Z0 + WALL, X0 + WALL - 1, y, Z1 - WALL - 1, lamp);
-                c.box(X1 - WALL, y, Z0 + WALL, X1 - WALL, y, Z1 - WALL - 1, lamp);
-            }
-            gates(c);
-            sign(c);
-        }
-        // bastions
-        int bx = X0 + 300, bX = X1 - 301, bz = Z0 + 300, bZ = Z1 - 301;
-        bastion(c, bx, bz);
-        bastion(c, bX, bz);
-        bastion(c, bx, bZ);
-        bastion(c, bX, bZ);
+    private void drawExteriorSpines(Cube c) {
+        drawSpine(c, -1710, CZ - 1120, 1140, 150, 64);
+        drawSpine(c, -1710, CZ - 250, 1510, 165, 64);
+        drawSpine(c, -1710, CZ + 640, 920, 130, 58);
+        drawSpine(c, 1710, CZ - 1120, 1240, 150, 62);
+        drawSpine(c, 1710, CZ - 250, 1630, 165, 60);
+        drawSpine(c, 1710, CZ + 640, 1030, 130, 55);
+
+        // Large sloping buttresses tie the spines into the central shells.
+        c.beam(-1830, 250, CZ + 680, -1320, 1110, CZ - 1120, 34, Mat.S_TOHA_MASS);
+        c.beam(1830, 250, CZ + 680, 1320, 1110, CZ - 1120, 34, Mat.S_TOHA_MASS);
+        c.beam(-1780, 670, CZ - 1450, -1050, 1490, CZ - 770, 25, Mat.S_TOHA_PALE);
+        c.beam(1780, 670, CZ - 1450, 1050, 1490, CZ - 770, 25, Mat.S_TOHA_PALE);
+
+        // Two exposed ring galleries break the long rectangular mass.
+        c.cylinder(CX + 0.5, CZ - 330 + 0.5, 1780, 1695, 1, 1, 850, 880, 0, 0, Mat.S_TOHA_RING);
+        c.cylinder(CX + 0.5, CZ - 420 + 0.5, 1460, 1388, 1, 1, 1325, 1348, 0, 0, Mat.S_TOHA_RING);
     }
 
-    private void bastion(Cube c, int x, int z) {
-        if (!c.hits(x - 300, GROUND, z - 300, x + 300, TOP_LIMIT, z + 300)) return;
-        double cx = x + 0.5, cz = z + 0.5;
-        c.cylinder(cx, cz, 290, 0, 1, 1, GROUND, SPIRE_TOP, 0, 0, Mat.S_TOHA_TANK);
-        for (int y = 200; y < SPIRE_TOP; y += 160) {
-            if (!c.hitsY(y, y + 1)) continue;
-            c.cylinder(cx, cz, 294, 289, 1, 1, y, y + 1, 0, 0, (y / 160 & 1) == 0 ? Mat.LAMP_RED : Mat.LAMP_AMBER);
+    private void drawSpine(Cube c, int x, int z, int height, int r0, int r1) {
+        c.taper(x + 0.5, z + 0.5, r0, r1, GROUND, height, 32, Mat.S_TOHA_MASS);
+        c.taper(x + 0.5, z + 0.5, r0 - 22, Math.max(12, r1 - 14), GROUND + 24, height - 18, 32, Mat.AIR);
+        for (int y = GROUND + 160; y < height; y += 160) {
+            if (!c.hitsY(y, y + 5)) continue;
+            double t = (double) (y - GROUND) / (height - GROUND);
+            double r = r0 + (r1 - r0) * t;
+            c.cylinder(x + 0.5, z + 0.5, r + 16, r + 5, 1, 1, y, y + 5, 0, 0, Mat.S_TOHA_PALE);
         }
     }
 
-    private void gates(Cube c) {
-        // tunnels
-        c.box(CX - GATE_HALF, GROUND, Z0, CX + GATE_HALF, GROUND + GATE_H, Z0 + WALL - 1, Mat.AIR);
-        c.box(CX - GATE_HALF, GROUND, Z1 - WALL, CX + GATE_HALF, GROUND + GATE_H, Z1 - 1, Mat.AIR);
-        c.box(X0, GROUND, CZ - GATE_HALF, X0 + WALL - 1, GROUND + GATE_H, CZ + GATE_HALF, Mat.AIR);
-        c.box(X1 - WALL, GROUND, CZ - GATE_HALF, X1 - 1, GROUND + GATE_H, CZ + GATE_HALF, Mat.AIR);
-        // lit frames on both faces: lintel and two posts
-        int top = GROUND + GATE_H;
-        for (int zf : new int[]{Z0, Z0 + WALL - 1, Z1 - WALL, Z1 - 1}) {
-            c.box(CX - GATE_HALF - 6, top + 1, zf, CX + GATE_HALF + 6, top + 3, zf, Mat.LAMP_AMBER);
-            c.box(CX - GATE_HALF - 3, GROUND, zf, CX - GATE_HALF - 1, top + 3, zf, Mat.LAMP_RED);
-            c.box(CX + GATE_HALF + 1, GROUND, zf, CX + GATE_HALF + 3, top + 3, zf, Mat.LAMP_RED);
-        }
-        for (int xf : new int[]{X0, X0 + WALL - 1, X1 - WALL, X1 - 1}) {
-            c.box(xf, top + 1, CZ - GATE_HALF - 6, xf, top + 3, CZ + GATE_HALF + 6, Mat.LAMP_AMBER);
-            c.box(xf, GROUND, CZ - GATE_HALF - 3, xf, top + 3, CZ - GATE_HALF - 1, Mat.LAMP_RED);
-            c.box(xf, GROUND, CZ + GATE_HALF + 1, xf, top + 3, CZ + GATE_HALF + 3, Mat.LAMP_RED);
-        }
-    }
+    // ------------------------------------------------------------------
+    // The south approach is a deliberate sequence of gateways. Its scale
+    // compresses the player before revealing the cave façade.
+    // ------------------------------------------------------------------
 
-    /** "TOHA" in 120-block pixels, set into the south wall's outer face above the gate. */
-    private void sign(Cube c) {
-        final int zf = Z1 - 1, P = 120, y0 = 900;
-        if (!c.hits(CX - 1500, 860, zf - 6, CX + 1500, 1780, zf)) return;
-        c.box(CX - 1500, 860, zf - 6, CX + 1500, 1780, zf, Mat.CONC_BLACK);
-        c.box(CX - 1500, 860, zf, CX + 1500, 867, zf, Mat.LAMP_RED);
-        c.box(CX - 1500, 1773, zf, CX + 1500, 1780, zf, Mat.LAMP_RED);
-        c.box(CX - 1500, 860, zf, CX - 1493, 1780, zf, Mat.LAMP_RED);
-        c.box(CX + 1493, 860, zf, CX + 1500, 1780, zf, Mat.LAMP_RED);
-        for (int L = 0; L < 4; L++) {
-            int lx0 = CX - 1380 + L * 6 * P;
-            if (!c.hits(lx0, y0, zf - 3, lx0 + 5 * P - 1, y0 + 7 * P - 1, zf)) continue;
-            for (int row = 0; row < 7; row++)
-                for (int col = 0; col < 5; col++) {
-                    if (FONT[L][row].charAt(col) != '1') continue;
-                    int x = lx0 + col * P, y = y0 + (6 - row) * P;
-                    c.box(x, y, zf - 3, x + P - 1, y + P - 1, zf, Mat.LAMP_AMBER);
-                }
+    private void drawApproach(Cube c) {
+        int zBack = CZ + 2760, zFront = CZ + 1460;
+        c.box(-640, 63, zFront, 640, 82, zBack, Mat.S_TOHA_DECK);
+        c.box(-580, 83, zFront, -565, 86, zBack, Mat.S_TOHA_MASS);
+        c.box(565, 83, zFront, 580, 86, zBack, Mat.S_TOHA_MASS);
+        c.box(-12, 83, zFront, 12, 84, zBack, Mat.CONC_BLACK);
+
+        int[] offsets = {2630, 2350, 2070, 1790, 1580};
+        int[] spans = {1000, 1260, 1510, 1760, 1980};
+        int[] heights = {310, 420, 555, 710, 900};
+        for (int i = 0; i < offsets.length; i++) {
+            approachFrame(c, offsets[i], spans[i], heights[i], i);
+        }
+
+        // Two deep feed channels and crossheads parallel the road, not a decorative plaza.
+        c.box(-930, 28, CZ + 1830, -830, 60, CZ + 2700, Mat.S_TOHA_MASS);
+        c.box(830, 28, CZ + 1830, 930, 60, CZ + 2700, Mat.S_TOHA_MASS);
+        for (int z = CZ + 1900; z <= CZ + 2650; z += 150) {
+            c.box(-965, 60, z, -800, 65, z + 10, Mat.S_TOHA_RING);
+            c.box(800, 60, z, 965, 65, z + 10, Mat.S_TOHA_RING);
         }
     }
 
-    // ------------------------------------------------------------------ central spire
+    private void approachFrame(Cube c, int offset, int span, int height, int index) {
+        int z = CZ + offset;
+        int post = Math.max(28, span / 28);
+        c.box(-span / 2, GROUND, z - 26, -span / 2 + post, GROUND + height, z + 26, Mat.S_TOHA_MASS);
+        c.box(span / 2 - post, GROUND, z - 26, span / 2, GROUND + height, z + 26, Mat.S_TOHA_MASS);
+        c.box(-span / 2, GROUND + height - 32, z - 38, span / 2, GROUND + height + 28, z + 38, Mat.S_TOHA_PALE);
+        c.box(-span / 2 + 14, GROUND + height - 12, z - 39, span / 2 - 14, GROUND + height - 6, z - 37, Mat.S_DARK);
+        if (index == 3 || index == 4) {
+            c.box(-span / 2 + 50, GROUND + height - 7, z + 39, span / 2 - 50, GROUND + height - 2, z + 40, Mat.BIO_CYAN);
+        }
 
-    private void spire(Cube c) {
-        if (!c.hits(CX - 520, GROUND, CZ - 520, CX + 520, TOP_LIMIT, CZ + 520)) return;
-        double cx = CX + 0.5, cz = CZ + 0.5, r0 = 420, r1 = 70;
-        int ht = SPIRE_TOP - GROUND;
-        c.taper(cx, cz, r0, r1, GROUND, SPIRE_TOP, 32, Mat.S_TOHA_RING);
-        c.taper(cx, cz, r0 - 14, r1 - 10, GROUND + 12, SPIRE_TOP - 30, 32, Mat.AIR);
-        for (int y = GROUND + 100; y < SPIRE_TOP; y += 100) {
-            if (!c.hitsY(y, y)) continue;
-            double rr = r0 + (r1 - r0) * (y - GROUND) / (double) ht;
-            c.cylinder(cx, cz, rr + 7, rr, 1, 1, y, y, 0, 0, (y / 100 & 1) == 0 ? Mat.LAMP_AMBER : Mat.BIO_CYAN);
-        }
-        for (int k = 0; k < 50; k++) {
-            int y = GROUND + k * 40, L = (int) (500 * (1 - k / 50.0));
-            if (L < 30) break;
-            if (!c.hitsY(y, y + 39)) continue;
-            c.box(CX - 5, y, CZ - L, CX + 5, y + 39, CZ + L, Mat.S_TOHA_MASS);
-            c.box(CX - L, y, CZ - 5, CX + L, y + 39, CZ + 5, Mat.S_TOHA_MASS);
-            c.box(CX - 5, y + 39, CZ - L, CX + 5, y + 39, CZ - L, Mat.LAMP_RED);
-            c.box(CX - 5, y + 39, CZ + L, CX + 5, y + 39, CZ + L, Mat.LAMP_RED);
-            c.box(CX - L, y + 39, CZ - 5, CX - L, y + 39, CZ + 5, Mat.LAMP_RED);
-            c.box(CX + L, y + 39, CZ - 5, CX + L, y + 39, CZ + 5, Mat.LAMP_RED);
-        }
-        c.sphere(cx, SPIRE_TOP - 20, cz, 50, 0, Mat.GLOWSTONE);
+        // The frames are connected to the ground by restrained diagonal braces.
+        c.beam(-span / 2 + post, GROUND + height - 40, z, -span / 2 + post + 120, GROUND + height - 150, z, 8, Mat.S_TOHA_RING);
+        c.beam(span / 2 - post, GROUND + height - 40, z, span / 2 - post - 120, GROUND + height - 150, z, 8, Mat.S_TOHA_RING);
     }
 
+    private void drawCourtyardPylons(Cube c) {
+        // Four boundary obelisks, all placed by design and aligned to the wall corners.
+        drawSpine(c, -2480, CZ - 2440, 600, 155, 85);
+        drawSpine(c, 2480, CZ - 2440, 540, 145, 80);
+        drawSpine(c, -2480, CZ + 2440, 510, 135, 75);
+        drawSpine(c, 2480, CZ + 2440, 640, 170, 82);
 
-    // ------------------------------------------------------------------ road portals
-
-    /** Portal frames spanning the lit roads: two piers, a deep girder and a cyan under-strip. */
-    private void portals(Cube c) {
-        if (!c.hitsY(GROUND, 330)) return;
-        final int P = 240;
-        for (int pass = 0; pass < 2; pass++) {
-            // pass 0: roads that run along Z (centre lines at x = X0 + r*CELL); pass 1: along X.
-            int a0 = pass == 0 ? c.x0 : c.z0, a1 = a0 + 15;
-            int b0 = pass == 0 ? c.z0 : c.x0;
-            int lo = pass == 0 ? X0 : Z0, blo = pass == 0 ? Z0 : X0;
-            int r0 = Math.floorDiv(a0 - lo - 34 + CELL - 1, CELL), r1 = Math.floorDiv(a1 - lo + 34, CELL);
-            for (int r = Math.max(1, r0); r <= Math.min(NC - 1, r1); r++) {
-                int rc = lo + r * CELL;
-                if (rc - 34 > a1 || rc + 34 < a0) continue;
-                int q0 = Math.floorDiv(b0 - blo - 8, P), q1 = Math.floorDiv(b0 + 15 - blo + 8, P);
-                for (int q = q0; q <= q1; q++) {
-                    long hh = H.h(seed, 0x9071, pass, r, q);
-                    if (!H.chance(hh, 0.55)) continue;
-                    int pos = blo + q * P + P / 2;
-                    if (pos < blo + WALL + 60 || pos > blo + 2 * HALF - WALL - 60) continue;
-                    int ht = 110 + (int) (H.u(H.h(hh, 3)) * 5) * 24;
-                    if (pass == 0) {
-                        if (!c.hits(rc - 34, GROUND, pos - 6, rc + 34, GROUND + ht + 24, pos + 6)) continue;
-                        c.box(rc - 33, GROUND, pos - 3, rc - 29, GROUND + ht, pos + 3, Mat.S_TOHA_MASS);
-                        c.box(rc + 29, GROUND, pos - 3, rc + 33, GROUND + ht, pos + 3, Mat.S_TOHA_MASS);
-                        c.box(rc - 34, GROUND + ht, pos - 4, rc + 34, GROUND + ht + 12, pos + 4, Mat.S_TOHA_MASS);
-                        c.box(rc - 30, GROUND + ht - 1, pos - 1, rc + 30, GROUND + ht - 1, pos + 1, Mat.BIO_CYAN);
-                        c.box(rc - 33, GROUND + ht + 13, pos - 1, rc - 29, GROUND + ht + 15, pos + 1, Mat.LAMP_RED);
-                        c.box(rc + 29, GROUND + ht + 13, pos - 1, rc + 33, GROUND + ht + 15, pos + 1, Mat.LAMP_RED);
-                    } else {
-                        if (!c.hits(pos - 6, GROUND, rc - 34, pos + 6, GROUND + ht + 24, rc + 34)) continue;
-                        c.box(pos - 3, GROUND, rc - 33, pos + 3, GROUND + ht, rc - 29, Mat.S_TOHA_MASS);
-                        c.box(pos - 3, GROUND, rc + 29, pos + 3, GROUND + ht, rc + 33, Mat.S_TOHA_MASS);
-                        c.box(pos - 4, GROUND + ht, rc - 34, pos + 4, GROUND + ht + 12, rc + 34, Mat.S_TOHA_MASS);
-                        c.box(pos - 1, GROUND + ht - 1, rc - 30, pos + 1, GROUND + ht - 1, rc + 30, Mat.BIO_CYAN);
-                        c.box(pos - 1, GROUND + ht + 13, rc - 33, pos + 1, GROUND + ht + 15, rc - 29, Mat.LAMP_RED);
-                        c.box(pos - 1, GROUND + ht + 13, rc + 29, pos + 1, GROUND + ht + 15, rc + 33, Mat.LAMP_RED);
-                    }
-                }
-            }
-        }
-    }
-
-    // ---- monolith slabs: the black screentone towers
-
-    private void monoliths(Cube c, int ox, int oz, long h) {
-        int n = H.range(H.h(h, 2), 3, 5);
-        int slot = N / n;
-        boolean alongX = (h & 1) == 0;
-        for (int k = 0; k < n; k++) {
-            int w = H.range(H.h(h, 10 + k), 70, Math.min(150, slot - 20)), d = H.range(H.h(h, 20 + k), 36, 64);
-            int ht = H.range(H.h(h, 30 + k), 850, 1950);
-            int a = k * slot + (slot - w) / 2;
-            int bpos = H.range(H.h(h, 50 + k), 20, N - d - 20);
-            int x0 = alongX ? ox + a : ox + bpos, z0 = alongX ? oz + bpos : oz + a;
-            int sx = alongX ? w : d, sz = alongX ? d : w;
-            slab(c, x0, z0, x0 + sx - 1, z0 + sz - 1, GROUND + ht, h, k, alongX);
-        }
-    }
-
-    private void slab(Cube c, int x0, int z0, int x1, int z1, int top, long h, int k, boolean alongX) {
-        if (!c.hits(x0 - 2, GROUND, z0 - 2, x1 + 2, top + 40, z1 + 2)) return;
-        byte body = (k & 1) == 0 ? Mat.S_TOHA_MASS : Mat.S_TOHA_PALE;
-        c.box(x0 - 2, GROUND, z0 - 2, x1 + 2, GROUND + 24, z1 + 2, Mat.S_TOHA_MASS);
-        c.box(x0, GROUND + 25, z0, x1, top, z1, body);
-        c.box(x0 - 2, top + 1, z0 - 2, x1 + 2, top + 10, z1 + 2, Mat.S_TOHA_MASS);
-        c.box(x0 + 3, top + 11, z0 + 3, x1 - 3, top + 24, z1 - 3, Mat.S_TOHA_MASS);
-        if (alongX) {
-            for (int x = Math.max(c.x0, x0 + 6); x < Math.min(c.x0 + 16, x1 - 6); x++) {
-                if (Math.floorMod(x - x0 - 6, 20) >= 3) continue;
-                c.box(x, GROUND + 25, z0 - 2, x, top - 20, z0 - 1, body);
-                c.box(x, GROUND + 25, z1 + 1, x, top - 20, z1 + 2, body);
-            }
-        } else {
-            for (int z = Math.max(c.z0, z0 + 6); z < Math.min(c.z0 + 16, z1 - 6); z++) {
-                if (Math.floorMod(z - z0 - 6, 20) >= 3) continue;
-                c.box(x0 - 2, GROUND + 25, z, x0 - 1, top - 20, z, body);
-                c.box(x1 + 1, GROUND + 25, z, x1 + 2, top - 20, z, body);
-            }
-        }
-        // sparse lit windows on a 24 x 56 grid: mostly amber, the odd cyan
-        for (int wy = GROUND + 120; wy < top - 60; wy += 56) {
-            if (!c.hitsY(wy, wy + 11)) continue;
-            if (alongX) {
-                for (int x = Math.max(c.x0, x0 + 8); x < Math.min(c.x0 + 16, x1 - 12); x++) {
-                    if (Math.floorMod(x - x0, 24) >= 6) continue;
-                    long hw = H.h(h, 0x77, Math.floorDiv(x - x0, 24) * 131L + k, wy);
-                    if (!H.chance(hw, 0.07)) continue;
-                    byte m = (hw >> 40 & 7) == 0 ? Mat.BIO_CYAN : Mat.LAMP_AMBER;
-                    c.box(x, wy, z0 - 1, x, wy + 11, z0, m);
-                    c.box(x, wy, z1, x, wy + 11, z1 + 1, m);
-                }
-            } else {
-                for (int z = Math.max(c.z0, z0 + 8); z < Math.min(c.z0 + 16, z1 - 12); z++) {
-                    if (Math.floorMod(z - z0, 24) >= 6) continue;
-                    long hw = H.h(h, 0x77, Math.floorDiv(z - z0, 24) * 131L + k, wy);
-                    if (!H.chance(hw, 0.07)) continue;
-                    byte m = (hw >> 40 & 7) == 0 ? Mat.BIO_CYAN : Mat.LAMP_AMBER;
-                    c.box(x0 - 1, wy, z, x0, wy + 11, z, m);
-                    c.box(x1, wy, z, x1 + 1, wy + 11, z, m);
-                }
-            }
-        }
-        // one deep vertical cyan slit up each long face
-        int mid = alongX ? (x0 + x1) / 2 : (z0 + z1) / 2;
-        if (alongX) {
-            if (mid >= c.x0 && mid < c.x0 + 16) {
-                c.box(mid, GROUND + 60, z0 - 1, mid, top - 40, z0, Mat.BIO_CYAN);
-                c.box(mid, GROUND + 60, z1, mid, top - 40, z1 + 1, Mat.BIO_CYAN);
-            }
-        } else if (mid >= c.z0 && mid < c.z0 + 16) {
-            c.box(x0 - 1, GROUND + 60, mid, x0, top - 40, mid, Mat.BIO_CYAN);
-            c.box(x1, GROUND + 60, mid, x1 + 1, top - 40, mid, Mat.BIO_CYAN);
-        }
-        int bx = (x0 + x1) / 2, bz = (z0 + z1) / 2;
-        c.box(bx - 2, top + 25, bz - 2, bx + 2, top + 34, bz + 2, Mat.LAMP_RED);
-    }
-
-    // ------------------------------------------------------------------ plant cells
-
-    private void cell(Cube c, int i, int j) {
-        if (i < 1 || j < 1 || i >= NC - 1 || j >= NC - 1) return; // perimeter corridor
-        int ox = X0 + i * CELL + M, oz = Z0 + j * CELL + M;
-        if (!c.hits(ox, GROUND, oz, ox + N - 1, TOP_LIMIT, oz + N - 1)) return;
-        double d = Math.max(Math.abs(i - 77.5), Math.abs(j - 77.5));
-        long h = H.h(seed, 0x70A, i, j);
-        if (d < 4) { plaza(c, ox, oz); return; }
-        clutter(c, ox, oz, h);
-        double r = H.u(H.h(h, 1));
-        if (r < 0.18) stacks(c, ox, oz, h);
-        else if (r < 0.34) hall(c, ox, oz, h);
-        else if (r < 0.46) tankFarm(c, ox, oz, h);
-        else if (r < 0.55) coolingTowers(c, ox, oz, h);
-        else if (r < 0.65) pipework(c, ox, oz, h);
-        else if (r < 0.74) gantry(c, ox, oz, h);
-        else if (r < 0.80) canal(c, ox, oz, h);
-        else if (r < 0.86) yard(c, ox, oz, h);
-        else monoliths(c, ox, oz, h);
-    }
-
-    /** Forecourt around the spire: a regular grid of fat black obelisks with small lit caps. */
-    private void plaza(Cube c, int ox, int oz) {
-        final int sp = 192;
-        int a0 = Math.max(0, Math.floorDiv(c.x0 - ox - 20, sp)), a1 = Math.min(N / sp - 1, Math.floorDiv(c.x0 + 15 - ox, sp));
-        int b0 = Math.max(0, Math.floorDiv(c.z0 - oz - 20, sp)), b1 = Math.min(N / sp - 1, Math.floorDiv(c.z0 + 15 - oz, sp));
-        for (int b = b0; b <= b1; b++)
-            for (int a = a0; a <= a1; a++) {
-                int x = ox + a * sp + 70, z = oz + b * sp + 70;
-                int ht = 70 + (int) (H.u(H.h(seed, 0x91A, x, z)) * 150);
-                if (!c.hits(x - 2, GROUND, z - 2, x + 15, GROUND + ht + 6, z + 15)) continue;
-                c.box(x - 2, GROUND, z - 2, x + 15, GROUND + 6, z + 15, Mat.S_TOHA_MASS);
-                c.box(x, GROUND + 7, z, x + 13, GROUND + ht, z + 13, Mat.S_TOHA_MASS);
-                c.box(x + 5, GROUND + ht + 1, z + 5, x + 8, GROUND + ht + 3, z + 8, ((a + b) & 3) == 0 ? Mat.LAMP_AMBER : Mat.BIO_CYAN);
-            }
-    }
-
-    // ---- ground clutter: low machinery blocks that stop the deck reading as an empty plane
-
-    private void clutter(Cube c, int ox, int oz, long h) {
-        if (!c.hitsY(GROUND, GROUND + 44)) return;
-        final int sp = 56;
-        int a0 = Math.max(0, Math.floorDiv(c.x0 - ox - 40, sp)), a1 = Math.min(N / sp - 1, Math.floorDiv(c.x0 + 15 - ox, sp));
-        int b0 = Math.max(0, Math.floorDiv(c.z0 - oz - 40, sp)), b1 = Math.min(N / sp - 1, Math.floorDiv(c.z0 + 15 - oz, sp));
-        for (int b = b0; b <= b1; b++)
-            for (int a = a0; a <= a1; a++) {
-                long hs = H.h(h, 0xC1, a, b);
-                if (!H.chance(hs, 0.32)) continue;
-                int w = H.range(H.h(hs, 1), 14, 38), d = H.range(H.h(hs, 2), 14, 38), ht = H.range(H.h(hs, 3), 6, 38);
-                int x0 = ox + a * sp + H.range(H.h(hs, 4), 0, sp - w), z0 = oz + b * sp + H.range(H.h(hs, 5), 0, sp - d);
-                if (!c.hits(x0, GROUND, z0, x0 + w, GROUND + ht + 8, z0 + d)) continue;
-                byte m = BOX_MATS[(int) (H.h(hs, 6) & 7)];
-                c.box(x0, GROUND, z0, x0 + w - 1, GROUND + ht, z0 + d - 1, m);
-                int kind = (int) (H.h(hs, 7) & 7);
-                if (kind == 0) c.box(x0 + w / 2 - 2, GROUND + ht + 1, z0 + d / 2 - 2, x0 + w / 2 + 2, GROUND + ht + 7, z0 + d / 2 + 2, Mat.VENT);
-                else if (kind == 1) c.box(x0 + 2, GROUND + ht + 1, z0 + 2, x0 + 3, GROUND + ht + 2, z0 + 3, Mat.LAMP_AMBER);
-                else if (kind == 2) c.box(x0, GROUND + ht - 2, z0, x0 + w - 1, GROUND + ht - 1, z0, Mat.BIO_CYAN);
-                else if (kind == 3) c.box(x0 + 3, GROUND + ht + 1, z0 + 3, x0 + w - 4, GROUND + ht + 3, z0 + 5, Mat.CABLE);
-            }
-    }
-
-    // ---- furnace stacks
-
-    private void stack(Cube c, int sx, int sz, int r, int ht, byte ring) {
-        int top = GROUND + ht;
-        if (!c.hits(sx - 2 * r, GROUND, sz - 2 * r, sx + 2 * r, top + r, sz + 2 * r)) return;
-        double cx = sx + 0.5, cz = sz + 0.5, r1 = r * 0.6;
-        c.cylinder(cx, cz, r * 1.9, 0, 1, 1, GROUND, GROUND + 36, 0, 0, Mat.S_DARK);
-        c.taper(cx, cz, r, r1, GROUND + 36, top, 24, Mat.S_TOHA_RING);
-        c.taper(cx, cz, r - 6, r1 - 6, GROUND + 40, top, 24, Mat.AIR);
-        for (int y = GROUND + 60; y < top - 10; y += 96) {
-            if (!c.hitsY(y, y)) continue;
-            double rr = r + (r1 - r) * (y - GROUND - 36) / (double) (top - GROUND - 36);
-            c.cylinder(cx, cz, rr + 3, rr, 1, 1, y, y, 0, 0, ring);
-        }
-        c.cylinder(cx, cz, r1 - 6, 0, 1, 1, top - 10, top - 4, 0, 0, Mat.GLOWSTONE);
-        c.blob(cx, top + r1, cz, r1 * 0.5, r1, r1 * 0.5, Mat.LAMP_AMBER);
-    }
-
-    private void stacks(Cube c, int ox, int oz, long h) {
-        int n = H.range(H.h(h, 2), 2, 5);
-        for (int k = 0; k < n; k++) {
-            int r = H.range(H.h(h, 10 + k), 26, 64), ht = H.range(H.h(h, 20 + k), 700, 1850);
-            int sx = ox + H.range(H.h(h, 30 + k), 2 * r, N - 2 * r), sz = oz + H.range(H.h(h, 40 + k), 2 * r, N - 2 * r);
-            stack(c, sx, sz, r, ht, (k & 1) == 0 ? Mat.LAMP_RED : Mat.LAMP_AMBER);
-        }
-    }
-
-    // ---- machine hall
-
-    private void hall(Cube c, int ox, int oz, long h) {
-        int w = H.range(H.h(h, 10), 520, 860), d = H.range(H.h(h, 11), 280, 520), ht = H.range(H.h(h, 12), 110, 300);
-        int x0 = ox + H.range(H.h(h, 13), 0, N - w), z0 = oz + H.range(H.h(h, 14), 0, N - d);
-        int x1 = x0 + w, z1 = z0 + d, top = GROUND + ht;
-        if (!c.hits(x0, GROUND, z0, x1, top + 16, z1)) return;
-        c.box(x0, GROUND, z0, x1, top, z1, Mat.S_TOHA_MASS);
-        c.box(x0 + 6, GROUND, z0 + 6, x1 - 6, top - 8, z1 - 6, Mat.AIR);
-        for (int x = x0; x <= x1; x += 40) c.box(x, top + 1, z0, x + 1, top + 6, z1, Mat.ANDESITE);
-        for (int x = x0 + 60; x < x1 - 60; x += 80) c.box(x, top + 1, z0 + d / 2 - 6, x + 11, top + 12, z0 + d / 2 + 5, Mat.VENT);
-        // lit window slots on both long faces
-        int wy = GROUND + ht / 2, wh = Math.max(6, ht / 6);
-        if (c.hits(x0, wy, z0, x1, wy + wh, z0 + 5) || c.hits(x0, wy, z1 - 5, x1, wy + wh, z1))
-            for (int x = x0 + 16; x < x1 - 24; x += 32) {
-                c.box(x, wy, z0, x + 15, wy + wh, z0 + 5, Mat.LAMP_AMBER);
-                c.box(x, wy, z1 - 5, x + 15, wy + wh, z1, Mat.LAMP_AMBER);
-            }
-        // doors
-        c.box(x0 + w / 2 - 40, GROUND, z0, x0 + w / 2 + 40, GROUND + 60, z0 + 5, Mat.AIR);
-        c.box(x0 + w / 2 - 40, GROUND, z1 - 5, x0 + w / 2 + 40, GROUND + 60, z1, Mat.AIR);
-        // interior: column grid, molten channel, crane rails
-        if (c.hits(x0 + 6, GROUND, z0 + 6, x1 - 6, top - 8, z1 - 6)) {
-            for (int x = x0 + 64; x < x1 - 20; x += 64)
-                for (int z = z0 + 64; z < z1 - 20; z += 64)
-                    c.box(x, GROUND, z, x + 3, top - 8, z + 3, Mat.ANDESITE);
-            int zc = z0 + d / 2;
-            c.box(x0 + 20, GROUND, zc - 1, x1 - 20, GROUND, zc + 2, Mat.GLOWSTONE);
-            int rail = top - 30;
-            c.box(x0 + 6, rail, z0 + 20, x1 - 6, rail + 1, z0 + 22, Mat.ANDESITE);
-            c.box(x0 + 6, rail, z1 - 22, x1 - 6, rail + 1, z1 - 20, Mat.ANDESITE);
-            int cx = x0 + H.range(H.h(h, 15), 40, w - 40);
-            c.box(cx, rail - 2, z0 + 20, cx + 5, rail, z1 - 20, Mat.S_DECK);
-            c.box(cx + 1, rail - 8, zc - 2, cx + 3, rail - 3, zc + 2, Mat.LAMP_RED);
-        }
-    }
-
-    // ---- tank farm
-
-    private void tankFarm(Cube c, int ox, int oz, long h) {
-        int nx = H.range(H.h(h, 10), 4, 6), nz = H.range(H.h(h, 11), 4, 6), sp = 148;
-        int sx0 = ox + (N - (nx - 1) * sp) / 2, sz0 = oz + (N - (nz - 1) * sp) / 2;
-        for (int b = 0; b < nz; b++)
-            for (int a = 0; a < nx; a++) {
-                long ht0 = H.h(h, 100 + a, b);
-                int r = H.range(H.h(ht0, 1), 22, 34), ht = H.range(H.h(ht0, 2), 60, 170);
-                int tx = sx0 + a * sp, tz = sz0 + b * sp, top = GROUND + ht;
-                if (!c.hits(tx - r - 12, GROUND, tz - r - 12, tx + r + sp, top + r, tz + r + sp)) continue;
-                double cx = tx + 0.5, cz = tz + 0.5;
-                c.cylinder(cx, cz, r, r - 3, 1, 1, GROUND, top, 0, 0, Mat.S_TOHA_TANK);
-                c.cylinder(cx, cz, r, 0, 1, 1, top, top + 2, 0, 0, Mat.S_TOHA_TANK);
-                c.blob(cx, top + 2, cz, r * 0.8, r * 0.3, r * 0.8, Mat.S_TOHA_TANK);
-                c.cylinder(cx, cz, r + 3, r, 1, 1, top - 4, top - 4, 0, 0, Mat.LAMP_AMBER);
-                c.cylinder(cx, cz, r + 6, r + 4, 1, 1, GROUND + ht / 2, GROUND + ht / 2, 0, 0, Mat.S_DECK);
-                if (a + 1 < nx) c.box(tx + r, GROUND + 10, tz - 1, tx + sp - r, GROUND + 13, tz + 2, Mat.CABLE);
-                if (b + 1 < nz) c.box(tx - 1, GROUND + 18, tz + r, tx + 2, GROUND + 21, tz + sp - r, Mat.S_DARK);
-            }
-    }
-
-    // ---- cooling towers
-
-    private void coolingTowers(Cube c, int ox, int oz, long h) {
-        for (int k = 0; k < 2; k++) {
-            int rw = H.range(H.h(h, 10 + k), 90, 115), ht = H.range(H.h(h, 20 + k), 400, 700);
-            int tx = ox + 222 + k * 444, tz = oz + H.range(H.h(h, 30 + k), 230, N - 230);
-            int top = GROUND + ht;
-            if (!c.hits(tx - 215, GROUND, tz - 215, tx + 215, top + 2, tz + 215)) continue;
-            double cx = tx + 0.5, cz = tz + 0.5, yw = ht * 0.7, kk = ht * 0.35;
-            for (int y = 0; y < ht; y += 20) {
-                if (!c.hitsY(GROUND + y, GROUND + y + 19)) continue;
-                double t = (y + 10 - yw) / kk, r = rw * 0.82 * Math.sqrt(1 + t * t);
-                c.cylinder(cx, cz, r, r - 5, 1, 1, GROUND + y, GROUND + y + 19, 0, 0, Mat.S_TOHA_TANK);
-            }
-            c.cylinder(cx, cz, rw * 0.82 * Math.sqrt(1 + (ht - yw) * (ht - yw) / (kk * kk)) + 2, rw * 0.8, 1, 1, top - 1, top, 0, 0, Mat.LAMP_RED);
-            c.cylinder(cx, cz, rw * 1.2, 0, 1, 1, GROUND, GROUND + 2, 0, 0, Mat.LAMP_AMBER);
-            // base arches
-            for (int s = 0; s < 4; s++) {
-                double ang = s * Math.PI / 2;
-                int ax = (int) Math.round(tx + Math.cos(ang) * rw * 1.8), az = (int) Math.round(tz + Math.sin(ang) * rw * 1.8);
-                c.box(ax - 12, GROUND, az - 12, ax + 12, GROUND + 40, az + 12, Mat.AIR);
-            }
-        }
-    }
-
-    // ---- pipework and refinery columns
-
-    private void pipework(Cube c, int ox, int oz, long h) {
-        int rows = H.range(H.h(h, 20), 3, 5);
-        int zc = oz + H.range(H.h(h, 21), 120, N - 200), xc = ox + H.range(H.h(h, 22), 120, N - 200);
-        int hgt = GROUND + 28 + rows * 9 + 4;
-        if (c.hits(ox + 24, GROUND, zc, ox + N - 25, hgt, zc + rows * 6 + 3)) {
-            for (int r = 0; r < rows; r++) {
-                byte m = PIPE_MATS[(int) (H.h(h, 23 + r) & 3)];
-                int y = GROUND + 28 + r * 9, z = zc + r * 6;
-                c.box(ox + 24, y, z, ox + N - 25, y + 3, z + 3, m);
-                for (int x = ox + 24; x < ox + N - 30; x += 96) c.box(x, y - 1, z - 1, x + 1, y + 4, z + 4, Mat.ANDESITE);
-            }
-            for (int x = ox + 24; x < ox + N - 30; x += 48) c.box(x, GROUND, zc, x + 3, hgt, zc + rows * 6 + 3, Mat.ANDESITE);
-        }
-        if (c.hits(xc, GROUND, oz + 24, xc + rows * 6 + 3, hgt, oz + N - 25)) {
-            for (int r = 0; r < rows; r++) {
-                byte m = PIPE_MATS[(int) (H.h(h, 33 + r) & 3)];
-                int y = GROUND + 40 + r * 9, x = xc + r * 6;
-                c.box(x, y, oz + 24, x + 3, y + 3, oz + N - 25, m);
-            }
-            for (int z = oz + 24; z < oz + N - 30; z += 48) c.box(xc, GROUND, z, xc + rows * 6 + 3, hgt + 12, z + 3, Mat.ANDESITE);
-        }
-        int n = H.range(H.h(h, 40), 3, 6);
-        for (int k = 0; k < n; k++) {
-            int r = H.range(H.h(h, 50 + k), 12, 20), ht = H.range(H.h(h, 60 + k), 150, 520);
-            int px = ox + H.range(H.h(h, 70 + k), 40, N - 40), pz = oz + H.range(H.h(h, 80 + k), 40, N - 40);
-            int top = GROUND + ht;
-            if (!c.hits(px - r - 10, GROUND, pz - r - 10, px + r + 10, top + 12, pz + r + 10)) continue;
-            double cx = px + 0.5, cz = pz + 0.5;
-            c.cylinder(cx, cz, r, r - 3, 1, 1, GROUND, top, 0, 0, Mat.ANDESITE);
-            c.cylinder(cx, cz, r, 0, 1, 1, top, top + 1, 0, 0, Mat.ANDESITE);
-            for (int y = GROUND + 30; y < top; y += 40) {
-                if (!c.hitsY(y, y + 1)) continue;
-                c.cylinder(cx, cz, r + 7, r, 1, 1, y, y, 0, 0, Mat.S_DECK);
-                c.cylinder(cx, cz, r + 8, r + 7, 1, 1, y + 1, y + 1, 0, 0, Mat.IRON_BARS);
-            }
-            c.blob(cx, top + 6, cz, 5, 6, 5, Mat.LAMP_RED);
-        }
-    }
-
-    // ---- gantry yard
-
-    private void gantry(Cube c, int ox, int oz, long h) {
-        int[] ts = new int[3];
-        for (int a = 0; a < 3; a++) ts[a] = N / 6 + a * (N / 3);
-        int[][] hts = new int[3][3];
-        for (int b = 0; b < 3; b++)
-            for (int a = 0; a < 3; a++) hts[b][a] = H.range(H.h(h, 30 + a * 3 + b), 500, 1100);
-        for (int b = 0; b < 3; b++)
-            for (int a = 0; a < 3; a++) {
-                int tx = ox + ts[a], tz = oz + ts[b], ht = hts[b][a], top = GROUND + ht;
-                // tower
-                if (c.hits(tx - 16, GROUND, tz - 16, tx + 16, top + 2, tz + 16)) {
-                    for (int s = 0; s < 4; s++) {
-                        int px = tx + ((s & 1) == 0 ? -14 : 12), pz = tz + ((s & 2) == 0 ? -14 : 12);
-                        c.box(px, GROUND, pz, px + 2, top, pz + 2, Mat.ANDESITE);
-                    }
-                    for (int y = GROUND; y <= top; y += 48) {
-                        if (!c.hitsY(y, y + 1)) continue;
-                        c.box(tx - 14, y, tz - 14, tx + 13, y + 1, tz - 12, Mat.ANDESITE);
-                        c.box(tx - 14, y, tz + 12, tx + 13, y + 1, tz + 14, Mat.ANDESITE);
-                        c.box(tx - 14, y, tz - 14, tx - 12, y + 1, tz + 13, Mat.ANDESITE);
-                        c.box(tx + 12, y, tz - 14, tx + 14, y + 1, tz + 13, Mat.ANDESITE);
-                    }
-                    for (int y = GROUND; y + 96 <= top; y += 96) {
-                        if (!c.hitsY(y, y + 96)) continue;
-                        double lo = (y / 96 & 1) == 0 ? -14 : 14;
-                        c.beam(tx + lo, y, tz - 13, tx - lo, y + 96, tz - 13, 1.2, Mat.ANDESITE);
-                        c.beam(tx + lo, y, tz + 13, tx - lo, y + 96, tz + 13, 1.2, Mat.ANDESITE);
-                        c.beam(tx - 13, y, tz + lo, tx - 13, y + 96, tz - lo, 1.2, Mat.ANDESITE);
-                        c.beam(tx + 13, y, tz + lo, tx + 13, y + 96, tz - lo, 1.2, Mat.ANDESITE);
-                    }
-                    c.box(tx - 16, top, tz - 16, tx + 16, top + 2, tz + 16, Mat.S_DECK);
-                    c.box(tx - 15, top + 3, tz - 15, tx - 13, top + 6, tz - 13, Mat.LAMP_RED);
-                    c.box(tx + 13, top + 3, tz + 13, tx + 15, top + 6, tz + 15, Mat.LAMP_RED);
-                }
-                // bridges to the next tower in +x and +z
-                if (a < 2) {
-                    int yb = GROUND + H.range(H.h(h, 60 + a * 3 + b), 150, 450), x1 = tx + 14, x2 = ox + ts[a + 1] - 14;
-                    if (c.hits(x1, yb - 1, tz - 4, x2, yb + 3, tz + 4)) {
-                        c.box(x1, yb, tz - 4, x2, yb + 1, tz + 4, Mat.S_DECK);
-                        c.box(x1, yb + 2, tz - 4, x2, yb + 3, tz - 4, Mat.IRON_BARS);
-                        c.box(x1, yb + 2, tz + 4, x2, yb + 3, tz + 4, Mat.IRON_BARS);
-                        c.box(x1, yb - 1, tz, x2, yb - 1, tz, Mat.LAMP_AMBER);
-                    }
-                }
-                if (b < 2) {
-                    int yb = GROUND + H.range(H.h(h, 70 + a * 3 + b), 150, 450), z1 = tz + 14, z2 = oz + ts[b + 1] - 14;
-                    if (c.hits(tx - 4, yb - 1, z1, tx + 4, yb + 3, z2)) {
-                        c.box(tx - 4, yb, z1, tx + 4, yb + 1, z2, Mat.S_DECK);
-                        c.box(tx - 4, yb + 2, z1, tx - 4, yb + 3, z2, Mat.IRON_BARS);
-                        c.box(tx + 4, yb + 2, z1, tx + 4, yb + 3, z2, Mat.IRON_BARS);
-                        c.box(tx, yb - 1, z1, tx, yb - 1, z2, Mat.LAMP_AMBER);
-                    }
-                }
-            }
-    }
-
-    // ---- slag canal
-
-    private void canal(Cube c, int ox, int oz, long h) {
-        int cz = oz + H.range(H.h(h, 10), 280, 560);
-        if (c.hits(ox, 24, cz - 51, ox + N - 1, DECK_TOP, cz + 51)) {
-            c.box(ox, 24, cz - 50, ox + N - 1, DECK_TOP, cz + 50, Mat.AIR);
-            c.box(ox, 24, cz - 50, ox + N - 1, 58, cz + 50, Mat.WATER);
-            for (int x = ox; x < ox + N; x += 16) {
-                c.set(x, DECK_TOP, cz - 51, Mat.LAMP_AMBER);
-                c.set(x, DECK_TOP, cz + 51, Mat.LAMP_AMBER);
-            }
-            for (int x = ox + 110; x < ox + N - 20; x += 220) {
-                c.box(x, 62, cz - 51, x + 13, 63, cz + 51, Mat.S_DECK);
-                c.box(x, 64, cz - 51, x, 66, cz + 51, Mat.IRON_BARS);
-                c.box(x + 13, 64, cz - 51, x + 13, 66, cz + 51, Mat.IRON_BARS);
-            }
-        }
-        stack(c, ox + 180, cz - 160, 56, H.range(H.h(h, 11), 280, 420), Mat.LAMP_RED);
-        stack(c, ox + N - 200, cz + 170, 62, H.range(H.h(h, 12), 280, 420), Mat.LAMP_AMBER);
-    }
-
-    // ---- container yard
-
-    private void yard(Cube c, int ox, int oz, long h) {
-        final int px = 32, pz = 16;
-        int a0 = Math.max(0, Math.floorDiv(c.x0 - ox, px)), a1 = Math.min(N / px - 1, Math.floorDiv(c.x0 + 15 - ox, px));
-        int b0 = Math.max(0, Math.floorDiv(c.z0 - oz, pz)), b1 = Math.min(N / pz - 1, Math.floorDiv(c.z0 + 15 - oz, pz));
-        for (int b = b0; b <= b1; b++) {
-            if (b % 5 == 4) { // rail aisle
-                c.box(ox, GROUND, oz + b * pz + 3, ox + N - 1, GROUND, oz + b * pz + 3, Mat.ANDESITE);
-                c.box(ox, GROUND, oz + b * pz + 8, ox + N - 1, GROUND, oz + b * pz + 8, Mat.ANDESITE);
-                continue;
-            }
-            for (int a = a0; a <= a1; a++) {
-                long hs = H.h(h, 50, a, b);
-                if (!H.chance(H.h(hs, 1), 0.72)) continue;
-                int lv = H.range(H.h(hs, 2), 1, 4);
-                byte m = BOX_MATS[(int) (H.h(hs, 3) & 7)];
-                c.box(ox + a * px, GROUND, oz + b * pz, ox + a * px + 27, GROUND + lv * 10 - 1, oz + b * pz + 11, m);
-            }
-        }
-        for (int k = 0; k < 4; k++) {
-            int mx = ox + H.range(H.h(h, 70 + k), 20, N - 20), mz = oz + H.range(H.h(h, 80 + k), 20, N - 20);
-            if (!c.hits(mx - 3, GROUND, mz - 3, mx + 5, GROUND + 175, mz + 5)) continue;
-            c.box(mx, GROUND, mz, mx + 2, GROUND + 170, mz + 2, Mat.ANDESITE);
-            c.box(mx - 3, GROUND + 171, mz - 3, mx + 5, GROUND + 174, mz + 5, Mat.LAMP_AMBER);
-        }
+        // Isolated transfer columns at the sides; the empty courtyard stays mostly empty.
+        c.taper(-2200.5, CZ - 700.5, 82, 45, GROUND, 770, 24, Mat.S_TOHA_PALE);
+        c.taper(2200.5, CZ - 700.5, 82, 45, GROUND, 710, 24, Mat.S_TOHA_PALE);
+        c.cylinder(-2200.5, CZ - 700.5, 105, 82, 1, 1, 420, 434, 0, 0, Mat.S_TOHA_RING);
+        c.cylinder(2200.5, CZ - 700.5, 105, 82, 1, 1, 420, 434, 0, 0, Mat.S_TOHA_RING);
     }
 }
