@@ -194,13 +194,22 @@ public class Preview {
         double t = 0;
         boolean inWater = false;
         double waterT = -1;
+        // Cache the current 16^3 cube locally for this ray. The old preview performed a
+        // concurrent-map lookup and empty-cube lookup for every single voxel step.
+        long loadedCubeKey = Long.MIN_VALUE;
+        byte[] loadedBlocks = null;
+        boolean loadedEmpty = false;
         while (t < localLimit) {
             byte m;
             if (TOHA_ONLY) {
                 int cx = x >> 4, cy = y >> 4, cz = z >> 4;
                 long key = cubeKey(cx, cy, cz);
-                byte[] blocks = cube(cx, cy, cz);
-                if (EMPTY_CUBES.contains(key)) {
+                if (key != loadedCubeKey) {
+                    loadedCubeKey = key;
+                    loadedBlocks = cube(cx, cy, cz);
+                    loadedEmpty = EMPTY_CUBES.contains(key);
+                }
+                if (loadedEmpty) {
                     // Jump directly to the next 16-block cube plane instead of
                     // testing every block in large empty rooms and air columns.
                     double tx = Math.abs(dx) < 1.0e-12 ? Double.POSITIVE_INFINITY
@@ -222,7 +231,7 @@ public class Preview {
                     face = 0;
                     continue;
                 }
-                m = blocks[(y & 15) << 8 | (z & 15) << 4 | (x & 15)];
+                m = loadedBlocks[(y & 15) << 8 | (z & 15) << 4 | (x & 15)];
             } else {
                 m = get(x, y, z);
             }
