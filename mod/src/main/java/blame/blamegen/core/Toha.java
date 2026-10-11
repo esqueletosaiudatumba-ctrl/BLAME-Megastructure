@@ -83,6 +83,7 @@ public final class Toha {
         drawNaveStructure(c);
         drawEngine(c);
         drawCaveFrames(c);
+        drawCaveAIControls(c);
         drawExteriorSpines(c);
         drawApproach(c);
         drawCourtyardPylons(c);
@@ -334,6 +335,35 @@ public final class Toha {
                 c.box(x - 34, top - 18, f + 29, x + 34, top - 12, f + 31, Mat.SEA_LANTERN);
             } else if (i == 5 || i == 8) {
                 c.box(l + 12, top - 18, f + 29, l + 42, top - 12, f + 31, Mat.LAMP_RED);
+            }
+        }
+    }
+
+    /**
+     * Each of Toha's thirteen cave AIs gets a fixed control slab recessed on the
+     * right-hand side of its chamber. The panels are identical enough to belong
+     * to one system, but only the primary and crown chambers retain a live cyan
+     * indicator: colour remains scarce and the black-and-white silhouette leads.
+     */
+    private void drawCaveAIControls(Cube c) {
+        for (int i = 0; i < CAVE_X.length; i++) {
+            int x = CAVE_X[i] + CAVE_W[i] / 2 - 22;
+            int y = CAVE_Y[i] + Math.max(22, CAVE_H[i] / 2 - 42);
+            int z = CZ + CAVE_FRONT[i] - 200;
+            if (!c.hits(x - 12, y, z - 18, x + 12, y + 92, z + 3)) continue;
+
+            c.box(x - 12, y, z - 18, x + 12, y + 92, z, Mat.S_TOHA_MASS);
+            c.box(x - 7, y + 12, z + 1, x - 5, y + 76, z + 3, Mat.S_DARK);
+            c.box(x + 3, y + 18, z + 1, x + 7, y + 34, z + 3, Mat.ANDESITE);
+            c.box(x + 3, y + 42, z + 1, x + 7, y + 48, z + 3, Mat.COAL);
+            c.box(x + 3, y + 56, z + 1, x + 7, y + 62, z + 3, Mat.COAL);
+
+            if (i == 2) {
+                c.box(x + 1, y + 68, z + 1, x + 7, y + 74, z + 3, Mat.BIO_CYAN);
+            } else if (i == 12) {
+                c.box(x + 1, y + 68, z + 1, x + 7, y + 74, z + 3, Mat.SEA_LANTERN);
+            } else if (i == 5 || i == 8) {
+                c.box(x + 1, y + 68, z + 1, x + 7, y + 74, z + 3, Mat.LAMP_RED);
             }
         }
     }
