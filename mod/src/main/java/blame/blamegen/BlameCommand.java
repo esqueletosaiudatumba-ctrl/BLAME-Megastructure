@@ -45,7 +45,7 @@ public class BlameCommand extends CommandBase {
     private static List<Spot> spots() {
         List<Spot> s = new ArrayList<Spot>();
         s.add(new Spot("beach", 0.5, WorldEvents.SPAWN_Y, 202.5, 180F, "the arrival beach (world spawn)"));
-        s.add(new Spot("toha-gate", Toha.CX + 0.5, 64, Toha.CZ + 2732.5, 180F, "inside the monumental south gate tunnel"));
+        s.add(new Spot("toha-gate", Toha.CX + 0.5, 64, Toha.CZ + 2732.5, 180F, "beneath the monumental south gate portal"));
         s.add(new Spot("toha-south", Toha.CX + 0.5, 64, Toha.CZ + 2600.5, 180F, "inside the precinct, facing the monumental approach"));
         s.add(new Spot("toha-north", Toha.CX + 0.5, 64, Toha.CZ - 2600.5, 0F, "inside the precinct at the north wall"));
         s.add(new Spot("toha-east", Toha.CX + 2660.5, 64, Toha.CZ + 0.5, 90F, "inside the precinct at the east wall"));
