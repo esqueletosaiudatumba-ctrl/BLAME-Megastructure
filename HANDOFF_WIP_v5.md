@@ -27,3 +27,9 @@ strata floor, (6) cyberpunk lighting (neon glass over sea lanterns; no sunlight)
 5. WorldEvents: set world spawn on WorldEvent.Load too (old saves keep old spawn). Users must delete old cubes / make a new world
    after the generator change.
 6. Run Probe/SeamCheck/bench + Preview renders, then merge to master (CI builds jar, packages instance).
+
+## Update (Pylon done)
+- `core/Pylon.java` written; core compiles again (JDK 21). Probe determinism PASS, SeamCheck PASS,
+  bench 0.146 ms random / 0.362 ms arrival cube. Renders in `docs/previews-v5/`.
+- Remaining from the list above: strata floor (2), neon post-pass + new Mats (3), `/blame tp` (4),
+  WorldEvents spawn on WorldEvent.Load (5). The Gradle mod-jar build still has to be run via CI.
