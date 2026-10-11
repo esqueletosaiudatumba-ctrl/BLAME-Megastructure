@@ -96,16 +96,25 @@ Keep the existing no-mob/quiet-world direction unless an explicit future task sa
 
 ## Translate the vision into this codebase
 
-This is a procedural, deterministic generator for Minecraft 1.12.2 and CubicChunks, not a hand-built static map. Preserve that architecture.
+The surrounding world is a procedural, deterministic generator for Minecraft 1.12.2 and CubicChunks. Toha Heavy Industries is the deliberate exception: a hand-authored, seed-invariant monument that must remain a single coherent architectural composition.
 
 - Treat `mod/src/main/java/blame/blamegen/core/` as pure Java. **Never add Minecraft or Forge imports to `core/`.**
 - Use `Mat.java` and `Styles.java` for material identity/style choices; use the existing `Cube` primitives and add new primitives only where they solve a real geometry need.
-- Use `Megastructure.java`, `Arrival.java`, `Face.java`, and `Landmark.java` as the current architectural organisation. Inspect the implementation before extending it; do not re-create systems that already exist.
+- Use `Megastructure.java`, `Arrival.java`, `Face.java`, and `Landmark.java` as the organisation of the surrounding world. Inspect implementations before extending them; do not re-create systems that already exist.
+- `Toha.java` is the fixed monumental set piece. Preserve its exact bounds and hand-authored design; do not turn it back into procedural district generation.
 - Geometry must be derived deterministically from seed and coordinates. Do not use runtime time, `Math.random()`, non-deterministic collection iteration, or state that makes cube-generation order matter.
 - Every feature must stay inside its owner region. Current documented margins are `MARGIN_XZ = 72` and `MARGIN_Y = 56`; if a feature crosses them, update margins and `tools/verify/SeamCheck.java`.
 - Keep primitives cheap by rejecting outside bounding boxes before raster work. Existing baseline was roughly 0.3 ms/random cube and about 0.55 ms/arrival cube; benchmark changes rather than assuming them harmless.
 - If architectural form changes, bump `Megastructure.GENERATOR_VERSION`, update previews under `docs/previews-<next>/`, run offline verification, and update the dated handoff.
 - Treat all runtime claims as unverified until they are actually tested. An offline preview is not an in-game screenshot; a source patch is not a built JAR.
+
+## Toha Heavy Industries — authored monument contract
+
+Toha is a **single fixed landmark**, not a randomized 150 km industrial grid. Its footprint is finite and its geometry is composed by hand in `mod/src/main/java/blame/blamegen/core/Toha.java`: a nearly 4 km-wide stepped factory-fortress, a 2 km central engine stack, thirteen cave mouths in four elevation tiers, a hollow service nave, exterior machine spines, and a processional approach. Its world placement and silhouette are seed-invariant; only the concrete material weathering may vary.
+
+Keep the design language severe and manga-faithful: pale ruled masses cut by black setbacks, immense uninterrupted walls, deep square cave openings, thin service slits, rare light, long structural braces, and void large enough to show the scale of the interior. Do not bring back randomized cell districts, random towers, bright advertising signs, decorative clutter, or a procedural city around the landmark. The surrounding world may remain procedural, but the Toha site itself must remain an authored architectural composition.
+
+The 13 cave mouths represent the facility's distinct cave-like chambers: they are fixed openings integrated into the façade, not a random cave-placement system. Preserve the broad silhouette and the contrast between a monumental exterior, a genuinely hollow central nave, and small passages/platforms inside it. See `docs/TOHA_MONUMENT_DESIGN.md` for the coordinate and composition contract.
 
 ## How an AI agent should work
 
