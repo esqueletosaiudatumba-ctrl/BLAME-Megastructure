@@ -74,6 +74,41 @@ final class Styles {
                 if (n > 0.88) return Mat.STONEBRICK_CRACKED;
                 return Mat.STONE;
             }
+            case Mat.S_TOHA_MASS: {
+                if (Math.floorMod(x, 32) == 0 || Math.floorMod(z, 32) == 0) return Mat.COAL;
+                if (Math.floorMod(y, 96) == 0) return Mat.CONC_GRAY;
+                double n = H.noise3(seed ^ 0xD1, x, y * 0.5, z, 21);
+                if (n < 0.14) return Mat.COAL;
+                if (n > 0.9) return Mat.TERRA_BLACK;
+                if ((ph & 1023) == 0) return Mat.CONC_GRAY;
+                return Mat.CONC_BLACK;
+            }
+            case Mat.S_TOHA_PALE: {
+                if (Math.floorMod(x, 12) == 0 || Math.floorMod(z, 12) == 0) return Mat.COAL;
+                if (Math.floorMod(y, 160) < 2) return Mat.CONC_BLACK;
+                double n = H.noise3(seed ^ 0xE1, x, y * 0.35, z, 27);
+                if (n < 0.2) return Mat.ANDESITE;
+                if (n > 0.86) return Mat.CONC_LGRAY;
+                return Mat.CONC_GRAY;
+            }
+            case Mat.S_TOHA_RING: {
+                if (Math.floorMod(y, 24) == 0) return Mat.COAL;
+                if (Math.floorMod(y, 96) == 1) return Mat.CONC_GRAY;
+                double n = H.noise3(seed ^ 0xF1, x * 0.3, y * 0.15, z * 0.3, 19);
+                return n < 0.3 ? Mat.COAL : Mat.CONC_BLACK;
+            }
+            case Mat.S_TOHA_TANK: {
+                if (Math.floorMod(y, 16) == 0) return Mat.ANDESITE;
+                double n = H.noise3(seed ^ 0xF2, x * 0.3, y * 0.15, z * 0.3, 23);
+                return n < 0.35 ? Mat.ANDESITE : Mat.CONC_GRAY;
+            }
+            case Mat.S_TOHA_DECK: {
+                if (Math.floorMod(x, 32) == 0 || Math.floorMod(z, 32) == 0) return Mat.CONC_BLACK;
+                long pl = H.h(seed, 9100, Math.floorDiv(x, 32), Math.floorDiv(z, 32));
+                int k = (int) (pl & 15);
+                if (k < 9) return Mat.CONC_GRAY;
+                return Mat.ANDESITE;
+            }
             default:
                 return Mat.CONC_GRAY;
         }

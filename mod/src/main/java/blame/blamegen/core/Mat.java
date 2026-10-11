@@ -90,6 +90,16 @@ public final class Mat {
     public static final byte S_PIPEWORK = 71;
     /** Heavily weathered stone with biological colonisation. */
     public static final byte S_BIO_STONE = 72;
+    /** Toha: near-black machined mass with panel seams and rivets. */
+    public static final byte S_TOHA_MASS = 73;
+    /** Toha: pale hatched concrete, ruled with fine dark vertical grooves like manga screentone. */
+    public static final byte S_TOHA_PALE = 74;
+    /** Toha: tiled steel deck plates with dark seams. */
+    public static final byte S_TOHA_DECK = 75;
+    /** Toha: dark curved shells, ruled only by horizontal courses (no vertical grooves, so no speckle on cylinders). */
+    public static final byte S_TOHA_RING = 76;
+    /** Toha: pale curved shells (tanks, cooling towers) with horizontal courses. */
+    public static final byte S_TOHA_TANK = 77;
 
     /**
      * Structure that a placed object can hang from or stand on: everything that is neither

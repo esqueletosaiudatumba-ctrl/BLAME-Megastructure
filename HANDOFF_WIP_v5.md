@@ -58,3 +58,10 @@ roof AND a new strata floor, (6) cyberpunk lighting.
 - Type-checked only against hand-written stubs of the 1.12.2 API (no MC jar in the sandbox); the real compile happens in CI.
   If CI fails, the likely suspects are the `CommandBase` signatures (`getTabCompletions`, `checkPermission`).
 - Not covered: ocean spires as landmarks (their standing height is not known without reading the world), a Toha sign viewpoint.
+
+## Update (Toha look pass, v7 WIP; session cut off by usage limit)
+- New styles `S_TOHA_MASS/PALE/DECK/RING/TANK` (Mat 73-77, Styles.java): near-black screentone masses, hatched pale concrete, tiled deck plates, ring-only curved shells. Toha no longer uses the orange/teal camo styles or the white/black speckle `S_METAL` (now ANDESITE).
+- `Toha.java`: road portal gantries, ground clutter blocks, fat-obelisk plaza, new `monoliths` district (black slabs with pilasters, sparse lit windows, cyan slits), fewer/cooler wall lights.
+- `Preview.java`: `BLAME_NIGHT=1` env renders night (moonlit blue-grey, emissives glow). Use `-Xmx5g` and maxD <= 2200 or it runs out of memory.
+- Renders in `docs/previews-v7/` (gate_approach, spire, monoliths, stacks, hall) were made BEFORE the last style fix (RING/TANK) so stacks/tanks there still look speckled.
+- NOT done: re-render after RING/TANK change; Probe/SeamCheck/bench re-run (portals/clutter/monoliths unverified for containment and cost); GENERATOR_VERSION not bumped; not compiled in CI.
