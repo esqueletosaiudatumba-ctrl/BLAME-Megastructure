@@ -59,3 +59,9 @@ TECHNICAL PROFILE
 
 Do not mark this instance as verified/playable until the matching mod JAR has been rebuilt and
 the save has been launched successfully in Minecraft 1.12.2 with this exact CubicChunks version.
+
+PACKAGE REPRODUCTION
+--------------------
+The committed ZIP is intended to be regenerated from this directory by the repository workflow
+`.github/workflows/update-instance-package.yml`. The archive is an importable base profile, not a
+playable release until a compatible `blamegen` JAR has been built and tested.
