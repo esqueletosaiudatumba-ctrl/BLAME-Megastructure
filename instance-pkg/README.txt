@@ -6,7 +6,7 @@ This package contains Minecraft 1.12.2, Forge 14.23.5.2860, CubicChunks
 0.0.1301.0-SNAPSHOT, the registry-fixed BLAME save, and the matching
 blamegen-1.0.0.jar for the authored Toha monument build.
 
-The source generator and JAR build have passed GitHub Actions offline tests on recent revisions; generator v9 is being revalidated after hollow-shell changes:
+The source generator and JAR build have passed GitHub Actions offline tests on recent revisions; generator v11 is being revalidated after hollow-shell and cave-machine changes:
 TohaMonumentCheck, Probe (determinism), SeamCheck, Survey, LandmarkSurvey,
 the preview renderer, and the Forge Gradle build. This is not yet an in-game
 visual/performance sign-off: launch Minecraft and inspect the monument before
@@ -32,9 +32,7 @@ Toha is now a single fixed architectural composition, not the old randomized
 150 km industrial district grid. It sits at X=0, Z=-4608, spans roughly 6 km
 across its precinct, and rises to Y=2030, close to the dark artificial ceiling.
 Its silhouette is hand-authored and seed-invariant: stepped pale/black shells,
-deep slit apertures, thirteen staggered AI cave chambers with nonuniform widths/heights and recessed control slabs, a hollow central
-nave, a tapered gravity furnace, six fused machine spines, four precinct pylons,
-and a south processional causeway with a monumental portal.
+deep slit apertures, thirteen staggered AI cave chambers with recessed control slabs and fixed spindle/gyro/cage/pressure-vessel mechanisms, a hollow central nave, a tapered gravity furnace, six fused machine spines, an off-axis mast rising to Y≈1975, four precinct pylons, and a south processional causeway with a monumental portal. The main tiers are hollow perimeter walls and the precinct is a thin plate supported by deep orthogonal girders.
 
 Read GRAND_GOAL_VISION.md and docs/TOHA_MONUMENT_DESIGN.md inside this package for
 the full visual north star and authored monument design contract.
