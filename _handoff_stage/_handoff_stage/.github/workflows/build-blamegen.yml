@@ -1,0 +1,49 @@
+name: Build BLAME mod
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "mod/**"
+      - ".github/workflows/build-blamegen.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+      - name: Build mod
+        working-directory: mod
+        run: |
+          chmod +x ./gradlew
+          set -o pipefail
+          ./gradlew build --no-daemon --console=plain --stacktrace 2>&1 | tee ../build.log
+      - name: Publish build log to ci-logs branch
+        if: always()
+        run: |
+          tail -c 60000 build.log > /tmp/build-tail.log || echo "no log" > /tmp/build-tail.log
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p /tmp/jar && cp mod/build/libs/blamegen-*.jar /tmp/jar/ 2>/dev/null || true
+          git checkout --orphan ci-logs
+          git rm -rf . -q
+          cp /tmp/build-tail.log build-tail.log
+          cp /tmp/jar/*.jar . 2>/dev/null || true
+          git add build-tail.log *.jar
+          git commit -q -m "ci: build log for ${GITHUB_SHA}"
+          git push -f origin ci-logs
+      - name: Upload generated mod JAR
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blamegen-1.0.0
+          path: mod/build/libs/blamegen-*.jar
+          if-no-files-found: error

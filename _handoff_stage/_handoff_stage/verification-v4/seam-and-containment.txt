@@ -1,0 +1,8 @@
+﻿tube band check done
+cube 0,-200,0 solid=0
+cube 5,-190,-7 solid=4096
+cube -30,300,40 solid=0
+cube 10,410,-3 solid=0
+cube 0,500,0 solid=0
+spawnY=65
+SEAMCHECK PASS

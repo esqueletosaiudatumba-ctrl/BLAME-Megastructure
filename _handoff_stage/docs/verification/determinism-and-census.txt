@@ -1,0 +1,8 @@
+﻿java.exe : Erro: Nπo foi possφvel localizar nem carregar a classe principal blame.blamegen.core.Probe
+No linha:1 caractere:642
++ ... oding utf8; & $java -cp build\pv blame.blamegen.core.Probe 2>&1 | Out ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Erro: Nπo foi p...egen.core.Probe:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Causada por: java.lang.ClassNotFoundException: blame.blamegen.core.Probe

@@ -10,12 +10,23 @@ package blame.blamegen.core;
  * Fixed design: it does not depend on the world seed, so every world arrives the same way.
  */
 public final class Arrival {
-    public static final int SPAWN_X = 0, SPAWN_Z = 64;
+    /**
+     * Horizontal scale of the whole arrival basin. The beach is exactly ten times its former
+     * AREA (sqrt(10) in each horizontal dimension): shore, ring wall, gate, causeway, piers and
+     * ocean spires all scale together. Heights, wall thickness and detail size stay in blocks.
+     */
+    public static final double S = Math.sqrt(10.0);
+    /** Arc length factor: blocks of wall per radian at the reference radius (was 160). */
+    static final double ARC_K = 160 * S;
+    /** Spawn on the south shore; 64 * S rounded. */
+    public static final int SPAWN_X = 0, SPAWN_Z = 202;
+    /** Largest radius at which this class writes blocks, plus the gate approach. */
+    static final int R_MAX = (int) Math.ceil(S * (280 + 38)) + 48 + 8;
     static final int W = 44;
     static final int FOUND_BOT = -96;
     static final int SEA = 62;
     static final int GATE_HALF = 26, GATE_FLOOR = 65, GATE_TOP = 295;
-    static final int CAUSEWAY_END = -500;
+    static final int CAUSEWAY_LEN = 173;
 
     private final Megastructure m;
     private final long seed = 0x0B1A3EL; // fixed so the arrival is identical in every world
@@ -27,14 +38,14 @@ public final class Arrival {
 
     static double radius(double theta) {
         // Expanded ring wall for a massive coastal expanse
-        return 280 + 18 * Math.sin(3 * theta + 0.7) + 12 * Math.sin(5 * theta + 2.1) + 8 * Math.sin(7 * theta + 1.3);
+        return S * (280 + 18 * Math.sin(3 * theta + 0.7) + 12 * Math.sin(5 * theta + 2.1) + 8 * Math.sin(7 * theta + 1.3));
     }
 
     double bayE(int x, int z) {
         // Broad elliptical bay: the shoreline sits well clear of spawn so the
         // beach reads as a vast coastal expanse, not a cove.
-        double ex = x / 230.0, ez = (z + 110) / 165.0;
-        return ex * ex + ez * ez + (H.noise2(seed ^ 0xB1, x, z, 48) - 0.5) * 0.25;
+        double ex = x / (230.0 * S), ez = (z + 110 * S) / (165.0 * S);
+        return ex * ex + ez * ez + (H.noise2(seed ^ 0xB1, x, z, (int) (48 * S)) - 0.5) * 0.25;
     }
 
     /** Y of the topmost solid block of the beach / seabed at (x, z). */
@@ -55,6 +66,26 @@ public final class Arrival {
         return surface(SPAWN_X, SPAWN_Z) + 1;
     }
 
+    /** True when (x, z) lies inside the ring wall's inner face, i.e. in the basin proper. */
+    boolean inBasin(int x, int z) {
+        double r = Math.sqrt((double) x * x + (double) z * z);
+        return r < radius(Math.atan2(z, x)) + W + 3;
+    }
+
+    /** Sky opening over the south beach: the only place the basin still sees the sky. */
+    boolean oculus(int x, int z) {
+        double ex = x / (OCU_RX), ez = (z - OCU_Z) / (OCU_RZ);
+        return ex * ex + ez * ez < 1;
+    }
+    static final double OCU_RX = 560, OCU_Z = 380, OCU_RZ = 440;
+
+    /** Cube entirely inside the smallest possible ring radius: nothing outside the basin matters. */
+    boolean deepInside(Cube c) {
+        double rMin = S * (280 - 38) - 6;
+        double fx = Math.max(Math.abs(c.x0), Math.abs(c.x0 + 15)), fz = Math.max(Math.abs(c.z0), Math.abs(c.z0 + 15));
+        return Math.sqrt(fx * fx + fz * fz) < rMin;
+    }
+
     static boolean inArc(double theta, double a0, double a1) {
         double t = theta;
         while (t < a0) t += 2 * Math.PI;
@@ -64,10 +95,11 @@ public final class Arrival {
 
     int wallTop(double theta) {
         if (inArc(theta, -1.10, -0.55)) {
-            int step = (int) Math.floor((theta + 1.10) * 160 / 9);
+            int step = (int) Math.floor((theta + 1.10) * ARC_K / 9);
             return 230 + H.range(H.h(seed, 11, step), -6, 22);
         }
-        return 1600 + (int) (300 * Math.sin(2 * theta));
+        // Everywhere else the wall climbs into the ceiling strata and closes the basin.
+        return Megastructure.CEIL_BASE + Megastructure.CEIL_J + 4;
     }
 
     boolean breach(double theta, int y) {
@@ -85,10 +117,10 @@ public final class Arrival {
     }
 
     public void draw(Cube c) {
-        int cx = Math.floorDiv(c.x0 + Megastructure.CELL / 2, Megastructure.CELL);
-        int cz = Math.floorDiv(c.z0 + Megastructure.CELL / 2, Megastructure.CELL);
-        if (cx != 0 || cz != 0) return;
         if (c.y0 + 15 < FOUND_BOT - 200) return;
+        if (c.y0 > Megastructure.CEIL_BASE + Megastructure.CEIL_J + Megastructure.CEIL_T + 40) return;
+        // The basin is far larger than one coarse cell, so it is keyed on distance from the origin.
+        if (!c.hits(-R_MAX, FOUND_BOT - 4, -R_MAX - 1200, R_MAX, 2400, R_MAX)) return;
         columns(c);
         oceanSpires(c); // Massive spires in the bay/ocean
         gate(c);
@@ -106,11 +138,11 @@ public final class Arrival {
                 double theta = Math.atan2(z + 0.5, x + 0.5);
                 double rt = radius(theta);
                 if (r >= rt + W + 3) continue;
-                double arc = (theta + Math.PI) * 160;
+                double arc = (theta + Math.PI) * ARC_K;
                 int top = wallTop(theta);
                 // A facade column only where blocks actually fall in the face band, which keeps
                 // the per-block cost to the wall ring instead of the whole shaft floor.
-                Face.Col fc = (r >= rt - 60 && r < rt + 34) ? face.new Col(theta) : null;
+                Face.Col fc = (r >= rt - 60 && r < rt + 34) ? new Face.Col(face, theta) : null;
                 if (r < rt) {
                     int s = surface(x, z);
                     double e = bayE(x, z);
@@ -163,7 +195,7 @@ public final class Arrival {
                         if (y > top) continue;
                         if (r >= rt + W) {
                             // Outer face: buttresses every ~34 blocks of arc.
-                            if (Math.floorMod((int) (arc * (rt + W) / 160), 34) < 5) c.set(x, y, z, Mat.S_MASS);
+                            if (Math.floorMod((int) (arc * (rt + W) / ARC_K), 34) < 5) c.set(x, y, z, Mat.S_MASS);
                             // Settlement ruins at base of outer wall
                             if (y == FOUND_BOT && H.chance(H.h(seed, 0xDEAD, x, z), 0.005)) {
                                 long hr = H.h(seed, 0xDEAD, x, z);
@@ -327,59 +359,27 @@ public final class Arrival {
     }
 
     // ========================================================================
-    // OCEAN SPIRES: massive monolithic columns rising from the bay/ocean
+    // OCEAN SPIRES: brutalist pylons standing in the bay, each rising into the strata roof
     // ========================================================================
+    /** Spire centres and half-widths at the base, in the scaled basin. */
+    static final int[][] SPIRES = {
+        {-474, -190, 40}, {443, -126, 46}, {-190, -569, 36}, {253, -601, 44},
+        {-538, -95, 34}, {569, -63, 38}, {190, -411, 52}, {-348, -379, 34},
+        {20, -330, 30}, {-640, -330, 32}, {640, -310, 34}, {-60, -760, 38}
+    };
+
+    public static int[][] spires() {
+        return SPIRES;
+    }
+
     private void oceanSpires(Cube c) {
-        if (c.y0 + 15 < SEA - 10) return;
-        if (c.y0 > SEA + 500) return;
-
-        // Spire positions across the bay water, clear of spawn, pier and gate axis.
-        int[][] spires = {
-            {-150, -60, 16}, {140, -40, 20}, {-60, -180, 14}, {80, -190, 18},
-            {-170, -30, 12}, {180, -20, 15}, {60, -130, 22}, {-110, -120, 13}
-        };
-
-        for (int[] sp : spires) {
-            int sx = sp[0], sz = sp[1], sr = sp[2];
-            if (!c.hits(sx - sr - 5, SEA - 20, sz - sr - 5, sx + sr + 5, SEA + 500, sz + sr + 5)) continue;
-
-            long hs = H.h(seed, 0xBEEF, sx, sz);
-            int sTop = SEA + H.range(H.h(hs, 1), 120, 400);
-
-            // Tapered monolithic column rising from seabed
-            c.taper(sx + 0.5, sz + 0.5, sr, Math.max(2, sr / 4), SEA - 20, sTop, 6, Mat.S_COLUMN);
-
-            // Weathered bands and copper patina streaks
-            for (int y = SEA + H.range(H.h(hs, 2), 0, 20); y < sTop; y += H.range(H.h(hs, 3), 16, 48)) {
-                if (c.hitsY(y - 3, y + 3)) {
-                    c.cylinder(sx + 0.5, sz + 0.5, sr + 2, sr - 1, 1, 1, y, y + 2, 0, 0,
-                               H.chance(H.h(hs, 4, y), 0.5) ? Mat.COPPER_PATINA : Mat.COPPER_WEATHERED);
-                }
-            }
-
-            // Internal spiral stair
-            c.box(sx - 1, SEA - 10, sz - 1, sx + 1, sTop, sz + 1, Mat.AIR);
-            for (int y = SEA - 10; y < sTop; y += 2) {
-                double a = (y - SEA + 10) * Math.PI / 8;
-                int lx = (int) Math.floor(sx + Math.cos(a) * 1.5);
-                int lz = (int) Math.floor(sz + Math.sin(a) * 1.5);
-                c.set(lx, y, lz, Mat.LADDER_N);
-            }
-
-            // Platform at top with warning lights
-            c.box(sx - sr - 3, sTop - 2, sz - sr - 3, sx + sr + 3, sTop + 2, sz + sr + 3, Mat.S_DARK);
-            c.box(sx - sr, sTop, sz - sr, sx + sr, sTop, sz + sr, Mat.DOUBLE_SLAB);
-            c.set(sx, sTop + 1, sz, Mat.LAMP_RED);
-            c.set(sx, sTop + 2, sz, Mat.LAMP_AMBER);
-            c.set(sx, sTop + 3, sz, Mat.LAMP_GREEN);
-
-            // Cable stays to other spires / wall
-            if (H.chance(H.h(hs, 5), 0.4)) {
-                int tx = H.range(H.h(hs, 6), -400, 400);
-                int tz = H.range(H.h(hs, 7), -400, 400);
-                int ty = SEA + H.range(H.h(hs, 8), 60, 200);
-                c.beam(sx, sTop, sz, tx, ty, tz, 1, Mat.CABLE);
-            }
+        for (int q = 0; q < SPIRES.length; q++) {
+            int[] sp = SPIRES[q];
+            int a = sp[2];
+            // quick reject: footprint plus cantilevers, full height
+            if (!c.hits(sp[0] - a * 2 - 40, SEA - 24, sp[1] - a * 2 - 40, sp[0] + a * 2 + 40, 2500, sp[1] + a * 2 + 40)) continue;
+            int roof = m.ceilDatum(sp[0], sp[1]);
+            Pylon.draw(m, c, sp[0], sp[1], SEA - 24, roof + 10, a, H.h(seed, 0xBEEF, q), SEA);
         }
     }
 
@@ -424,8 +424,8 @@ public final class Arrival {
 
     private void causeway(Cube c) {
         int zs = gateInnerZ() - W - 3;
-        int ze = CAUSEWAY_END;
-        if (!c.hits(-40, -260, ze, 40, 90, zs)) return;
+        int ze = zs - CAUSEWAY_LEN;
+        if (!c.hits(-40, -260, ze - 2, 40, 90, zs)) return;
         c.box(-6, GATE_FLOOR - 3, ze, 6, GATE_FLOOR, zs, Mat.S_DARK);
         c.box(-5, GATE_FLOOR, ze, 5, GATE_FLOOR, zs, Mat.DOUBLE_SLAB);
         c.box(-5, GATE_FLOOR + 1, ze, 5, GATE_FLOOR + 8, zs, Mat.AIR);
@@ -465,21 +465,21 @@ public final class Arrival {
     }
 
     private int wallHit(int along, boolean xAxis, int offset, int sign) {
-        for (int t = 0; t < 420; t++) {
+        for (int t = 0; t < (int) (S * 420); t++) {
             int x = xAxis ? sign * t : offset, z = xAxis ? offset : sign * t;
             double r = Math.sqrt((double) x * x + (double) z * z);
             if (r >= radius(Math.atan2(z, x))) return sign * t;
         }
-        return sign * 420;
+        return sign * (int) (S * 420);
     }
 
     private void skyStructures(Cube c) {
         // Catwalks across the shaft: y, axis (true = runs along x), offset.
-        int[][] cw = {{150, 1, -60}, {205, 0, 40}, {290, 1, 25}, {480, 0, -70}, {760, 1, 90}, {1100, 0, 10}};
+        int[][] cw = {{150, 1, -190}, {205, 0, 126}, {290, 1, 80}, {480, 0, -221}, {760, 1, 285}, {1100, 0, 32}};
         for (int[] w : cw) {
             int y = w[0], off = w[2];
             boolean xAxis = w[1] == 1;
-            if (!c.hits(-240, y - 130, -240, 240, y + 4, 240)) continue;
+            if (!c.hits(-R_MAX, y - 130, -R_MAX, R_MAX, y + 4, R_MAX)) continue;
             int a = wallHit(0, xAxis, off, -1) - 3, b = wallHit(0, xAxis, off, 1) + 3;
             if (xAxis) m.catwalkX(c, a, b, off, y);
             else m.catwalkZ(c, a, b, off, y);
@@ -494,7 +494,7 @@ public final class Arrival {
         }
         // Broken ring cantilevered from the west wall.
         int ry = 232;
-        if (c.hits(-240, ry - 130, -240, 240, ry + 8, 240)) {
+        if (c.hits(-R_MAX, ry - 130, -R_MAX, R_MAX, ry + 8, R_MAX)) {
             for (int z = c.z0; z < c.z0 + 16; z++)
                 for (int x = c.x0; x < c.x0 + 16; x++) {
                     double theta = Math.atan2(z + 0.5, x + 0.5);
@@ -502,14 +502,14 @@ public final class Arrival {
                     double r = Math.sqrt((double) x * x + (double) z * z) + 0.5;
                     double rt = radius(theta);
                     // Ragged inner edge.
-                    int step = (int) Math.floor((theta + Math.PI) * 160 / 7);
+                    int step = (int) Math.floor((theta + Math.PI) * ARC_K / 7);
                     double inner = rt - 56 + H.range(H.h(seed, 40, step), -3, 3);
                     double t = (theta - 2.3 + 2 * Math.PI) % (2 * Math.PI);
                     if (t > 2.0) inner += (t - 2.0) / 0.25 * 40; // tapering broken end
                     if (r < inner || r >= rt + 2) continue;
                     for (int y = ry; y <= ry + 7; y++) c.set(x, y, z, Mat.S_MASS);
                     c.set(x, ry + 8, z, Mat.DOUBLE_SLAB);
-                    double arc = (theta + Math.PI) * 160;
+                    double arc = (theta + Math.PI) * ARC_K;
                     if (Math.floorMod((int) arc, 14) < 2) for (int y = ry - 5; y < ry; y++) c.set(x, y, z, Mat.S_DARK);
                     if (r < inner + 1 && Math.floorMod((int) arc, 9) == 0) {
                         long hq = H.h(seed, 41, (int) arc);
@@ -531,73 +531,61 @@ public final class Arrival {
         int[] cy = {95, 230, 410, 650, 980, 1420};
         for (int q = 0; q < phi.length; q++) {
             long ha = H.h(seed, 0xA4C, q);
-            double ux = Math.cos(phi[q]), uz = Math.sin(phi[q]);
             double rr = radius(phi[q]) + 14, rl = radius(phi[q] + Math.PI) + 14;
-            int vert = H.range(H.h(ha, 1), 150, 340);
-            int t = H.range(H.h(ha, 2), 4, 9);
+            int vert = H.range(H.h(ha, 1), 150, 340) * 2;
+            int t = H.range(H.h(ha, 2), 4, 9) * 2;
             int base = cy[q];
-            // Up to two gaps break the arch, so it reads as ruin rather than monument.
-            double g0 = 0.25 + H.u(H.h(ha, 3)) * 2.6, gw0 = 0.20 + H.u(H.h(ha, 4)) * 0.5;
-            double g1 = H.u(H.h(ha, 5)) * Math.PI, gw1 = 0.12 + H.u(H.h(ha, 6)) * 0.35;
-            if (!c.hits((int) -Math.max(rr, rl) - t, base - t - 4, (int) -Math.max(rr, rl) - t,
-                    (int) Math.max(rr, rl) + t, base + vert + t + 4, (int) Math.max(rr, rl) + t)) continue;
-            // Springers: each arch springs from the ring wall, so its ends are embedded.
-            int xa0 = -(int) rr, za0 = 0, xa1 = -(int) rl, za1 = 0;
-            // Span + legs.
-            int steps = 28;
-            for (int q2 = 0; q2 <= steps; q2++) {
-                double f = (double) q2 / steps;
-                int px = (int) (xa0 + (xa1 - xa0) * f);
-                int pz = (int) (za0 + (za1 - za0) * f) + (int) (ux * f * 0 + 0);
-                double arch = Math.sin(Math.PI * f);
-                int h = (int) (vert * arch);
-                for (int dy = 0; dy < t; dy++)
-                    for (int dxx = -t / 2; dxx <= t / 2; dxx++) {
-                        int bx = px + dxx;
-                        if (bx < c.x0 - 1 || bx > c.x0 + 16) continue;
-                        c.set(bx, base + h + dy, pz + dxx, h > vert * 0.05 ? Mat.S_DARK : Mat.S_MASS);
-                    }
-                // Gaps.
-                if (f > g0 && f < g0 + gw0) {
-                    for (int dy = 0; dy < t + 1; dy++)
-                        c.set(px, base + h + dy, pz, Mat.AIR);
+            if (base + vert + t + 4 >= Megastructure.CEIL_BASE - Megastructure.CEIL_J - 8) vert = Megastructure.CEIL_BASE - Megastructure.CEIL_J - 12 - base - t;
+            if (vert < 40) continue;
+            // The arches lie in the plane z = zc, spanning the basin end to end.
+            int zc = (int) Math.round((q - 2.5) * 38);
+            if (!c.hits((int) -rr - t, base - t - 4, zc - t - 4, (int) rl + t, base + vert + t + 4, zc + t + 4)) continue;
+            double g0 = 0.25 + H.u(H.h(ha, 3)) * 0.5, gw0 = 0.03 + H.u(H.h(ha, 4)) * 0.06;
+            int xa = (int) -rr, xb = (int) rl;
+            double span = xb - xa;
+            int lo = Math.max(xa, c.x0 - 1), hi = Math.min(xb, c.x0 + 16);
+            for (int x = lo; x <= hi; x++) {
+                double f = (x - xa) / span;
+                double f2 = (x + 1 - xa) / span;
+                int h = (int) Math.round(vert * Math.sin(Math.PI * Math.min(1, f)));
+                int h2 = (int) Math.round(vert * Math.sin(Math.PI * Math.min(1, f2)));
+                if (f > g0 && f < g0 + gw0) continue; // the ruin: one clean break
+                int ya = Math.min(h, h2), yb = Math.max(h, h2) + t;
+                // Rectangular section: deep soffit ribs, a dark extrados, a lit intrados seam.
+                for (int dz = -t / 2; dz <= t / 2; dz++) {
+                    byte mat = (dz == -t / 2 || dz == t / 2) ? Mat.CONC_BLACK : Mat.CONC_GRAY;
+                    c.box(x, base + ya, zc + dz, x, base + yb, zc + dz, mat);
                 }
-                if (f > g1 && f < g1 + gw1) c.set(px, base + h, pz, Mat.AIR);
-            }
-            // Legs down from the springers.
-            c.box(xa0 - t, base - t, za0 - t, xa0 + t, base, za0 + t, Mat.S_MASS);
-            c.box(xa1 - t, base - t, za1 - t, xa1 + t, base, za1 + t, Mat.S_MASS);
-            // Cables hanging from the crown, and lanterns at the springers.
-            for (int q3 = 0; q3 < 3; q3++) {
-                long hc2 = H.h(ha, 20 + q3);
-                double f = 0.3 + H.u(H.h(hc2, 1)) * 0.4;
-                int px = (int) (xa0 + (xa1 - xa0) * f);
-                int len = H.range(H.h(hc2, 2), 20, Math.min(120, base + vert * (int) (Math.sin(Math.PI * f)) - 90));
-                if (len > 6) {
-                    c.box(px, base + vert * (int) (Math.sin(Math.PI * f)) - len, za0,
-                            px, base + vert * (int) (Math.sin(Math.PI * f)) - 2, za0, Mat.IRON_BARS);
-                    if (H.chance(H.h(hc2, 3), 0.4))
-                        c.set(px, base + vert * (int) (Math.sin(Math.PI * f)) - len - 1, za0, Mat.SEA_LANTERN);
+                if (Math.floorMod(x, 24) < 2) c.box(x, base + ya - 3, zc - 1, x, base + ya - 1, zc + 1, Mat.CONC_BLACK);
+                if (Math.floorMod(x, 12) == 0) {
+                    c.set(x, base + ya - 1, zc, Mat.SEA_LANTERN);
+                    c.set(x, base + yb + 1, zc, Mat.SEA_LANTERN);
                 }
             }
-            c.set(xa0, base + 2, za0, Mat.LAMP_AMBER);
-            c.set(xa1, base + 2, za1, Mat.LAMP_AMBER);
+            // Abutments at both ends, embedded in the wall.
+            c.box(xa - t, base - 40, zc - t, xa + t, base + t * 2, zc + t, Mat.CONC_GRAY);
+            c.box(xb - t, base - 40, zc - t, xb + t, base + t * 2, zc + t, Mat.CONC_GRAY);
+            c.set(xa + t + 1, base + 2, zc, Mat.LAMP_AMBER);
+            c.set(xb - t - 1, base + 2, zc, Mat.LAMP_AMBER);
         }
     }
 
     private void pier(Cube c) {
-        int x = -40, za = 0, zb = 34;
-        if (!c.hits(x - 2, 40, za, x + 2, 70, zb)) return;
+        int x = -126, za = -120, zb = 196;
+        if (!c.hits(x - 3, 40, za, x + 3, 72, zb)) return;
         c.box(x - 1, 63, za, x + 1, 63, zb, Mat.DOUBLE_SLAB);
         c.box(x - 1, 64, za, x + 1, 66, zb, Mat.AIR);
         c.box(x - 2, 64, za, x - 2, 64, zb, Mat.IRON_BARS);
         c.box(x + 2, 64, za, x + 2, 64, zb, Mat.IRON_BARS);
         c.box(x - 2, 64, za, x + 2, 64, za, Mat.IRON_BARS);
         for (int z = za; z <= zb; z += 8) {
-            c.box(x - 1, 48, z, x - 1, 62, z, Mat.S_DARK);
-            c.box(x + 1, 48, z, x + 1, 62, z, Mat.S_DARK);
+            c.box(x - 1, 46, z, x - 1, 62, z, Mat.S_DARK);
+            c.box(x + 1, 46, z, x + 1, 62, z, Mat.S_DARK);
+            if (Math.floorMod(z, 16) == 0) {
+                c.set(x - 2, 65, z, Mat.END_ROD_UP);
+                c.set(x + 2, 65, z, Mat.END_ROD_UP);
+                c.set(x, 62, z, Mat.SEA_LANTERN); // light under the deck, glowing through the water
+            }
         }
-        c.set(x + 2, 65, za, Mat.END_ROD_UP);
-        c.set(x - 2, 65, za, Mat.END_ROD_UP);
     }
 }

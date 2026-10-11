@@ -33,7 +33,7 @@ package blame.blamegen.core;
  * same seed always produces the same world regardless of generation order.
  */
 public final class Megastructure {
-    public static final int GENERATOR_VERSION = 3;
+    public static final int GENERATOR_VERSION = 5;
 
     static final int GRID = 192, GRID_J = 48;
     static final int TIER = 256, TIER_J = 56;
@@ -112,12 +112,16 @@ public final class Megastructure {
     // ------------------------------------------------------------------ entry point
 
     public void generate(Cube c) {
-        drawLattice(c);
-        drawWalls(c);
-        drawCoarse(c);
-        drawCeiling(c);
-        beacons.draw(c);
+        // Deep inside the arrival basin nothing of the lattice survives, so do not draw it just
+        // to overwrite it. Everything else is drawn first and the basin is stamped over it.
+        if (!arrival.deepInside(c)) {
+            drawLattice(c);
+            drawWalls(c);
+            drawCoarse(c);
+        }
         arrival.draw(c);
+        drawCeiling(c); // after the basin: the roof closes over the spires, the oculus stays open
+        if (!arrival.deepInside(c)) beacons.draw(c);
         c.resolveStyles(seed);
     }
 
@@ -131,8 +135,9 @@ public final class Megastructure {
     /** True when a light well is open above this column, so natural light still reaches down. */
     boolean ceilWell(int x, int z) {
         int cx = Math.floorDiv(x, CELL), cz = Math.floorDiv(z, CELL);
-        if (cx == 0 && cz == 0) return true; // the arrival shaft is open to the sky for ever
-        if (isSkyShaft(cx, cz)) {
+        if (arrival.oculus(x, z)) return true; // the sky opening over the beach
+        boolean basin = arrival.inBasin(x, z);
+        if (!basin && isSkyShaft(cx, cz)) {
             double dx = x - (cx * CELL + CELL / 2), dz = z - (cz * CELL + CELL / 2);
             if (dx * dx + dz * dz < WELL_R * WELL_R) return true;
         }
@@ -157,7 +162,7 @@ public final class Megastructure {
 
     /** True if this coarse cell has a megashaft that stays open to the sky (for ceilWell). */
     private boolean isSkyShaft(int cx, int cz) {
-        if (cx == 0 && cz == 0) return true;
+        if (cx == 0 && cz == 0) return false;
         long hc = H.h(seed, 600, cx, cz);
         double r = H.u(H.h(hc, 1));
         return r < 0.55 && H.chance(H.h(hc, 10), 0.5);
@@ -180,6 +185,11 @@ public final class Megastructure {
                 int p1 = Math.min(d + CEIL_PLATE, c.y0 + 15);
                 // Base plate: gap-free, so no natural light gets through.
                 for (int y = Math.max(d, c.y0); y <= p1; y++) c.set(x, y, z, Mat.S_MASS);
+                // Canon: "the underside of each layer periodically illuminates the overside of
+                // the one below to provide a day-night cycle." The underside of the base plate
+                // carries an irregular array of lighting panels; this is the only artificial
+                // sky the deep structure has.
+                if (d - 1 >= c.y0 && d - 1 <= c.y0 + 15) undersidePanels(c, x, z, d - 1);
                 // Dense strata above: layers with air gaps, ribs and hanging fittings.
                 for (int y = p1 + 1; y <= y1; y++) {
                     int ly = y - d - CEIL_PLATE;
@@ -196,6 +206,23 @@ public final class Megastructure {
     }
 
     // ------------------------------------------------------------------ decks
+
+    /**
+     * Lighting panels on the underside of the ceiling plate: the artificial sky that the canon
+     * Megastructure uses to give the layer below a day-night cycle. Panels are arranged in
+     * irregular bands of sea-lantern bays separated by dark framing, and occasionally a single
+     * amber panel. Density drifts so some districts read as daylight and others as gloom.
+     */
+    private void undersidePanels(Cube c, int x, int z, int y) {
+        // District-scale density so whole regions share one quality of light.
+        long hd = H.h(seed, 0x551, Math.floorDiv(x, 256), Math.floorDiv(z, 256));
+        double density = 0.20 + H.u(hd) * 0.55;
+        // Band structure: a band is a run of lit bays between dark framing strips.
+        long hb = H.h(seed, 0x552, x, z);
+        if (!H.chance(hb, density)) return;
+        byte mat = H.chance(H.h(hb, 1), 0.08) ? Mat.LAMP_AMBER : Mat.SEA_LANTERN;
+        c.set(x, y, z, mat);
+    }
 
     static final int D_NONE = 0, D_FULL = 1, D_HOLED = 2, D_PARTIAL = 3, D_LATTICE = 4, D_BLOCK = 5;
     static final int K_VOID = 0, K_FRAME = 1, K_BLOCK = 2;

@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'com.gtnewhorizons.retrofuturagradle' version '1.4.9'
+    id 'com.gtnewhorizons.retrofuturagradle' version '2.0.6'
     id 'com.gradleup.shadow' version '9.6.1'
 }
 
@@ -10,12 +10,15 @@ group = 'blame'
 version = '1.0.0'
 base.archivesName = 'blamegen'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+// Forge 1.12.2 runs on Java 8 (the instance uses jre-legacy). Compiling on a newer toolchain
+// would emit class files the game cannot load. Gradle itself still runs on JDK 17+.
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
-// RFG 2.x: the MC version is a single property on the extension; mappings come from
-// gradle.properties (mapping_channel / mapping_version).
+// RFG defaults to Minecraft 1.7.10 (Forge package cpw.mods.fml, Twitch, WorldSettings.GameType...).
+// The property that selects 1.12.2 is `mcVersion`; `version = ...` silently set project.version
+// instead, which is why compilePatchedMcJava was compiling 1.7.10 sources and failing.
 minecraft {
-    version = '1.12.2'
+    mcVersion = '1.12.2'
 }
 
 // Interpolate the ${mod_*} / ${mod_version} placeholders used by mcmod.info and pack.mcmeta,
