@@ -5,7 +5,7 @@ package blame.blamegen.core;
  *
  * A single deterministic architectural composition centred at (0, -4608):
  * a 6.1 km precinct, a 3.9 km-wide stepped factory-fortress, a 2 km engine
- * stack, thirteen cave mouths, a hollow central nave, exterior machine spines,
+ * stack, thirteen cave mouths with dedicated AI machines, a hollow central nave, a ceiling-height service mast, exterior machine spines,
  * and a five-frame processional causeway. All proportions and placements are
  * fixed. Only the material weathering resolved by Cube remains seed-dependent.
  *
