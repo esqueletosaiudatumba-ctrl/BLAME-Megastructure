@@ -46,6 +46,9 @@ jobs:
           echo "front elevation render exit=$?"
           timeout 100s java -Xmx2g -cp build/pv Preview toha-section toha-cross-section.png -4603 0 1030 5000 2200 5
           echo "central cut render exit=$?"
+          # Frontal elevation, one block behind the lower façade: the thirteen cave mouths are visible.
+          timeout 60s java -Xmx2g -cp build/pv Preview toha-section toha-elevation.png -3259 0 1030 4400 2100 4
+          echo "front elevation render exit=$?"
           timeout 100s java -Xmx2g -cp build/pv Preview toha-slice toha-plan.png 800 0 -4608 6500 8
           echo "plan render exit=$?"
 
@@ -59,6 +62,7 @@ jobs:
             toha-facade.png
             toha-oblique.png
             toha-cross-section.png
+            toha-elevation.png
             toha-plan.png
           if-no-files-found: warn
 
