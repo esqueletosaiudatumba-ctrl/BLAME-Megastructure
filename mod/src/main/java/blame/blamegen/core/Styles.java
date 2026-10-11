@@ -86,7 +86,7 @@ final class Styles {
             case Mat.S_TOHA_PALE: {
                 // Pale manga screentone: repeated fine dark rules, sparse mineral
                 // variance, and long horizontal courses instead of noisy camouflage.
-                if (Math.floorMod(x, 12) == 0 || Math.floorMod(z, 12) == 0) return Mat.COAL;
+                if (Math.floorMod(x, 32) == 0 || Math.floorMod(z, 32) == 0) return Mat.COAL;
                 if (Math.floorMod(y, 160) < 2) return Mat.CONC_BLACK;
                 double n = H.noise3(seed ^ 0xE1, x, y * 0.35, z, 27);
                 if (n < 0.10) return Mat.ANDESITE;
