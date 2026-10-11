@@ -90,7 +90,7 @@ geometry — a camera inside a slab renders a black image and tells you nothing.
 
 ## State of play (2026-10-11)
 
-- **Generator v9:** the infinite surrounding world stays deterministic and procedural; Toha Heavy Industries is a fixed monument at X=0, Z=-4608, reaching Y=2030. Its large tiers are hollow perimeter walls and its precinct is a thin plate carried by sparse girders. See `docs/TOHA_MONUMENT_DESIGN.md`.
+- **Generator v11:** the infinite surrounding world stays deterministic and procedural; Toha Heavy Industries is a fixed monument at X=0, Z=-4608, reaching Y=2030. Its large tiers are hollow perimeter walls and its precinct is a thin plate carried by sparse girders. Thirteen cave AIs have fixed chamber mechanisms and a ceiling-height off-axis mast breaks the roofline. See `docs/TOHA_MONUMENT_DESIGN.md`.
 - **Offline verification:** the Actions workflow compiles the core and runs `TohaMonumentCheck`, `Probe`, `SeamCheck`, `Survey`, `LandmarkSurvey`, and the generator benchmark. Recent versions also produce section, plan, and facade-review outputs. Check the newest run before claiming the current revision passed.
 - **Forge build:** the RFG/Forge 1.12.2 build has completed successfully in Actions on recent revisions. The workflow must ship exactly `mod/build/libs/blamegen-1.0.0.jar` (the reobfuscated runtime jar), never the `*-dev.jar`; it then rebuilds `BLAME_Megastructure_Instance.zip` with the same jar and Toha design document.
 - **Visual status:** the Minecraft client has not been launched for this revision. In-game lighting, block mapping, traversal, world creation, and performance remain unverified. Offline renders are schematic previews, not screenshots.
