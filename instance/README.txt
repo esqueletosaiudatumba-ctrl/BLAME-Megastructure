@@ -15,9 +15,10 @@ still required before calling this fully verified.
 TOHA HEAVY INDUSTRIES — AUTHORED MONUMENT
 The generator now builds one fixed Toha landmark, not a randomized 150 km
 industrial grid. The site is centred at X=0, Z=-4608; the stepped factory
-fortress rises to Y=2030 and includes thirteen AI cave chambers, a hollow
-central nave, a tapered gravity furnace, fused exterior machine spines, true
-deep façade slits, and a monumental south gate/approach.
+fortress rises to Y=2030 and includes thirteen staggered AI cave chambers, a
+hollow central nave, a tapered gravity furnace, an asymmetric east-side transfer
+mass, a west upper cantilever, fused exterior machine spines, deep façade slits,
+and a monumental south gate/approach.
 
 In the BLAME world, useful commands:
   /blame list
