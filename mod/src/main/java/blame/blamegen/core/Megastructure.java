@@ -113,6 +113,16 @@ public final class Megastructure {
 
     // ------------------------------------------------------------------ entry point
 
+    /**
+     * Offline art-review path: render only the fixed Toha monument, excluding
+     * the surrounding world lattice, Arrival basin, and artificial ceiling.
+     * Gameplay continues to use generate(Cube).
+     */
+    public void generateMonument(Cube c) {
+        if (toha.overlaps(c)) toha.draw(c);
+        c.resolveStyles(seed);
+    }
+
     public void generate(Cube c) {
         // Deep inside the arrival basin nothing of the lattice survives, so do not draw it just
         // to overwrite it. Everything else is drawn first and the basin is stamped over it.
