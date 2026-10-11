@@ -87,11 +87,13 @@ public final class TohaMonumentCheck {
         check(Toha.projectedFrontZ(1200) == Toha.CZ + 850,
                 "upper elevation must account for shell setback");
 
-        Cube transferMass = new Cube(Math.floorDiv(1700, 16), Math.floorDiv(800, 16),
+        Cube transferMass = new Cube(Math.floorDiv(1830, 16), Math.floorDiv(800, 16),
                 Math.floorDiv(Toha.CZ + 950, 16));
         toha.draw(transferMass);
-        check(Mat.isStructure(transferMass.get(1700, 800, Toha.CZ + 950)),
-                "the deliberately asymmetric eastern transfer mass must be present");
+        check(Mat.isStructure(transferMass.get(1830, 800, Toha.CZ + 950)),
+                "the deliberately asymmetric eastern transfer wall must be present");
+        check(transferMass.get(1700, 800, Toha.CZ + 950) == Mat.AIR,
+                "the eastern transfer mass must remain hollow behind its wall");
 
         Cube engine = new Cube(Math.floorDiv(260, 16), Math.floorDiv(500, 16),
                 Math.floorDiv(Toha.CZ - 560, 16));
