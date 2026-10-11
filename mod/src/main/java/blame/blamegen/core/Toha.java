@@ -21,7 +21,7 @@ public final class Toha {
     public static final int Z0 = CZ - HALF, Z1 = CZ + HALF;
 
     private static final int GROUND = 64;
-    private static final int TOP = 2030;
+    public static final int TOP = 2030;
     private static final int NAVE_X = 1050;
     private static final int NAVE_BACK = -1050;
     private static final int NAVE_FRONT = 250;
