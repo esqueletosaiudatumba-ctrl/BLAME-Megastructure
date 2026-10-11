@@ -33,7 +33,7 @@ package blame.blamegen.core;
  * same seed always produces the same world regardless of generation order.
  */
 public final class Megastructure {
-    public static final int GENERATOR_VERSION = 6;
+    public static final int GENERATOR_VERSION = 7;
 
     static final int GRID = 192, GRID_J = 48;
     static final int TIER = 256, TIER_J = 56;
@@ -116,7 +116,7 @@ public final class Megastructure {
     public void generate(Cube c) {
         // Deep inside the arrival basin nothing of the lattice survives, so do not draw it just
         // to overwrite it. Everything else is drawn first and the basin is stamped over it.
-        // Toha Heavy Industries replaces the lattice above y 0 inside its 150 km footprint.
+        // The authored Toha monument replaces the lattice above y 0 inside its finite precinct.
         boolean inToha = c.y0 >= 0 && toha.overlaps(c);
         if (!arrival.deepInside(c) && !inToha) {
             drawLattice(c);
