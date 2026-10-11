@@ -33,7 +33,7 @@ package blame.blamegen.core;
  * same seed always produces the same world regardless of generation order.
  */
 public final class Megastructure {
-    public static final int GENERATOR_VERSION = 8;
+    public static final int GENERATOR_VERSION = 9;
 
     static final int GRID = 192, GRID_J = 48;
     static final int TIER = 256, TIER_J = 56;
