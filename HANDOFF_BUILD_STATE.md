@@ -1,14 +1,14 @@
 # BUILD LOG + EXACT STOPPING POINT (2026-10-11)
 
-> **Status update — authored Toha milestone:** the older compile failure below is a historical stopping point, superseded by the current GitHub Actions build workflow. The offline core, Toha monument regression suite, and Forge build have passed on recent commits. The generator now builds the Toha site as one fixed, seed-invariant landmark (not a randomized 150 km district); the CI packaging workflow is being corrected to ship the reobfuscated runtime JAR rather than the similarly named development JAR. No in-client Minecraft launch or visual/performance sign-off has been completed. Use the latest Build BLAME mod run in Actions as the source of truth for the currently tested commit.
+> **Status update — authored Toha milestone:** the older compile failure below is a historical stopping point, superseded by the current GitHub Actions build workflow. The offline core, Toha monument regression suite, and Forge build have passed on recent commits. The generator now builds the Toha site as one fixed, seed-invariant landmark (not a randomized 150 km district). Generator v8 staggers the thirteen cave mouths, adds asymmetric transfer massing, and has a tier-aware offline elevation renderer. The CI packaging workflow explicitly selects and validates the reobfuscated runtime JAR, then rebuilds the instance ZIP; the latest v8 revision is still being revalidated. No in-client Minecraft launch or visual/performance sign-off has been completed. Use the latest Build BLAME mod run in Actions as the source of truth for the currently tested commit.
 
 ## Toha monument update
 
 - Fixed authored site at X=0, Z=-4608, with a roughly 6 km precinct and height to Y=2030.
-- One stepped main mass; thirteen fixed cave mouths and recessed AI control slabs; a hollow nave and tapered gravity furnace; sparse deep façade slits; fixed external machine spines; and a monumental south portal/causeway.
+- One stepped main mass; thirteen staggered cave mouths and recessed AI control slabs; a hollow nave and tapered gravity furnace; sparse deep façade slits; fixed external machine spines; and a monumental south portal/causeway.
 - Commands: /blame tp toha-gate and /blame tp toha-center reach the authored site.
 - tools/verify/TohaMonumentCheck.java checks the bounds, gate opening, shell, actual slit void, principal cave, AI panel, open nave, and gravity furnace.
-- Architecture contract: docs/TOHA_MONUMENT_DESIGN.md. The offline preview supports isolated rendering with Preview toha-persp, toha-section, and toha-slice.
+- Architecture contract: docs/TOHA_MONUMENT_DESIGN.md. The offline preview supports isolated rendering with Preview toha-persp, toha-section, toha-elevation, and toha-slice; toha-elevation projects the stepped facade instead of sampling one depth plane.
 
 
 Everything below is the literal state when I stopped. Nothing is silently "done".
