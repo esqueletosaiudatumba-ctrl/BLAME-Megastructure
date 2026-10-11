@@ -40,13 +40,13 @@ jobs:
           set +e
           # Render only the authored landmark so the arrival wall/lattice cannot occlude it.
           # Each view is independent: a slow perspective ray cast cannot suppress the plan/cut.
-          timeout 100s java -Xmx2g -cp build/pv Preview toha-persp toha-monument.png 0 800 2000 180 0 80 320 180 6500
+          timeout 80s java -Xmx2g -cp build/pv Preview toha-persp toha-monument.png 0 800 2000 180 0 80 240 135 6000
           echo "full silhouette render exit=$?"
-          timeout 100s java -Xmx2g -cp build/pv Preview toha-persp toha-facade.png 0 850 -900 180 0 86 320 180 5000
+          timeout 80s java -Xmx2g -cp build/pv Preview toha-persp toha-facade.png 0 850 -900 180 0 86 240 135 4000
           echo "front elevation render exit=$?"
-          timeout 100s java -Xmx2g -cp build/pv Preview toha-section toha-cross-section.png -4608 0 1030 5000 2200 5
+          timeout 100s java -Xmx2g -cp build/pv Preview toha-section toha-cross-section.png -4603 0 1030 5000 2200 5
           echo "central cut render exit=$?"
-          timeout 100s java -Xmx2g -cp build/pv Preview toha-slice toha-plan.png 1100 0 -4608 6500 8
+          timeout 100s java -Xmx2g -cp build/pv Preview toha-slice toha-plan.png 800 0 -4608 6500 8
           echo "plan render exit=$?"
 
       - name: Upload Toha monument views
