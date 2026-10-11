@@ -41,7 +41,7 @@ jobs:
           # Render only the authored landmark so the arrival wall/lattice cannot occlude it.
           # Each view is independent: a slow perspective ray cast cannot suppress the plan/cut.
           # One wide 3D silhouette view from outside the south gate, at reduced sampling density.
-          timeout 75s java -Xmx1200m -cp build/pv Preview toha-persp toha-monument.png 1800 200 -900 154 -14 80 240 135 5200
+          timeout 75s java -Xmx1200m -cp build/pv Preview toha-persp toha-monument.png 1800 850 -900 154 -9 80 240 135 5200
           echo "wide silhouette render exit=$?"
           timeout 100s java -Xmx2g -cp build/pv Preview toha-section toha-cross-section.png -4603 0 1030 5000 2200 5
           echo "central cut render exit=$?"
