@@ -20,6 +20,17 @@ jobs:
         with:
           distribution: temurin
           java-version: "25"
+      - name: Offline generator compile and verification
+        run: |
+          mkdir -p build/pv
+          javac -nowarn -d build/pv mod/src/main/java/blame/blamegen/core/*.java tools/preview/Preview.java tools/verify/*.java
+          java -cp build/pv blame.blamegen.core.TohaMonumentCheck
+          java -cp build/pv blame.blamegen.core.Probe
+          java -cp build/pv blame.blamegen.core.SeamCheck
+          java -cp build/pv blame.blamegen.core.Survey
+          java -cp build/pv blame.blamegen.core.LandmarkSurvey
+          java -cp build/pv Preview bench 3000
+
       - name: Build mod
         working-directory: mod
         run: |
