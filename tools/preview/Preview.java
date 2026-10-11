@@ -24,6 +24,8 @@ import java.util.stream.IntStream;
 public class Preview {
     static long SEED = 0x424C414D45L; // "BLAME"
     static Megastructure MS;
+    /** When enabled, the offline viewer isolates the authored landmark from the world around it. */
+    static boolean TOHA_ONLY;
     static final Map<Long, byte[]> CACHE = new ConcurrentHashMap<>();
 
     static int[] COL = new int[Mat.COUNT];
@@ -57,7 +59,8 @@ public class Preview {
         byte[] b = CACHE.get(key);
         if (b == null) {
             Cube c = new Cube(cx, cy, cz);
-            MS.generate(c);
+            if (TOHA_ONLY) MS.generateMonument(c);
+            else MS.generate(c);
             b = c.b;
             CACHE.put(key, b);
         }
@@ -76,6 +79,9 @@ public class Preview {
             case "persp": persp(a); break;
             case "slice": slice(a); break;
             case "section": section(a); break;
+            case "toha-persp": TOHA_ONLY = true; persp(a); break;
+            case "toha-slice": TOHA_ONLY = true; slice(a); break;
+            case "toha-section": TOHA_ONLY = true; section(a); break;
             case "bench": bench(Integer.parseInt(a[1])); break;
             case "spawn": System.out.println("spawnY=" + MS.spawnY()); break;
             default: throw new IllegalArgumentException(a[0]);
