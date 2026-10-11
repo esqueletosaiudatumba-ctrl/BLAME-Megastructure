@@ -28,3 +28,8 @@ roof AND a new strata floor, (6) cyberpunk lighting.
 4. WorldEvents: set world spawn on WorldEvent.Load too.
 5. **Users must delete old cubes or make a new world after this change** — the generator hash
    space changed, so old save data and new data do not match.
+
+## Update (night time)
+- World clock is now locked to midnight (18000) instead of noon: set on world creation and re-applied on every
+  `WorldEvent.Load` so old saves switch too. Adapter code only; needs the CI Forge build to be compiled.
+- The beach and bay have no sunlight now; the client fog (`ClientEvents`) follows sky colour, which is near-black at night.
