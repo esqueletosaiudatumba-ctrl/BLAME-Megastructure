@@ -8,7 +8,8 @@ does not have to reverse-engineer your session.
 **Creative north star:** before visual or world-content work, read the root-level `GRAND_GOAL_VISION.md`. It defines the intended atmosphere and includes embedded reference images. Keep its creative goals subordinate to the technical hard rules in this file.
 
 **What this is:** a Forge 1.12.2 mod (`blamegen`) that generates an infinite, deterministic,
-BLAME!-style megastructure via CubicChunks. Deterministic pure-Java core, thin MC adapter.
+BLAME!-style world via CubicChunks, with Toha Heavy Industries authored as a fixed monumental set piece.
+Deterministic pure-Java core, thin MC adapter.
 
 **Repo layout:**
 
@@ -22,6 +23,7 @@ mod/                                   the Forge 1.12.2 mod (RetroFuturaGradle)
     ClientEvents.java                  fog follows skylight (black inside, blue in daylight)
     core/                              PURE JAVA, no Minecraft imports, safe to copy anywhere
       Megastructure.java               THE WORLD GENERATOR
+      Toha.java                        fixed, authored Toha Heavy Industries monument — not a random district generator
       Arrival.java                     fixed beach/bay/gate/causeway + ocean spires + ruins + face + arches
       Face.java                        sculpted shaft-wall facades
       Landmark.java                    5 landmark types for previously-empty coarse cells
@@ -59,6 +61,9 @@ docs/
 5. **Never** ship the old v1 `blamegen` jar with the v3/v4 core: `Mat.COUNT` is a
    `static final` compile-time constant, so a v1 adapter + v3 core = `ArrayIndexOutOfBoundsException`
    at world creation. Rebuild the jar or drop it.
+6. **Toha is a fixed monument.** Keep its geometry coordinate-authored and seed-invariant in
+   `Toha.java`; do not restore randomized district selection, arbitrary tower placement, or billboard
+   dressing. Update `docs/TOHA_MONUMENT_DESIGN.md` and `TohaMonumentCheck` when changing its design.
 
 ## The dev loop (no Minecraft needed)
 
