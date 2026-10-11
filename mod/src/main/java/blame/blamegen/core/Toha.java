@@ -43,27 +43,27 @@ public final class Toha {
     // Thirteen fixed chambers: five at the foot, four in the second tier,
     // three in the third, and one isolated chamber in the crown.
     private static final int[] CAVE_X = {
-        -1350, -690, 0, 690, 1350,
-        -1100, -365, 365, 1100,
-        -740, 0, 740,
-        0
+        -1500, -630, 0, 790, 1510,
+        -1130, -345, 500, 1170,
+        -820, 120, 780,
+        190
     };
     private static final int[] CAVE_Y = {
-        150, 170, 130, 170, 150,
-        670, 690, 690, 670,
-        1050, 1025, 1050,
-        1475
+        160, 220, 130, 175, 190,
+        700, 680, 730, 650,
+        1070, 1000, 1130,
+        1505
     };
     private static final int[] CAVE_W = {
-        180, 260, 480, 260, 180,
-        280, 260, 260, 280,
-        260, 420, 260,
-        300
+        220, 190, 480, 300, 160,
+        230, 260, 320, 190,
+        230, 460, 280,
+        280
     };
     private static final int[] CAVE_H = {
-        260, 280, 500, 280, 260,
-        250, 270, 270, 250,
-        300, 360, 300,
+        300, 220, 500, 310, 240,
+        240, 280, 250, 310,
+        290, 330, 260,
         240
     };
     private static final int[] CAVE_FRONT = {
@@ -90,6 +90,7 @@ public final class Toha {
         drawOuterWalls(c);
         drawGatePortal(c);
         drawMainShell(c);
+        drawAsymmetricTransferMass(c);
         drawFacade(c);
         drawTerraceBands(c);
         carveSlitApertures(c);
@@ -199,6 +200,31 @@ public final class Toha {
         c.box(-970, 440, CZ - 2240, 970, 1600, CZ - 1860, Mat.S_TOHA_PALE);
         c.box(-1250, 760, CZ - 2280, 1250, 820, CZ - 1750, Mat.S_TOHA_MASS);
         c.box(-820, 1290, CZ - 2160, 820, 1760, CZ - 1810, Mat.S_TOHA_MASS);
+    }
+
+    /**
+     * One-sided service massing is intentional: the main shell is immense, but it
+     * must not read as a mirrored palace. This eastern transfer buttress and the
+     * western upper cantilever break the symmetry with functional industrial bulk.
+     */
+    private void drawAsymmetricTransferMass(Cube c) {
+        // A broad, setback transfer block grows out of the east shoulder.
+        c.box(1510, 720, CZ - 1650, 1840, 1110, CZ + 1040, Mat.S_TOHA_MASS);
+        c.box(1450, 1040, CZ - 1410, 1900, 1190, CZ + 900, Mat.S_TOHA_PALE);
+        c.box(1570, 1160, CZ - 1320, 1880, 1460, CZ + 720, Mat.S_TOHA_MASS);
+
+        // A deep slot cuts the exposed end wall; it is a machine access trench, not a window.
+        c.box(1834, 790, CZ + 260, 1842, 1040, CZ + 720, Mat.AIR);
+        c.box(1834, 1075, CZ + 260, 1842, 1092, CZ + 720, Mat.S_TOHA_PALE);
+
+        // The east transfer mass is pinned into the rear shell by a long diagonal brace.
+        c.beam(1810, 770, CZ + 980, 1600, 1190, CZ - 1540, 38, Mat.S_TOHA_PALE);
+        c.beam(1850, 820, CZ + 940, 1650, 1110, CZ - 1460, 14, Mat.S_TOHA_RING);
+
+        // Opposite side: a single upper cantilever, deliberately not mirrored.
+        c.box(-1770, 1480, CZ - 1080, -1040, 1560, CZ + 420, Mat.S_TOHA_MASS);
+        c.box(-1840, 1510, CZ - 980, -1764, 1550, CZ + 360, Mat.S_TOHA_PALE);
+        c.beam(-1710, 1485, CZ + 380, -1090, 1670, CZ - 900, 28, Mat.S_TOHA_RING);
     }
 
     private void drawFacade(Cube c) {
