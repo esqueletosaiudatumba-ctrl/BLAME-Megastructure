@@ -110,7 +110,7 @@ public final class Arrival {
                 int top = wallTop(theta);
                 // A facade column only where blocks actually fall in the face band, which keeps
                 // the per-block cost to the wall ring instead of the whole shaft floor.
-                Face.Col fc = (r >= rt - 60 && r < rt + 34) ? face.new Col(theta) : null;
+                Face.Col fc = (r >= rt - 60 && r < rt + 34) ? new Face.Col(face, theta) : null;
                 if (r < rt) {
                     int s = surface(x, z);
                     double e = bayE(x, z);

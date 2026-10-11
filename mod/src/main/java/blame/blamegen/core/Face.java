@@ -67,7 +67,7 @@ final class Face {
         this.seed = seed;
     }
 
-    private int sector(double theta) {
+    private static int sector(double theta) {
         return (int) Math.floor(theta / SECTOR);
     }
 
@@ -84,7 +84,11 @@ final class Face {
      * One angular position of the wall. Built once per block column, so the constructor is
      * expected to be cheap: a handful of hashes.
      */
-    final class Col {
+    /**
+     * One angular position of the wall. Built once per block column, so the constructor is
+     * expected to be cheap: a handful of hashes.
+     */
+    static final class Col {
         private final double theta;
         private final int styleIdx;
         private final long h;
@@ -94,11 +98,11 @@ final class Face {
         private final int ribHalf;
         private final int lampStride;
 
-        Col(double theta) {
+        Col(Face face, double theta) {
             this.theta = theta;
-            this.styleIdx = styleOf(theta);
-            this.h = H.h(seed, 0xF4C2, sector(theta));
-            this.phase = (theta / SECTOR) - sector(theta);
+            this.styleIdx = face.styleOf(theta);
+            this.h = H.h(face.seed, 0xF4C2, face.sector(theta));
+            this.phase = (theta / SECTOR) - face.sector(theta);
             this.ribPitch = 6 + H.range(H.h(h, 1), 0, 5);
             this.ribHalf = 1 + H.range(H.h(h, 2), 0, 3);
             this.lampStride = 3 + H.range(H.h(h, 3), 0, 5);

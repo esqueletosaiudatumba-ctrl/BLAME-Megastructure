@@ -10,7 +10,7 @@ import io.github.opencubicchunks.cubicchunks.api.worldgen.ICubeGenerator;
 import net.minecraft.block.BlockColored;
 import net.minecraft.block.BlockEndRod;
 import net.minecraft.block.BlockLadder;
-import net.minecraft.block.BlockRedstoneLamp;
+import net.minecraft.block.BlockRedstoneLight;
 import net.minecraft.block.BlockSandStone;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStone;
@@ -79,7 +79,7 @@ public class BlameCubeGenerator implements ICubeGenerator {
         s[Mat.OBSIDIAN] = Blocks.OBSIDIAN.getDefaultState();
         s[Mat.GLASS_GRAY] = Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.GRAY);
         // New materials
-        s[Mat.LAMP_RED] = Blocks.REDSTONE_LAMP.getDefaultState().withProperty(BlockRedstoneLamp.LIT, Boolean.TRUE);
+        s[Mat.LAMP_RED] = getLitRedstoneLamp();
         s[Mat.LAMP_AMBER] = Blocks.GLOWSTONE.getDefaultState(); // closest vanilla amber glow
         s[Mat.LAMP_GREEN] = Blocks.SEA_LANTERN.getDefaultState(); // cyan-green glow
         s[Mat.PIPE] = Blocks.PRISMARINE.getDefaultState(); // prismarine for plumbing
@@ -88,7 +88,7 @@ public class BlameCubeGenerator implements ICubeGenerator {
         s[Mat.COPPER_WEATHERED] = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.LIME); // weathered green-brown
         s[Mat.CONC_RUST] = Blocks.STAINED_HARDENED_CLAY.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.RED); // rust red
         s[Mat.BIO_CYAN] = Blocks.SEA_LANTERN.getDefaultState(); // bioluminescent cyan
-        s[Mat.BIO_MAGENTA] = Blocks.REDSTONE_LAMP.getDefaultState().withProperty(BlockRedstoneLamp.LIT, Boolean.TRUE); // bioluminescent magenta
+        s[Mat.BIO_MAGENTA] = getLitRedstoneLamp(); // bioluminescent magenta
         s[Mat.CABLE] = Blocks.IRON_BARS.getDefaultState(); // cable bundles
         s[Mat.VENT] = Blocks.IRON_BARS.getDefaultState(); // ventilation grills
         s[Mat.REBAR] = Blocks.IRON_BARS.getDefaultState(); // exposed rebar
@@ -97,6 +97,14 @@ public class BlameCubeGenerator implements ICubeGenerator {
             if (s[i] == null) throw new IllegalStateException("No block state for material " + i);
         }
         return s;
+    }
+
+    private static IBlockState getLitRedstoneLamp() {
+        try {
+            return Blocks.REDSTONE_LAMP.getDefaultState().withProperty((net.minecraft.block.properties.PropertyBool)net.minecraft.block.BlockRedstoneLight.class.getDeclaredField("LIT").get(null), Boolean.TRUE);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to get LIT property from BlockRedstoneLight", e);
+        }
     }
 
     public int spawnY() {
@@ -134,12 +142,12 @@ public class BlameCubeGenerator implements ICubeGenerator {
 
     @Override
     public Box getFullPopulationRequirements(ICube cube) {
-        return NO_REQUIREMENT;
+        return ICubeGenerator.NO_REQUIREMENT;
     }
 
     @Override
     public Box getPopulationPregenerationRequirements(ICube cube) {
-        return NO_REQUIREMENT;
+        return ICubeGenerator.NO_REQUIREMENT;
     }
 
     @Override
