@@ -7,7 +7,7 @@ A Forge 1.12.2 + CubicChunks project that procedurally generates an immense, det
 - [Grand goal and visual direction](GRAND_GOAL_VISION.md) — creative target and embedded visual references.
 - [Agent instructions](AGENTS.md) — repository layout, hard rules, build/verification workflow.
 - [Current handoff](HANDOFF_2026-10-11.md) — latest project status and next steps.
-- [Build status](HANDOFF_BUILD_STATE.md) — current Forge/RFG build blocker and candidate fixes.
+- [Build and verification status](HANDOFF_BUILD_STATE.md) — latest Forge/RFG state, offline checks, and remaining in-game verification.
 - [Toha monument design](docs/TOHA_MONUMENT_DESIGN.md) — the fixed, manga-faithful megastructure landmark and its dimensions.
 - [Shader and view-distance notes](docs/SHADERS_AND_VIEW_DISTANCE.md) — rendering/performance context.
 
@@ -27,7 +27,7 @@ A Forge 1.12.2 + CubicChunks project that procedurally generates an immense, det
 2. Keep `mod/src/main/java/blame/blamegen/core/` pure Java: no Minecraft imports.
 3. Preserve deterministic output for the same seed and coordinates.
 4. Check feature containment and seam margins when adding geometry.
-5. Never pair the legacy v1 `blamegen` adapter with the newer v3/v4 core; rebuild compatible artifacts.
+5. Never pair the legacy v1 `blamegen` adapter with the newer v3/v4+ core; rebuild compatible artifacts.
 
 ## Offline verification
 
