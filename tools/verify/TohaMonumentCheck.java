@@ -63,7 +63,7 @@ public final class TohaMonumentCheck {
                 Math.floorDiv(Toha.CZ - 560, 16));
         toha.draw(engine);
         check(Mat.isStructure(engine.get(260, 500, Toha.CZ - 560)),
-                "tapered engine shell must be present");
+                "gravity furnace shell must be present");
 
         System.out.println(failures == 0
                 ? "TOHA MONUMENT CHECK PASS"
