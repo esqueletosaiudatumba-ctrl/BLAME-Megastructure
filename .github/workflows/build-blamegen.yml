@@ -170,7 +170,8 @@ jobs:
           git rm -rf . -q
           cp /tmp/build-tail.log build-tail.log
           cp /tmp/jar/*.jar . 2>/dev/null || true
-          git add build-tail.log *.jar
+          git add build-tail.log
+          if compgen -G "*.jar" > /dev/null; then git add *.jar; fi
           git commit -q -m "ci: build log for ${GITHUB_SHA}"
           git push -f origin ci-logs
       - name: Upload generated mod JAR
