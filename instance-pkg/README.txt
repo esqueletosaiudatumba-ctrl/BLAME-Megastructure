@@ -6,7 +6,7 @@ This package contains Minecraft 1.12.2, Forge 14.23.5.2860, CubicChunks
 0.0.1301.0-SNAPSHOT, the registry-fixed BLAME save, and the matching
 blamegen-1.0.0.jar for the authored Toha monument build.
 
-The source generator and JAR build have passed GitHub Actions offline tests:
+The source generator and JAR build have passed GitHub Actions offline tests on recent revisions:
 TohaMonumentCheck, Probe (determinism), SeamCheck, Survey, LandmarkSurvey,
 the preview renderer, and the Forge Gradle build. This is not yet an in-game
 visual/performance sign-off: launch Minecraft and inspect the monument before
@@ -32,7 +32,7 @@ Toha is now a single fixed architectural composition, not the old randomized
 150 km industrial district grid. It sits at X=0, Z=-4608, spans roughly 6 km
 across its precinct, and rises to Y=2030, close to the dark artificial ceiling.
 Its silhouette is hand-authored and seed-invariant: stepped pale/black shells,
-deep slit apertures, thirteen AI cave chambers and control slabs, a hollow central
+deep slit apertures, thirteen staggered AI cave chambers with nonuniform widths/heights and recessed control slabs, a hollow central
 nave, a tapered gravity furnace, six fused machine spines, four precinct pylons,
 and a south processional causeway with a monumental portal.
 
