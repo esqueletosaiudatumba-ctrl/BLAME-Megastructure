@@ -37,11 +37,11 @@ jobs:
         continue-on-error: true
         run: |
           # Wide shot from the open arrival basin: complete height + approach in frame.
-          timeout 150s java -cp build/pv Preview persp toha-monument.png 0 200 0 180 -4 80 480 270 5200
+          timeout 150s java -cp build/pv Preview persp toha-monument.png 0 200 0 180 -4 80 400 225 4000
           # Closer axial view through the south portal and into the principal cave.
-          timeout 150s java -cp build/pv Preview persp toha-facade.png 0 200 -1000 180 -4 80 480 270 4500
+          timeout 150s java -cp build/pv Preview persp toha-facade.png 0 200 -1000 180 -4 80 400 225 3600
           # Oblique view reveals the front elevation and the side shell in one silhouette.
-          timeout 150s java -cp build/pv Preview persp toha-oblique.png 3000 200 -800 132 -4 80 480 270 5600
+          timeout 150s java -cp build/pv Preview persp toha-oblique.png 2300 200 -800 137 -4 80 400 225 4000
           # Vertical cut through the site's centre exposes the hollow nave and stepped shell.
           timeout 150s java -cp build/pv Preview section toha-cross-section.png -4608 0 1030 5000 2200 5
 
