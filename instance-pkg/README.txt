@@ -6,7 +6,7 @@ This package contains Minecraft 1.12.2, Forge 14.23.5.2860, CubicChunks
 0.0.1301.0-SNAPSHOT, the registry-fixed BLAME save, and the matching
 blamegen-1.0.0.jar for the authored Toha monument build.
 
-The source generator and JAR build have passed GitHub Actions offline tests on recent revisions:
+The source generator and JAR build have passed GitHub Actions offline tests on recent revisions; generator v9 is being revalidated after hollow-shell changes:
 TohaMonumentCheck, Probe (determinism), SeamCheck, Survey, LandmarkSurvey,
 the preview renderer, and the Forge Gradle build. This is not yet an in-game
 visual/performance sign-off: launch Minecraft and inspect the monument before
