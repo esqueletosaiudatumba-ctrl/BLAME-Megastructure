@@ -50,7 +50,7 @@ public class BlameCommand extends CommandBase {
         s.add(new Spot("toha-north", Toha.CX + 0.5, 64, Toha.CZ - 2600.5, 0F, "inside the precinct at the north wall"));
         s.add(new Spot("toha-east", Toha.CX + 2660.5, 64, Toha.CZ + 0.5, 90F, "inside the precinct at the east wall"));
         s.add(new Spot("toha-west", Toha.CX - 2660.5, 64, Toha.CZ + 0.5, 270F, "inside the precinct at the west wall"));
-        s.add(new Spot("toha-center", Toha.CX + 0.5, 64, Toha.CZ + 800.5, 180F, "inside the principal cave mouth, facing the core furnace"));
+        s.add(new Spot("toha-center", Toha.CX + 0.5, 130, Toha.CZ + 800.5, 180F, "inside the principal cave mouth, facing the core furnace"));
         return s;
     }
 
