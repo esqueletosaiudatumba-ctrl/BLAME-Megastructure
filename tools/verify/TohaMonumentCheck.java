@@ -101,6 +101,18 @@ public final class TohaMonumentCheck {
         check(Mat.isStructure(engine.get(260, 500, Toha.CZ - 560)),
                 "gravity furnace shell must be present");
 
+        Cube caveMachine = new Cube(Math.floorDiv(-1465, 16), Math.floorDiv(310, 16),
+                Math.floorDiv(Toha.CZ + 970, 16));
+        toha.draw(caveMachine);
+        check(Mat.isStructure(caveMachine.get(-1465, 310, Toha.CZ + 970)),
+                "each subordinate cave must receive its fixed chamber machine");
+
+        Cube crownMast = new Cube(Math.floorDiv(2230, 16), Math.floorDiv(1900, 16),
+                Math.floorDiv(Toha.CZ - 900, 16));
+        toha.draw(crownMast);
+        check(Mat.isStructure(crownMast.get(2230, 1900, Toha.CZ - 900)),
+                "the off-axis service mast must rise close to the ceiling");
+
         System.out.println(failures == 0
                 ? "TOHA MONUMENT CHECK PASS"
                 : "TOHA MONUMENT CHECK FAILURES=" + failures);
