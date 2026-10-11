@@ -21,6 +21,14 @@ public final class TohaMonumentCheck {
         check(!toha.overlaps(new Cube(0, 10, Math.floorDiv(Toha.Z1, 16))),
                 "footprint must end at Z=Toha.Z1");
 
+        Cube gate = new Cube(Math.floorDiv(-700, 16), Math.floorDiv(544, 16),
+                Math.floorDiv(Toha.CZ + 2600, 16));
+        toha.draw(gate);
+        check(Mat.isStructure(gate.get(-700, 544, Toha.CZ + 2600)),
+                "the south gate must have its monumental crosshead");
+        check(gate.get(0, 100, Toha.CZ + 2600) == Mat.AIR,
+                "the centre of the south gate must remain passable");
+
         Cube shell = new Cube(Math.floorDiv(1500, 16), Math.floorDiv(300, 16),
                 Math.floorDiv(Toha.CZ + 1000, 16));
         toha.draw(shell);
