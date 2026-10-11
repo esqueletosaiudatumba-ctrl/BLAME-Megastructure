@@ -7,7 +7,6 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
 
@@ -29,7 +28,9 @@ public class Preview {
     /** When enabled, the offline viewer isolates the authored landmark from the world around it. */
     static boolean TOHA_ONLY;
     static final Map<Long, byte[]> CACHE = new ConcurrentHashMap<>();
-    static final Set<Long> EMPTY_CUBES = ConcurrentHashMap.newKeySet();
+    // Reuse one immutable all-air cube for empty Toha-only ray cells; keeping a 4 KB
+    // byte array per empty cell exhausted CI memory during wide perspective previews.
+    static final byte[] EMPTY_CUBE = new byte[4096];
 
     static int[] COL = new int[Mat.COUNT];
     static {
@@ -75,7 +76,7 @@ public class Preview {
                 for (byte m : b) {
                     if (m != Mat.AIR) { empty = false; break; }
                 }
-                if (empty) EMPTY_CUBES.add(key);
+                if (empty) return EMPTY_CUBE;
             }
             return b;
         });
@@ -207,7 +208,7 @@ public class Preview {
                 if (key != loadedCubeKey) {
                     loadedCubeKey = key;
                     loadedBlocks = cube(cx, cy, cz);
-                    loadedEmpty = EMPTY_CUBES.contains(key);
+                    loadedEmpty = loadedBlocks == EMPTY_CUBE;
                 }
                 if (loadedEmpty) {
                     // Jump directly to the next 16-block cube plane instead of
