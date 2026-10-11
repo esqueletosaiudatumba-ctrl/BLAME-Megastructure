@@ -10,7 +10,6 @@ import io.github.opencubicchunks.cubicchunks.api.worldgen.ICubeGenerator;
 import net.minecraft.block.BlockColored;
 import net.minecraft.block.BlockEndRod;
 import net.minecraft.block.BlockLadder;
-import net.minecraft.block.BlockRedstoneLight;
 import net.minecraft.block.BlockSandStone;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.BlockStone;
@@ -100,8 +99,9 @@ public class BlameCubeGenerator implements ICubeGenerator {
     }
 
     private static IBlockState getLitRedstoneLamp() {
-        // Metadata 1 creates the lit state without reflecting a private property field.
-        return Blocks.REDSTONE_LAMP.getStateFromMeta(1);
+        // BlockRedstoneLight has no LIT property or metadata; lit and unlit are two separate blocks.
+        // (getStateFromMeta(1) just returned the UNLIT lamp, so these lights never glowed.)
+        return Blocks.LIT_REDSTONE_LAMP.getDefaultState();
     }
 
     public int spawnY() {

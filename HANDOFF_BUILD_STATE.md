@@ -86,3 +86,14 @@ extension, not from `gradle.properties`).
 `dist/blamegen-1.0.0.jar` (v1) has `new IBlockState[31]` inlined into `BlameCubeGenerator.class`.
 Mixing v1 classes with the v3 `Mat` (COUNT=45) throws `ArrayIndexOutOfBoundsException` in
 `buildStates()` at world creation. Rebuild the jar or ship without it.
+
+## Update: root cause of the compilePatchedMcJava failure (found by code review, not yet CI-verified)
+
+`minecraft { version = '1.12.2' }` does not select the Minecraft version in RFG: the property is
+`mcVersion`, and RFG defaults to **1.7.10**. That is why the build compiled `cpw.mods.fml`, Twitch and
+`WorldSettings.GameType` sources. `build.gradle` now sets `mcVersion = '1.12.2'`, a Java 8 toolchain
+(Forge 1.12.2 cannot load Java 17 class files), RFG 2.0.6 (the version proven to load on Gradle 9.7),
+and compiles against the bundled CubicChunks jar instead of an unverified Modrinth coordinate.
+Also fixed: `Mat.LAMP_RED/BIO_MAGENTA` used `getStateFromMeta(1)` on the redstone lamp, which returns the
+UNLIT lamp (lit/unlit are separate blocks); now `Blocks.LIT_REDSTONE_LAMP`. Next: run the
+"Build BLAME mod" workflow and report the result.
