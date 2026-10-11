@@ -2,7 +2,7 @@
 
 ## Intent
 
-Toha is one fixed architectural set piece, not the previous 150 km randomized industrial field. The surrounding BLAME! world remains deterministic and procedural; the Toha site itself is an authored silhouette with intentionally chosen dimensions, elevations, openings, and approach sequence.
+Toha is one fixed architectural set piece, not the previous 150 km randomized industrial field. The surrounding BLAME! world remains deterministic and procedural; the Toha site itself is an authored silhouette with intentionally chosen dimensions, elevations, openings, and approach sequence. Its kilometre-scale shells are hollow wall envelopes rather than solid boxes, so the central voids, side chambers and exterior view corridors are real geometry.
 
 The target is manga-faithful architectural grammar: monumental stepped volumes, pale ruled concrete, near-black setbacks, deep cave-like voids, sparse slit apertures, heavy braces, mechanical ring courses, a long empty approach, and a core that nearly meets the dark ceiling. The cave mouths are deliberately staggered rather than mirrored, with a heavy east-side transfer mass and a separate west-side cantilever to break the temple-like symmetry. Avoid generic industrial-city repetition, randomized structures, billboard signage, saturated lights, or decorative clutter.
 
@@ -15,7 +15,7 @@ The target is manga-faithful architectural grammar: monumental stepped volumes, 
 | Maximum authored height | Y=2030 (the ceiling underside begins no lower than about Y=2080) |
 | Main building width | About 4,200 blocks at the broad base |
 | Main building depth | About 3,860 blocks at the base plinth |
-| Precinct deck | 5,600 × 5,600 blocks, Y=0–63 |
+| Precinct deck | 5,600 × 5,600 blocks, thin plate at Y=60–63 on girders at Y=48–59 |
 | Site edge | Low outer walls with a deliberate south entrance gap |
 | Orientation | Monumental façade faces +Z (south); player approaches from the arrival basin |
 
@@ -42,9 +42,9 @@ The large lower central mouth is the primary arrival into the interior. Side mou
 
 The central hollow gravity furnace is the focal machine, rising to just below the artificial ceiling. It uses a thick tapered shell, a hollow bore, six stepped ring courses, and sparse service arms rather than neon ornament.
 
-The central nave is carved out of the solid exterior so the structure has actual negative space. Four ring-collared structural piers, partial service platforms, two inclined braces, hanging lines, and the hollow gravity furnace are visible from the lower cave mouths. Floors do not fill the chamber: a large uninterrupted void around the engine is essential to the scale.
+The central nave is a true open void within the wall shells; major tiers do not contain solid kilometre-wide interiors. Its perimeter is carried by deep wall envelopes, terrace collars and discrete structural members. Four ring-collared structural piers, partial service platforms, two inclined braces, hanging lines, and the hollow gravity furnace are visible from the lower cave mouths. Floors do not fill the chamber: a large uninterrupted void around the engine is essential to the scale.
 
-The core shell and side spines have hollow interiors. Preserve this when changing the material palette or expanding the geometry. The large shape should still look strong as a black silhouette; detail comes second.
+The core shell, side spines, main tiers and transfer masses have hollow interiors. The precinct platform is a four-block plate supported by an orthogonal grid of eight-block-wide, twelve-block-high girders at 512-block spacing. Preserve this sparse load-bearing logic when changing the material palette or expanding the geometry. The large shape should still look strong as a black silhouette; detail comes second.
 
 ## South approach
 
