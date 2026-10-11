@@ -46,7 +46,7 @@ The core shell and side spines have hollow interiors. Preserve this when changin
 
 ## South approach
 
-The approach is a narrow processional causeway crossing a mostly empty forecourt. Five fixed industrial frames grow wider and taller toward the façade. Twin recessed feed channels and restrained cyan marks identify the route. The boundary wall is low relative to the building and leaves a wide southern gate, so the monument remains visually dominant.
+The approach is a narrow processional causeway crossing a mostly empty forecourt. A deep side-pier portal with a heavy pale crosshead anchors the south perimeter opening; it stays clear in the middle for entry. Five fixed industrial frames grow wider and taller toward the façade. Twin recessed feed channels and restrained cyan marks identify the route. The boundary wall is low relative to the building and leaves a wide southern gate, so the monument remains visually dominant.
 
 ## Materials and lighting
 
