@@ -42,31 +42,31 @@ public final class Toha {
 
     // Thirteen fixed chambers: five at the foot, four in the second tier,
     // three in the third, and one isolated chamber in the crown.
-    private static final int[] CAVE_X = {
+    static final int[] CAVE_X = {
         -1500, -630, 0, 790, 1510,
         -1130, -345, 500, 1170,
         -820, 120, 780,
         190
     };
-    private static final int[] CAVE_Y = {
+    static final int[] CAVE_Y = {
         160, 220, 130, 175, 190,
         700, 680, 730, 650,
         1070, 1000, 1130,
         1505
     };
-    private static final int[] CAVE_W = {
+    static final int[] CAVE_W = {
         220, 190, 480, 300, 160,
         230, 260, 320, 190,
         230, 460, 280,
         280
     };
-    private static final int[] CAVE_H = {
+    static final int[] CAVE_H = {
         300, 220, 500, 310, 240,
         240, 280, 250, 310,
         290, 330, 260,
         240
     };
-    private static final int[] CAVE_FRONT = {
+    static final int[] CAVE_FRONT = {
         1350, 1350, 1350, 1350, 1350,
         1130, 1130, 1130, 1130,
         850, 850, 850,
