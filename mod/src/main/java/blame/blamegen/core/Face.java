@@ -61,7 +61,7 @@ final class Face {
 
     private final long seed;
     /** Angular size of a sector, in radians. */
-    private static final double SECTOR = 0.075;
+    private static final double SECTOR = 0.075 / Arrival.S;
 
     Face(long seed) {
         this.seed = seed;
