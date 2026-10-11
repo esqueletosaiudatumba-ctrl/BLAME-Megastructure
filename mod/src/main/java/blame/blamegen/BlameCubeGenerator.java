@@ -100,9 +100,8 @@ public class BlameCubeGenerator implements ICubeGenerator {
     }
 
     private static IBlockState getLitRedstoneLamp() {
-        // Use the mapped constant directly; reflective field names are not stable at runtime.
-        return Blocks.REDSTONE_LAMP.getDefaultState()
-                .withProperty(BlockRedstoneLight.LIT, Boolean.TRUE);
+        // Metadata 1 creates the lit state without reflecting a private property field.
+        return Blocks.REDSTONE_LAMP.getStateFromMeta(1);
     }
 
     public int spawnY() {
