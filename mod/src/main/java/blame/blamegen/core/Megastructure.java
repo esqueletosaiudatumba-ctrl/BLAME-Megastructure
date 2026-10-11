@@ -33,7 +33,7 @@ package blame.blamegen.core;
  * same seed always produces the same world regardless of generation order.
  */
 public final class Megastructure {
-    public static final int GENERATOR_VERSION = 5;
+    public static final int GENERATOR_VERSION = 6;
 
     static final int GRID = 192, GRID_J = 48;
     static final int TIER = 256, TIER_J = 56;
@@ -56,11 +56,13 @@ public final class Megastructure {
     final long seed;
     final Arrival arrival;
     final Beacons beacons;
+    final Toha toha;
 
     public Megastructure(long worldSeed) {
         this.seed = H.mix(worldSeed ^ 0x8A3F1C2B5D4E6F70L);
         this.arrival = new Arrival(this);
         this.beacons = new Beacons(this);
+        this.toha = new Toha(this);
     }
 
     // ------------------------------------------------------------------ grid helpers
@@ -114,14 +116,17 @@ public final class Megastructure {
     public void generate(Cube c) {
         // Deep inside the arrival basin nothing of the lattice survives, so do not draw it just
         // to overwrite it. Everything else is drawn first and the basin is stamped over it.
-        if (!arrival.deepInside(c)) {
+        // Toha Heavy Industries replaces the lattice above y 0 inside its 150 km footprint.
+        boolean inToha = c.y0 >= 0 && toha.overlaps(c);
+        if (!arrival.deepInside(c) && !inToha) {
             drawLattice(c);
             drawWalls(c);
             drawCoarse(c);
         }
         arrival.draw(c);
+        if (inToha) toha.draw(c);
         drawCeiling(c); // after the basin: the roof closes over the spires, the oculus stays open
-        if (!arrival.deepInside(c)) beacons.draw(c);
+        if (!arrival.deepInside(c) && !inToha) beacons.draw(c);
         c.resolveStyles(seed);
     }
 

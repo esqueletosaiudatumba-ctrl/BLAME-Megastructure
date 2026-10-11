@@ -4,6 +4,7 @@ import blame.blamegen.Tags;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,5 +22,10 @@ public class BlameGen {
         MinecraftForge.EVENT_BUS.register(new WorldEvents());
         LOGGER.info("Registered world type '{}' (generator version {})", WORLD_TYPE.getName(),
                 blame.blamegen.core.Megastructure.GENERATOR_VERSION);
+    }
+
+    @Mod.EventHandler
+    public void serverStarting(FMLServerStartingEvent event) {
+        event.registerServerCommand(new BlameCommand());
     }
 }
