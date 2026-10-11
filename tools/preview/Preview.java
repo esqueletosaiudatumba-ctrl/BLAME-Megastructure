@@ -63,12 +63,13 @@ public class Preview {
 
     static byte[] cube(int cx, int cy, int cz) {
         long key = cubeKey(cx, cy, cz);
-        byte[] b = CACHE.get(key);
-        if (b == null) {
+        // Rays are traced in parallel. Atomic construction prevents dozens of workers
+        // from regenerating the same 16^3 cube on the first frame cache miss.
+        return CACHE.computeIfAbsent(key, ignored -> {
             Cube c = new Cube(cx, cy, cz);
             if (TOHA_ONLY) MS.generateMonument(c);
             else MS.generate(c);
-            b = c.b;
+            byte[] b = c.b;
             if (TOHA_ONLY) {
                 boolean empty = true;
                 for (byte m : b) {
@@ -76,9 +77,8 @@ public class Preview {
                 }
                 if (empty) EMPTY_CUBES.add(key);
             }
-            CACHE.put(key, b);
-        }
-        return b;
+            return b;
+        });
     }
 
     static byte get(int x, int y, int z) {
