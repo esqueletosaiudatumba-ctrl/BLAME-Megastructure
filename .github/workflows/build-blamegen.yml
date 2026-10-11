@@ -102,6 +102,7 @@ jobs:
           fi
           git checkout -B publish-instance origin/master
           install -D /tmp/blamegen-built.jar instance-pkg/minecraft/mods/blamegen-1.0.0.jar
+          install -D GRAND_GOAL_VISION.md instance-pkg/GRAND_GOAL_VISION.md
           install -D docs/TOHA_MONUMENT_DESIGN.md instance-pkg/docs/TOHA_MONUMENT_DESIGN.md
 
           # A GITHUB_TOKEN push does not start another Actions workflow. Rebuild
@@ -151,7 +152,7 @@ jobs:
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add instance-pkg/minecraft/mods/blamegen-1.0.0.jar instance-pkg/docs/TOHA_MONUMENT_DESIGN.md BLAME_Megastructure_Instance.zip
+          git add instance-pkg/minecraft/mods/blamegen-1.0.0.jar instance-pkg/GRAND_GOAL_VISION.md instance-pkg/docs/TOHA_MONUMENT_DESIGN.md BLAME_Megastructure_Instance.zip
           if git diff --cached --quiet; then
             echo "The instance jar and ZIP are already current."
           else
