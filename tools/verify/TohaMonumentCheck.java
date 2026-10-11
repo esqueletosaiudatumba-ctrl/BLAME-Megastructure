@@ -59,6 +59,13 @@ public final class TohaMonumentCheck {
         check(Mat.isStructure(aiPanel.get(215, 410, Toha.CZ + 1140)),
                 "the principal cave must contain its fixed AI control slab");
 
+        check(Toha.projectedFrontZ(500) == Toha.CZ + 1350,
+                "lower elevation must project its own forward shell");
+        check(Toha.projectedFrontZ(800) == Toha.CZ + 1130,
+                "middle elevation must account for shell setback");
+        check(Toha.projectedFrontZ(1200) == Toha.CZ + 850,
+                "upper elevation must account for shell setback");
+
         Cube engine = new Cube(Math.floorDiv(260, 16), Math.floorDiv(500, 16),
                 Math.floorDiv(Toha.CZ - 560, 16));
         toha.draw(engine);
