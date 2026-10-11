@@ -33,7 +33,7 @@ package blame.blamegen.core;
  * same seed always produces the same world regardless of generation order.
  */
 public final class Megastructure {
-    public static final int GENERATOR_VERSION = 3;
+    public static final int GENERATOR_VERSION = 5;
 
     static final int GRID = 192, GRID_J = 48;
     static final int TIER = 256, TIER_J = 56;
@@ -112,12 +112,16 @@ public final class Megastructure {
     // ------------------------------------------------------------------ entry point
 
     public void generate(Cube c) {
-        drawLattice(c);
-        drawWalls(c);
-        drawCoarse(c);
-        drawCeiling(c);
-        beacons.draw(c);
+        // Deep inside the arrival basin nothing of the lattice survives, so do not draw it just
+        // to overwrite it. Everything else is drawn first and the basin is stamped over it.
+        if (!arrival.deepInside(c)) {
+            drawLattice(c);
+            drawWalls(c);
+            drawCoarse(c);
+        }
         arrival.draw(c);
+        drawCeiling(c); // after the basin: the roof closes over the spires, the oculus stays open
+        if (!arrival.deepInside(c)) beacons.draw(c);
         c.resolveStyles(seed);
     }
 
@@ -131,8 +135,9 @@ public final class Megastructure {
     /** True when a light well is open above this column, so natural light still reaches down. */
     boolean ceilWell(int x, int z) {
         int cx = Math.floorDiv(x, CELL), cz = Math.floorDiv(z, CELL);
-        if (cx == 0 && cz == 0) return true; // the arrival shaft is open to the sky for ever
-        if (isSkyShaft(cx, cz)) {
+        if (arrival.oculus(x, z)) return true; // the sky opening over the beach
+        boolean basin = arrival.inBasin(x, z);
+        if (!basin && isSkyShaft(cx, cz)) {
             double dx = x - (cx * CELL + CELL / 2), dz = z - (cz * CELL + CELL / 2);
             if (dx * dx + dz * dz < WELL_R * WELL_R) return true;
         }
@@ -157,7 +162,7 @@ public final class Megastructure {
 
     /** True if this coarse cell has a megashaft that stays open to the sky (for ceilWell). */
     private boolean isSkyShaft(int cx, int cz) {
-        if (cx == 0 && cz == 0) return true;
+        if (cx == 0 && cz == 0) return false;
         long hc = H.h(seed, 600, cx, cz);
         double r = H.u(H.h(hc, 1));
         return r < 0.55 && H.chance(H.h(hc, 10), 0.5);
