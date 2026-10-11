@@ -40,6 +40,8 @@ The large lower central mouth is the primary arrival into the interior. Side mou
 
 ## Interior
 
+The central hollow gravity furnace is the focal machine, rising to just below the artificial ceiling. It uses a thick tapered shell, a hollow bore, six stepped ring courses, and sparse service arms rather than neon ornament.
+
 The central nave is carved out of the solid exterior so the structure has actual negative space. Four ring-collared structural piers, partial service platforms, two inclined braces, hanging lines, and the hollow core engine are visible from the lower cave mouths. Floors do not fill the chamber: a large uninterrupted void around the engine is essential to the scale.
 
 The core shell and side spines have hollow interiors. Preserve this when changing the material palette or expanding the geometry. The large shape should still look strong as a black silhouette; detail comes second.
