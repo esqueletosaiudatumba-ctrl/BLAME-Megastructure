@@ -49,3 +49,12 @@ roof AND a new strata floor, (6) cyberpunk lighting.
 - NOT done: SeamCheck has no Toha-specific containment check yet (features are bounded to the 888-block cell inner square by
   construction; eyeball in renders); no `/blame tp toha` command; no neon/lighting pass; the south wall is not visible
   from the beach because the lattice occludes it. Mod jar still has to be built by CI.
+
+## Update (`/blame` command)
+- `BlameCommand.java` + registration in `BlameGen.serverStarting`: `/blame list`, `/blame tp <landmark>`,
+  `/blame tp <x> <y> <z>`. Landmarks: beach, toha-gate, toha-south, toha-north, toha-east, toha-west, toha-center.
+  Permission level 0 (works with cheats off). Only runs in the BLAME overworld. A floor-finder reads blocks around the
+  target (+-48 y) so the cubic world generates them, then snaps to solid floor with 2 blocks of headroom.
+- Type-checked only against hand-written stubs of the 1.12.2 API (no MC jar in the sandbox); the real compile happens in CI.
+  If CI fails, the likely suspects are the `CommandBase` signatures (`getTabCompletions`, `checkPermission`).
+- Not covered: ocean spires as landmarks (their standing height is not known without reading the world), a Toha sign viewpoint.
