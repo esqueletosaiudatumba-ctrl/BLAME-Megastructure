@@ -119,7 +119,10 @@ public final class Megastructure {
      * Gameplay continues to use generate(Cube).
      */
     public void generateMonument(Cube c) {
-        if (toha.overlaps(c)) toha.draw(c);
+        // The perspective ray caster traverses large empty distances. Resolve styles
+        // only for intersecting cubes so empty rays remain cheap.
+        if (!toha.overlaps(c)) return;
+        toha.draw(c);
         c.resolveStyles(seed);
     }
 
