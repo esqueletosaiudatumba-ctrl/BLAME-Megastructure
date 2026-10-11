@@ -45,12 +45,12 @@ public class BlameCommand extends CommandBase {
     private static List<Spot> spots() {
         List<Spot> s = new ArrayList<Spot>();
         s.add(new Spot("beach", 0.5, WorldEvents.SPAWN_Y, 202.5, 180F, "the arrival beach (world spawn)"));
-        s.add(new Spot("toha-gate", Toha.CX + 0.5, 64, Toha.Z1 - 60, 180F, "inside the south gate tunnel of Toha Heavy Industries"));
-        s.add(new Spot("toha-south", Toha.CX + 0.5, 64, Toha.Z1 - 300, 180F, "inside Toha's south wall, facing the complex"));
-        s.add(new Spot("toha-north", Toha.CX + 0.5, 64, Toha.Z0 + 300, 0F, "inside Toha's north wall"));
-        s.add(new Spot("toha-east", Toha.X1 - 300, 64, Toha.CZ + 0.5, 90F, "inside Toha's east wall"));
-        s.add(new Spot("toha-west", Toha.X0 + 300, 64, Toha.CZ + 0.5, 270F, "inside Toha's west wall"));
-        s.add(new Spot("toha-center", Toha.CX + 0.5, 64, Toha.CZ + 800.5, 180F, "the plaza before Toha's central spire"));
+        s.add(new Spot("toha-gate", Toha.CX + 0.5, 64, Toha.CZ + 2732.5, 180F, "inside the monumental south gate tunnel"));
+        s.add(new Spot("toha-south", Toha.CX + 0.5, 64, Toha.CZ + 2600.5, 180F, "inside the precinct, facing the monumental approach"));
+        s.add(new Spot("toha-north", Toha.CX + 0.5, 64, Toha.CZ - 2600.5, 0F, "inside the precinct at the north wall"));
+        s.add(new Spot("toha-east", Toha.CX + 2660.5, 64, Toha.CZ + 0.5, 90F, "inside the precinct at the east wall"));
+        s.add(new Spot("toha-west", Toha.CX - 2660.5, 64, Toha.CZ + 0.5, 270F, "inside the precinct at the west wall"));
+        s.add(new Spot("toha-center", Toha.CX + 0.5, 64, Toha.CZ + 800.5, 180F, "inside the principal cave mouth, facing the core furnace"));
         return s;
     }
 
