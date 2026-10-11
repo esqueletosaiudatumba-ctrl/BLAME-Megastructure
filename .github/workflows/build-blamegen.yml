@@ -31,6 +31,19 @@ jobs:
           java -cp build/pv blame.blamegen.core.LandmarkSurvey
           java -cp build/pv Preview bench 3000
 
+      - name: Render Toha monument preview
+        continue-on-error: true
+        run: |
+          timeout 150s java -cp build/pv Preview persp toha-monument.png 0 1000 -1000 180 0 80 320 180 3400
+
+      - name: Upload Toha monument preview
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: toha-monument-preview
+          path: toha-monument.png
+          if-no-files-found: warn
+
       - name: Build mod
         working-directory: mod
         run: |
@@ -44,7 +57,14 @@ jobs:
           set -euo pipefail
           jar="$(find mod/build/libs -maxdepth 1 -type f -name 'blamegen-*.jar' ! -name '*sources*' ! -name '*javadoc*' | sort | head -n 1)"
           test -n "$jar" || { echo "No built blamegen runtime JAR found"; exit 1; }
-          install -D "$jar" instance-pkg/minecraft/mods/blamegen-1.0.0.jar
+          cp "$jar" /tmp/blamegen-built.jar
+          git fetch origin master
+          if ! git diff --quiet "$GITHUB_SHA" origin/master -- mod .github/workflows/build-blamegen.yml; then
+            echo "Master has newer generator/build sources; skipping this stale JAR."
+            exit 0
+          fi
+          git checkout -B publish-instance origin/master
+          install -D /tmp/blamegen-built.jar instance-pkg/minecraft/mods/blamegen-1.0.0.jar
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add instance-pkg/minecraft/mods/blamegen-1.0.0.jar
