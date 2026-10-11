@@ -29,10 +29,10 @@ public final class TohaMonumentCheck {
         check(gate.get(0, 100, Toha.CZ + 2600) == Mat.AIR,
                 "the centre of the south gate must remain passable");
 
-        Cube shell = new Cube(Math.floorDiv(1500, 16), Math.floorDiv(300, 16),
+        Cube shell = new Cube(Math.floorDiv(1750, 16), Math.floorDiv(300, 16),
                 Math.floorDiv(Toha.CZ + 1000, 16));
         toha.draw(shell);
-        check(Mat.isStructure(shell.get(1500, 300, Toha.CZ + 1000)),
+        check(Mat.isStructure(shell.get(1750, 300, Toha.CZ + 1000)),
                 "authored lower shell must occupy its designed sample");
 
         Cube mouth = new Cube(0, Math.floorDiv(300, 16),
