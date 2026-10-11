@@ -82,7 +82,7 @@ public final class Toha {
         carveNave(c);
         carveCaves(c);
         drawNaveStructure(c);
-        drawEngine(c);
+        drawGravityFurnace(c);
         drawCaveFrames(c);
         drawCaveAIControls(c);
         drawExteriorSpines(c);
@@ -309,7 +309,7 @@ public final class Toha {
         c.beam(870, 1640, CZ - 830, 820, 630, CZ - 720, 2, Mat.CABLE);
     }
 
-    private void drawEngine(Cube c) {
+    private void drawGravityFurnace(Cube c) {
         double x = CX + 0.5, z = CZ - 560 + 0.5;
         // One continuous, hollow tapered furnace/spine nearly touches the ceiling.
         c.taper(x, z, 320, 92, 210, TOP, 32, Mat.S_TOHA_RING);
