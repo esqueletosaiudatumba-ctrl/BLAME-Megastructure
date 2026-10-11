@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.IntStream;
 
@@ -28,6 +29,7 @@ public class Preview {
     /** When enabled, the offline viewer isolates the authored landmark from the world around it. */
     static boolean TOHA_ONLY;
     static final Map<Long, byte[]> CACHE = new ConcurrentHashMap<>();
+    static final Set<Long> EMPTY_CUBES = ConcurrentHashMap.newKeySet();
 
     static int[] COL = new int[Mat.COUNT];
     static {
@@ -55,14 +57,25 @@ public class Preview {
                 || m == Mat.BIO_CYAN || m == Mat.BIO_MAGENTA;
     }
 
+    static long cubeKey(int cx, int cy, int cz) {
+        return ((long) cx & 0x1FFFFF) << 42 | ((long) cy & 0x1FFFFF) << 21 | ((long) cz & 0x1FFFFF);
+    }
+
     static byte[] cube(int cx, int cy, int cz) {
-        long key = ((long) cx & 0x1FFFFF) << 42 | ((long) cy & 0x1FFFFF) << 21 | ((long) cz & 0x1FFFFF);
+        long key = cubeKey(cx, cy, cz);
         byte[] b = CACHE.get(key);
         if (b == null) {
             Cube c = new Cube(cx, cy, cz);
             if (TOHA_ONLY) MS.generateMonument(c);
             else MS.generate(c);
             b = c.b;
+            if (TOHA_ONLY) {
+                boolean empty = true;
+                for (byte m : b) {
+                    if (m != Mat.AIR) { empty = false; break; }
+                }
+                if (empty) EMPTY_CUBES.add(key);
+            }
             CACHE.put(key, b);
         }
         return b;
@@ -170,16 +183,48 @@ public class Preview {
         }
         int x = (int) Math.floor(ox), y = (int) Math.floor(oy), z = (int) Math.floor(oz);
         int sx = dx > 0 ? 1 : -1, sy = dy > 0 ? 1 : -1, sz = dz > 0 ? 1 : -1;
-        double tdx = Math.abs(1 / dx), tdy = Math.abs(1 / dy), tdz = Math.abs(1 / dz);
-        double tmx = (dx > 0 ? (x + 1 - ox) : (ox - x)) * tdx;
-        double tmy = (dy > 0 ? (y + 1 - oy) : (oy - y)) * tdy;
-        double tmz = (dz > 0 ? (z + 1 - oz) : (oz - z)) * tdz;
+        double tdx = Math.abs(dx) < 1.0e-12 ? Double.POSITIVE_INFINITY : Math.abs(1 / dx);
+        double tdy = Math.abs(dy) < 1.0e-12 ? Double.POSITIVE_INFINITY : Math.abs(1 / dy);
+        double tdz = Math.abs(dz) < 1.0e-12 ? Double.POSITIVE_INFINITY : Math.abs(1 / dz);
+        double tmx = Math.abs(dx) < 1.0e-12 ? Double.POSITIVE_INFINITY : (dx > 0 ? (x + 1 - ox) : (ox - x)) * tdx;
+        double tmy = Math.abs(dy) < 1.0e-12 ? Double.POSITIVE_INFINITY : (dy > 0 ? (y + 1 - oy) : (oy - y)) * tdy;
+        double tmz = Math.abs(dz) < 1.0e-12 ? Double.POSITIVE_INFINITY : (dz > 0 ? (z + 1 - oz) : (oz - z)) * tdz;
         int face = 0;
         double t = 0;
         boolean inWater = false;
         double waterT = -1;
         while (t < localLimit) {
-            byte m = get(x, y, z);
+            byte m;
+            if (TOHA_ONLY) {
+                int cx = x >> 4, cy = y >> 4, cz = z >> 4;
+                long key = cubeKey(cx, cy, cz);
+                byte[] blocks = cube(cx, cy, cz);
+                if (EMPTY_CUBES.contains(key)) {
+                    // Jump directly to the next 16-block cube plane instead of
+                    // testing every block in large empty rooms and air columns.
+                    double tx = Math.abs(dx) < 1.0e-12 ? Double.POSITIVE_INFINITY
+                            : (((dx > 0 ? (cx + 1) * 16.0 : cx * 16.0) - ox) / dx);
+                    double ty = Math.abs(dy) < 1.0e-12 ? Double.POSITIVE_INFINITY
+                            : (((dy > 0 ? (cy + 1) * 16.0 : cy * 16.0) - oy) / dy);
+                    double tz = Math.abs(dz) < 1.0e-12 ? Double.POSITIVE_INFINITY
+                            : (((dz > 0 ? (cz + 1) * 16.0 : cz * 16.0) - oz) / dz);
+                    double next = Math.min(tx, Math.min(ty, tz));
+                    if (!Double.isFinite(next) || next >= localLimit) break;
+                    t = Math.max(t, next) + 0.001;
+                    if (t >= localLimit) break;
+                    x = (int) Math.floor(ox + dx * t);
+                    y = (int) Math.floor(oy + dy * t);
+                    z = (int) Math.floor(oz + dz * t);
+                    tmx = Math.abs(dx) < 1.0e-12 ? Double.POSITIVE_INFINITY : (dx > 0 ? (x + 1 - ox) : (ox - x)) * tdx;
+                    tmy = Math.abs(dy) < 1.0e-12 ? Double.POSITIVE_INFINITY : (dy > 0 ? (y + 1 - oy) : (oy - y)) * tdy;
+                    tmz = Math.abs(dz) < 1.0e-12 ? Double.POSITIVE_INFINITY : (dz > 0 ? (z + 1 - oz) : (oz - z)) * tdz;
+                    face = 0;
+                    continue;
+                }
+                m = blocks[(y & 15) << 8 | (z & 15) << 4 | (x & 15)];
+            } else {
+                m = get(x, y, z);
+            }
             if (m == Mat.WATER) {
                 if (!inWater) { inWater = true; waterT = t; }
             } else if (m != Mat.AIR) {
