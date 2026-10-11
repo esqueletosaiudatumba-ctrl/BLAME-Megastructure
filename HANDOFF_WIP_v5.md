@@ -33,3 +33,19 @@ roof AND a new strata floor, (6) cyberpunk lighting.
 - World clock is now locked to midnight (18000) instead of noon: set on world creation and re-applied on every
   `WorldEvent.Load` so old saves switch too. Adapter code only; needs the CI Forge build to be compiled.
 - The beach and bay have no sunlight now; the client fog (`ClientEvents`) follows sky colour, which is near-black at night.
+
+## Update (Toha Heavy Industries, generator v6)
+- New `core/Toha.java`: a fixed 150 km x 150 km complex centred at (0, -90000), x/z = +-74880 around it. Spawn is
+  ~15 km south of its south wall (z = -15120). Hooked in `Megastructure.generate`: inside the footprint, for cubes with
+  y0 >= 0, the lattice/walls/coarse/beacons are skipped and `Toha.draw` runs; below y 0 the abyss lattice is untouched.
+  Height stays under the strata ceiling (everything <= y 2075).
+- Contents: deck (y 0..63); 120-thick perimeter wall to y 1960 with a 800 x 700 gate in each side, grooved faces, lit
+  strips, corner bastions; a lit TOHA sign (120-block pixels) on the outer face of the south wall above the gate;
+  central spire (r 420 -> 70, to y 2040) with fins; 156 x 156 grid of 960-block cells separated by lit roads, each owning
+  one district (furnace stacks, machine halls, tank farms, cooling towers, pipework, gantry yards, slag canals,
+  container yards); the 8 x 8 cells around the spire are a lamp-obelisk plaza.
+- Verified offline on top of master (opencode's Pylon): Probe determinism PASS, SeamCheck PASS, bench 0.145 random /
+  0.301 arrival, Toha cubes 0.072 ms. Renders in `docs/previews-v6/` (sign section + two in-complex views).
+- NOT done: SeamCheck has no Toha-specific containment check yet (features are bounded to the 888-block cell inner square by
+  construction; eyeball in renders); no `/blame tp toha` command; no neon/lighting pass; the south wall is not visible
+  from the beach because the lattice occludes it. Mod jar still has to be built by CI.
