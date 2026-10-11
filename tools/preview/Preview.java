@@ -1,6 +1,7 @@
 import blame.blamegen.core.Cube;
 import blame.blamegen.core.Mat;
 import blame.blamegen.core.Megastructure;
+import blame.blamegen.core.Toha;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -149,6 +150,24 @@ public class Preview {
     }
 
     static int trace(double ox, double oy, double oz, double dx, double dy, double dz, double maxD) {
+        // The Toha-only review mode has a known finite world-space bound. Intersect the ray
+        // with that box first, so rays do not visit thousands of empty blocks before reaching it.
+        double entry = 0.0;
+        double localLimit = maxD;
+        if (TOHA_ONLY) {
+            double[] interval = rayBox(ox, oy, oz, dx, dy, dz,
+                    Toha.X0, 0, Toha.Z0, Toha.X1 - 1, Toha.TOP, Toha.Z1 - 1, maxD);
+            if (interval == null) return fogged(sky(dy), 1.0, dy);
+            entry = interval[0];
+            double exit = interval[1];
+            if (exit <= entry) return fogged(sky(dy), 1.0, dy);
+            double nudge = Math.min(0.001, (exit - entry) * 0.25);
+            entry += nudge;
+            ox += dx * entry;
+            oy += dy * entry;
+            oz += dz * entry;
+            localLimit = exit - entry;
+        }
         int x = (int) Math.floor(ox), y = (int) Math.floor(oy), z = (int) Math.floor(oz);
         int sx = dx > 0 ? 1 : -1, sy = dy > 0 ? 1 : -1, sz = dz > 0 ? 1 : -1;
         double tdx = Math.abs(1 / dx), tdy = Math.abs(1 / dy), tdz = Math.abs(1 / dz);
@@ -159,12 +178,12 @@ public class Preview {
         double t = 0;
         boolean inWater = false;
         double waterT = -1;
-        while (t < maxD) {
+        while (t < localLimit) {
             byte m = get(x, y, z);
             if (m == Mat.WATER) {
                 if (!inWater) { inWater = true; waterT = t; }
             } else if (m != Mat.AIR) {
-                return shade(m, face, x, y, z, t, maxD, inWater ? t - waterT : 0, dy);
+                return shade(m, face, x, y, z, t + entry, maxD, inWater ? t - waterT : 0, dy);
             }
             if (tmx < tmy && tmx < tmz) { x += sx; t = tmx; tmx += tdx; face = sx > 0 ? 1 : 2; }
             else if (tmy < tmz) { y += sy; t = tmy; tmy += tdy; face = sy > 0 ? 3 : 4; }
@@ -173,6 +192,34 @@ public class Preview {
         int s = sky(dy);
         if (inWater) s = blend(s, 0x3d63d8, 0.6);
         return fogged(s, 1.0, dy);
+    }
+
+    /**
+     * Ray/AABB interval, clipped to the viewer's maximum distance. Used only by the
+     * isolated preview path; gameplay block generation and ray tracing are unaffected.
+     */
+    static double[] rayBox(double ox, double oy, double oz, double dx, double dy, double dz,
+                           double minX, double minY, double minZ,
+                           double maxX, double maxY, double maxZ, double maxD) {
+        double near = Double.NEGATIVE_INFINITY, far = Double.POSITIVE_INFINITY;
+        double[] o = {ox, oy, oz}, d = {dx, dy, dz};
+        double[] lo = {minX, minY, minZ}, hi = {maxX, maxY, maxZ};
+        for (int axis = 0; axis < 3; axis++) {
+            if (Math.abs(d[axis]) < 1.0e-12) {
+                if (o[axis] < lo[axis] || o[axis] > hi[axis]) return null;
+                continue;
+            }
+            double a = (lo[axis] - o[axis]) / d[axis];
+            double b = (hi[axis] - o[axis]) / d[axis];
+            if (a > b) { double tmp = a; a = b; b = tmp; }
+            near = Math.max(near, a);
+            far = Math.min(far, b);
+            if (far < near) return null;
+        }
+        if (far < 0 || near > maxD) return null;
+        double start = Math.max(0, near);
+        double end = Math.min(maxD, far);
+        return end < start ? null : new double[] {start, end};
     }
 
     static boolean colOpen(int x, int y, int z) {
