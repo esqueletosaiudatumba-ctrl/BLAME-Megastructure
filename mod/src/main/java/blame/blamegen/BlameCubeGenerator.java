@@ -100,11 +100,9 @@ public class BlameCubeGenerator implements ICubeGenerator {
     }
 
     private static IBlockState getLitRedstoneLamp() {
-        try {
-            return Blocks.REDSTONE_LAMP.getDefaultState().withProperty((net.minecraft.block.properties.PropertyBool)net.minecraft.block.BlockRedstoneLight.class.getDeclaredField("LIT").get(null), Boolean.TRUE);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException("Failed to get LIT property from BlockRedstoneLight", e);
-        }
+        // Use the mapped constant directly; reflective field names are not stable at runtime.
+        return Blocks.REDSTONE_LAMP.getDefaultState()
+                .withProperty(BlockRedstoneLight.LIT, Boolean.TRUE);
     }
 
     public int spawnY() {
