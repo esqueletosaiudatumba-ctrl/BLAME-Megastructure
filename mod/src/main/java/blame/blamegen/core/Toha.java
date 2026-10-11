@@ -74,6 +74,7 @@ public final class Toha {
 
         drawFoundation(c);
         drawOuterWalls(c);
+        drawGatePortal(c);
         drawMainShell(c);
         drawFacade(c);
         drawTerraceBands(c);
@@ -132,6 +133,24 @@ public final class Toha {
                 c.box(s * 2710 - 28, 350, z - 18, s * 2755 + 28, 405, z + 18, Mat.S_TOHA_MASS);
             }
         }
+    }
+
+    /**
+     * The south perimeter opening is a portal, not a hole in a fence: two
+     * deep side piers and a massive crosshead form the first compressed scale
+     * cue before the larger factory mass comes into view.
+     */
+    private void drawGatePortal(Cube c) {
+        int z0 = CZ + 2520, z1 = CZ + 2770;
+        c.box(-725, GROUND, z0, -655, GROUND + 520, z1, Mat.S_TOHA_MASS);
+        c.box(655, GROUND, z0, 725, GROUND + 520, z1, Mat.S_TOHA_MASS);
+        c.box(-725, GROUND + 460, z0, 725, GROUND + 520, z1, Mat.S_TOHA_PALE);
+        c.box(-700, GROUND + 438, z0 + 14, 700, GROUND + 452, z1 - 14, Mat.S_TOHA_MASS);
+
+        // Two recessed vertical seams and one restrained central index mark.
+        c.box(-711, GROUND + 70, z0 + 24, -705, GROUND + 420, z0 + 30, Mat.S_TOHA_RING);
+        c.box(705, GROUND + 70, z0 + 24, 711, GROUND + 420, z0 + 30, Mat.S_TOHA_RING);
+        c.box(-48, GROUND + 480, z1 + 1, 48, GROUND + 486, z1 + 3, Mat.BIO_CYAN);
     }
 
     // ------------------------------------------------------------------
