@@ -90,16 +90,11 @@ geometry — a camera inside a slab renders a black image and tells you nothing.
 
 ## State of play (2026-10-11)
 
-- **Core is v4 and fully verified offline.** See `HANDOFF_2026-10-11.md`.
-- **The mod jar is the blocker.** `mod/build.gradle` had to be written from scratch (the
-  original handoff zip lost it). RFG now resolves MC 1.12.2 but fails compiling Minecraft's own
-  sources: the decompiled `WorldSettings.java` is missing its inner `GameType` enum and the
-  Twitch/log4j deps are not on the patched-MC compile classpath. See
-  `HANDOFF_BUILD_STATE.md` for the three candidate fixes — this is the highest-value next task.
-- **The client has never been launched** for v3/v4. Fog handler, CubicChunks light propagation,
-  in-game look of the shapeless districts, and performance are all untested.
-- `tools/forge/SrgMcpChanger.java` is a newer, standalone attempt at the reobf step; it is not
-  yet wired into a working build.
+- **Generator v8:** the infinite surrounding world stays deterministic and procedural; Toha Heavy Industries is a fixed monument at X=0, Z=-4608, reaching Y=2030. See `docs/TOHA_MONUMENT_DESIGN.md`.
+- **Offline verification:** the Actions workflow compiles the core and runs `TohaMonumentCheck`, `Probe`, `SeamCheck`, `Survey`, `LandmarkSurvey`, and the generator benchmark. Recent versions also produce section, plan, and facade-review outputs. Check the newest run before claiming the current revision passed.
+- **Forge build:** the RFG/Forge 1.12.2 build has completed successfully in Actions on recent revisions. The workflow must ship exactly `mod/build/libs/blamegen-1.0.0.jar` (the reobfuscated runtime jar), never the `*-dev.jar`; it then rebuilds `BLAME_Megastructure_Instance.zip` with the same jar and Toha design document.
+- **Visual status:** the Minecraft client has not been launched for this revision. In-game lighting, block mapping, traversal, world creation, and performance remain unverified. Offline renders are schematic previews, not screenshots.
+- Useful access: `/blame tp toha-gate` and `/blame tp toha-center`; a new BLAME world is required if the site's chunks were already saved before this generator revision.
 
 ## If you change the generator
 
