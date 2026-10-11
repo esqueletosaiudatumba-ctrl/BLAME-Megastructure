@@ -45,6 +45,12 @@ public final class TohaMonumentCheck {
         check(aperture.get(-860, 370, Toha.CZ + 1310) == Mat.AIR,
                 "the south façade needs a genuine, deep slit aperture");
 
+        Cube aiPanel = new Cube(Math.floorDiv(215, 16), Math.floorDiv(410, 16),
+                Math.floorDiv(Toha.CZ + 1140, 16));
+        toha.draw(aiPanel);
+        check(Mat.isStructure(aiPanel.get(215, 410, Toha.CZ + 1140)),
+                "the principal cave must contain its fixed AI control slab");
+
         Cube engine = new Cube(Math.floorDiv(260, 16), Math.floorDiv(500, 16),
                 Math.floorDiv(Toha.CZ - 560, 16));
         toha.draw(engine);
