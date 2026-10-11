@@ -96,6 +96,7 @@ public class Preview {
             case "toha-persp": TOHA_ONLY = true; persp(a); break;
             case "toha-slice": TOHA_ONLY = true; slice(a); break;
             case "toha-section": TOHA_ONLY = true; section(a); break;
+            case "toha-elevation": TOHA_ONLY = true; elevation(a); break;
             case "bench": bench(Integer.parseInt(a[1])); break;
             case "spawn": System.out.println("spawnY=" + MS.spawnY()); break;
             default: throw new IllegalArgumentException(a[0]);
@@ -323,6 +324,33 @@ public class Preview {
         int g = (int) (((a >> 8) & 255) * (1 - k) + ((b >> 8) & 255) * k);
         int bb = (int) ((a & 255) * (1 - k) + (b & 255) * k);
         return r << 16 | g << 8 | bb;
+    }
+
+    /**
+     * Orthographic front elevation. Because Toha's shells deliberately step backward
+     * with height, each tier is sampled on its own front plane; a single Z slice
+     * misleadingly shows only the lowest wall and hides the upper cave entrances.
+     * Usage: toha-elevation OUT.png cx cy width height [scale=4]
+     */
+    static void elevation(String[] a) throws Exception {
+        String out = a[1];
+        int cx = Integer.parseInt(a[2]), cy = Integer.parseInt(a[3]);
+        int width = Integer.parseInt(a[4]), height = Integer.parseInt(a[5]);
+        int scale = a.length > 6 ? Integer.parseInt(a[6]) : 4;
+        int nw = width / scale, nh = height / scale;
+        BufferedImage img = new BufferedImage(nw, nh, BufferedImage.TYPE_INT_RGB);
+        IntStream.range(0, nh).parallel().forEach(j -> {
+            int y = cy + height / 2 - j * scale;
+            int z = Toha.projectedFrontZ(y);
+            for (int i = 0; i < nw; i++) {
+                int x = cx - width / 2 + i * scale;
+                byte m = get(x, y, z);
+                int col = m == Mat.AIR ? 0x0b0c12 : COL[m];
+                img.setRGB(i, j, col);
+            }
+        });
+        ImageIO.write(img, "png", new File(out));
+        System.out.println("wrote " + out + " orthographic tiers=" + nh + "x" + nw + " cubes=" + CACHE.size());
     }
 
     static void slice(String[] a) throws Exception {
