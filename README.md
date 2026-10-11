@@ -47,4 +47,4 @@ These offline checks do not replace launching the Minecraft client. See the curr
 
 ## Status
 
-The latest handoff reports the v4 generator core as verified offline, while the Forge mod build and in-client verification remain outstanding. Treat the dated handoff documents as the source of truth for current build status.
+The current handoff documents generator v8 and an authored Toha monument beside the arrival basin. Offline core checks and the Forge 1.12.2 build passed on recent revisions; the newest v8 geometry and packaging edits are being revalidated in GitHub Actions. The Minecraft client has not been launched for final visual, traversal, lighting, or performance sign-off.
