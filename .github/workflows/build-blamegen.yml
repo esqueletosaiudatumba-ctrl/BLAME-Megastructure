@@ -168,5 +168,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: blamegen-1.0.0
-          path: mod/build/libs/blamegen-*.jar
+          path: mod/build/libs/blamegen-1.0.0.jar
           if-no-files-found: error
