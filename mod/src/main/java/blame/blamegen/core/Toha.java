@@ -111,10 +111,24 @@ public final class Toha {
     // ------------------------------------------------------------------
 
     private void drawFoundation(Cube c) {
-        if (!c.hitsY(0, 63)) return;
-        c.box(-2800, 0, CZ - 2800, 2800, 63, CZ + 2800, Mat.S_TOHA_DECK);
+        // A four-block deck plate sits on an immense but sparse girder grid. The
+        // old 64-block solid slab consumed billions of blocks without adding silhouette.
+        c.box(-2800, 60, CZ - 2800, 2800, 63, CZ + 2800, Mat.S_TOHA_DECK);
 
-        // Three inset, unlit perimeter courses make the floor feel machined.
+        // Main orthogonal girders are 8 blocks wide and 12 high at 512-block spacing.
+        if (c.hitsY(48, 59)) {
+            for (int x = -2560; x <= 2560; x += 512) {
+                if (x + 4 >= c.x0 && x - 4 <= c.x0 + 15)
+                    c.box(x - 4, 48, CZ - 2800, x + 4, 59, CZ + 2800, Mat.S_TOHA_MASS);
+            }
+            for (int z = -2560; z <= 2560; z += 512) {
+                int wz = CZ + z;
+                if (wz + 4 >= c.z0 && wz - 4 <= c.z0 + 15)
+                    c.box(-2800, 48, wz - 4, 2800, 59, wz + 4, Mat.S_TOHA_MASS);
+            }
+        }
+
+        // Three inset, unlit perimeter courses make the deck feel machined.
         if (c.hitsY(63, 63)) {
             c.box(-2720, 63, CZ - 2720, 2720, 63, CZ - 2704, Mat.S_DARK);
             c.box(-2720, 63, CZ + 2704, 2720, 63, CZ + 2720, Mat.S_DARK);
@@ -174,32 +188,34 @@ public final class Toha {
     // ------------------------------------------------------------------
 
     private void drawMainShell(Cube c) {
-        // Broad footing: nearly 4 km wide, with a deep rear heel.
-        c.box(-2050, 64, CZ - 2200, 2050, 200, CZ + 1600, Mat.S_TOHA_PALE);
-        c.box(-2100, 180, CZ - 2220, 2100, 236, CZ + 1640, Mat.S_TOHA_MASS);
+        // Immense shells are vertical wall envelopes, not solid rectangular volumes.
+        // The interior belongs to the nave, service bridges and cave chambers.
+        wallShell(c, -2050, 64, CZ - 2200, 2050, 200, CZ + 1600, 24, Mat.S_TOHA_PALE);
+        rectBand(c, 2100, -2220, 1640, 180, 236, Mat.S_TOHA_MASS);
 
         // The lower black body, broad shoulder, pale middle mass, and receding crown.
-        c.box(-1850, 200, CZ - 1900, 1850, 640, CZ + 1350, Mat.S_TOHA_MASS);
-        c.box(-1940, 600, CZ - 1980, 1940, 632, CZ + 1420, Mat.S_TOHA_PALE);
+        wallShell(c, -1850, 200, CZ - 1900, 1850, 640, CZ + 1350, 28, Mat.S_TOHA_MASS);
+        rectBand(c, 1940, -1980, 1420, 600, 632, Mat.S_TOHA_PALE);
 
-        c.box(-1580, 640, CZ - 1700, 1580, 1020, CZ + 1130, Mat.S_TOHA_PALE);
-        c.box(-1660, 980, CZ - 1770, 1660, 1018, CZ + 1200, Mat.S_TOHA_MASS);
+        wallShell(c, -1580, 640, CZ - 1700, 1580, 1020, CZ + 1130, 24, Mat.S_TOHA_PALE);
+        rectBand(c, 1660, -1770, 1200, 980, 1018, Mat.S_TOHA_MASS);
 
-        c.box(-1320, 1020, CZ - 1440, 1320, 1450, CZ + 850, Mat.S_TOHA_MASS);
-        c.box(-1390, 1408, CZ - 1510, 1390, 1448, CZ + 920, Mat.S_TOHA_PALE);
+        wallShell(c, -1320, 1020, CZ - 1440, 1320, 1450, CZ + 850, 24, Mat.S_TOHA_MASS);
+        rectBand(c, 1390, -1510, 920, 1408, 1448, Mat.S_TOHA_PALE);
 
-        c.box(-1050, 1450, CZ - 1130, 1050, 1760, CZ + 630, Mat.S_TOHA_PALE);
-        c.box(-1150, 1724, CZ - 1230, 1150, 1758, CZ + 710, Mat.S_TOHA_MASS);
-        c.box(-800, 1760, CZ - 900, 800, 1880, CZ + 430, Mat.S_TOHA_MASS);
+        wallShell(c, -1050, 1450, CZ - 1130, 1050, 1760, CZ + 630, 24, Mat.S_TOHA_PALE);
+        rectBand(c, 1150, -1230, 710, 1724, 1758, Mat.S_TOHA_MASS);
+        wallShell(c, -800, 1760, CZ - 900, 800, 1880, CZ + 430, 20, Mat.S_TOHA_MASS);
 
         // A thin, dark crown lip, intentionally close to the immense ceiling above.
-        c.box(-900, 1870, CZ - 1010, 900, 1895, CZ + 530, Mat.S_TOHA_PALE);
-        c.box(-620, 1895, CZ - 790, 620, 1920, CZ + 310, Mat.S_TOHA_MASS);
+        rectBand(c, 900, -1010, 530, 1870, 1895, Mat.S_TOHA_PALE);
+        wallShell(c, -620, 1895, CZ - 790, 620, 1920, CZ + 310, 16, Mat.S_TOHA_MASS);
 
-        // Rear counter-mass prevents this from reading as a flat stage façade.
-        c.box(-970, 440, CZ - 2240, 970, 1600, CZ - 1860, Mat.S_TOHA_PALE);
-        c.box(-1250, 760, CZ - 2280, 1250, 820, CZ - 1750, Mat.S_TOHA_MASS);
-        c.box(-820, 1290, CZ - 2160, 820, 1760, CZ - 1810, Mat.S_TOHA_MASS);
+        // Rear counter-masses are similarly hollow wall envelopes; their offset
+        // position changes the silhouette without filling billions of blocks.
+        wallShell(c, -970, 440, CZ - 2240, 970, 1600, CZ - 1860, 24, Mat.S_TOHA_PALE);
+        rectBand(c, 1250, -2280, -1750, 760, 820, Mat.S_TOHA_MASS);
+        wallShell(c, -820, 1290, CZ - 2160, 820, 1760, CZ - 1810, 16, Mat.S_TOHA_MASS);
     }
 
     /**
@@ -208,10 +224,10 @@ public final class Toha {
      * western upper cantilever break the symmetry with functional industrial bulk.
      */
     private void drawAsymmetricTransferMass(Cube c) {
-        // A broad, setback transfer block grows out of the east shoulder.
-        c.box(1510, 720, CZ - 1650, 1840, 1110, CZ + 1040, Mat.S_TOHA_MASS);
-        c.box(1450, 1040, CZ - 1410, 1900, 1190, CZ + 900, Mat.S_TOHA_PALE);
-        c.box(1570, 1160, CZ - 1320, 1880, 1460, CZ + 720, Mat.S_TOHA_MASS);
+        // A broad, setback transfer mass grows out of the east shoulder.
+        wallShell(c, 1510, 720, CZ - 1650, 1840, 1110, CZ + 1040, 24, Mat.S_TOHA_MASS);
+        rectBand(c, 1900, -1410, 900, 1040, 1190, Mat.S_TOHA_PALE);
+        wallShell(c, 1570, 1160, CZ - 1320, 1880, 1460, CZ + 720, 24, Mat.S_TOHA_MASS);
 
         // A deep slot cuts the exposed end wall; it is a machine access trench, not a window.
         c.box(1834, 790, CZ + 260, 1842, 1040, CZ + 720, Mat.AIR);
@@ -222,9 +238,23 @@ public final class Toha {
         c.beam(1850, 820, CZ + 940, 1650, 1110, CZ - 1460, 14, Mat.S_TOHA_RING);
 
         // Opposite side: a single upper cantilever, deliberately not mirrored.
-        c.box(-1770, 1480, CZ - 1080, -1040, 1560, CZ + 420, Mat.S_TOHA_MASS);
+        wallShell(c, -1770, 1480, CZ - 1080, -1040, 1560, CZ + 420, 16, Mat.S_TOHA_MASS);
         c.box(-1840, 1510, CZ - 980, -1764, 1550, CZ + 360, Mat.S_TOHA_PALE);
         c.beam(-1710, 1485, CZ + 380, -1090, 1670, CZ - 900, 28, Mat.S_TOHA_RING);
+    }
+
+    /**
+     * Draw four vertical perimeter walls for an enormous architectural envelope.
+     * Top/bottom surfaces are deliberately omitted: the interior stays hollow and
+     * is crossed by authored girders, service platforms and machine components.
+     */
+    private void wallShell(Cube c, int x0, int y0, int z0, int x1, int y1, int z1,
+                           int thickness, byte material) {
+        int t = Math.max(1, thickness);
+        c.box(x0, y0, z0, x1, y1, z0 + t - 1, material);
+        c.box(x0, y0, z1 - t + 1, x1, y1, z1, material);
+        c.box(x0, y0, z0 + t, x0 + t - 1, y1, z1 - t, material);
+        c.box(x1 - t + 1, y0, z0 + t, x1, y1, z1 - t, material);
     }
 
     private void drawFacade(Cube c) {
