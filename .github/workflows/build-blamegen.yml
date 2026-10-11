@@ -32,10 +32,12 @@ jobs:
           tail -c 60000 build.log > /tmp/build-tail.log || echo "no log" > /tmp/build-tail.log
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          mkdir -p /tmp/jar && cp mod/build/libs/blamegen-*.jar /tmp/jar/ 2>/dev/null || true
           git checkout --orphan ci-logs
           git rm -rf . -q
           cp /tmp/build-tail.log build-tail.log
-          git add build-tail.log
+          cp /tmp/jar/*.jar . 2>/dev/null || true
+          git add build-tail.log *.jar
           git commit -q -m "ci: build log for ${GITHUB_SHA}"
           git push -f origin ci-logs
       - name: Upload generated mod JAR

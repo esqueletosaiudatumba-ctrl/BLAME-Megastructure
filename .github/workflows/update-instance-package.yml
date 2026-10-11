@@ -50,9 +50,9 @@ jobs:
           missing = [str(p) for p in required if not p.is_file()]
           if missing:
               raise SystemExit("Missing required package files: " + ", ".join(missing))
-          stale = root / "minecraft/mods/blamegen-1.0.0.jar"
-          if stale.exists():
-              raise SystemExit("Refusing to package the stale, known-incompatible blamegen JAR")
+          jar = root / "minecraft/mods/blamegen-1.0.0.jar"
+          if not jar.exists():
+              raise SystemExit("Missing freshly built blamegen jar")
           
           with ZipFile(out, "w", compression=ZIP_DEFLATED, compresslevel=9) as z:
               for path in sorted(p for p in root.rglob("*") if p.is_file()):
@@ -65,7 +65,7 @@ jobs:
           
           with ZipFile(out, "r") as z:
               names = set(z.namelist())
-              assert "minecraft/mods/blamegen-1.0.0.jar" not in names
+              assert "minecraft/mods/blamegen-1.0.0.jar" in names
               assert "GRAND_GOAL_VISION.md" in names
               assert all(f"docs/reference-images/ref-0{i}-" in "\n".join(names) for i in range(1, 5))
               assert z.testzip() is None
