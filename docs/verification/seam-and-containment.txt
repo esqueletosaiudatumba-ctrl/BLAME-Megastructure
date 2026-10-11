@@ -1,0 +1,8 @@
+﻿java.exe : Erro: Nπo foi possφvel localizar nem carregar a classe principal blame.blamegen.core.SeamCheck
+No linha:1 caractere:516
++ ... "COMPILED"; & $java -cp build\pv blame.blamegen.core.SeamCheck 2>&1 | ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Erro: Nπo foi p....core.SeamCheck:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Causada por: java.lang.ClassNotFoundException: blame.blamegen.core.SeamCheck

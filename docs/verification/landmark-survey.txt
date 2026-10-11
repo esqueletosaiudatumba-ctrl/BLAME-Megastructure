@@ -1,0 +1,8 @@
+﻿java.exe : Erro: Nπo foi possφvel localizar nem carregar a classe principal blame.blamegen.core.LandmarkSurvey
+No linha:1 caractere:887
++ ... oding utf8; & $java -cp build\pv blame.blamegen.core.LandmarkSurvey 2 ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Erro: Nπo foi p....LandmarkSurvey:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Causada por: java.lang.ClassNotFoundException: blame.blamegen.core.LandmarkSurvey

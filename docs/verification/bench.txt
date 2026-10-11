@@ -1,0 +1,8 @@
+﻿java.exe : Erro: Nπo foi possφvel localizar nem carregar a classe principal Preview
+No linha:1 caractere:1013
++ ...  -Encoding utf8; & $java -cp build\pv Preview bench 3000 2>&1 | Out-F ...
++                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Erro: Nπo foi p...incipal Preview:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+Causada por: java.lang.ClassNotFoundException: Preview
