@@ -185,6 +185,11 @@ public final class Megastructure {
                 int p1 = Math.min(d + CEIL_PLATE, c.y0 + 15);
                 // Base plate: gap-free, so no natural light gets through.
                 for (int y = Math.max(d, c.y0); y <= p1; y++) c.set(x, y, z, Mat.S_MASS);
+                // Canon: "the underside of each layer periodically illuminates the overside of
+                // the one below to provide a day-night cycle." The underside of the base plate
+                // carries an irregular array of lighting panels; this is the only artificial
+                // sky the deep structure has.
+                if (d - 1 >= c.y0 && d - 1 <= c.y0 + 15) undersidePanels(c, x, z, d - 1);
                 // Dense strata above: layers with air gaps, ribs and hanging fittings.
                 for (int y = p1 + 1; y <= y1; y++) {
                     int ly = y - d - CEIL_PLATE;
@@ -201,6 +206,23 @@ public final class Megastructure {
     }
 
     // ------------------------------------------------------------------ decks
+
+    /**
+     * Lighting panels on the underside of the ceiling plate: the artificial sky that the canon
+     * Megastructure uses to give the layer below a day-night cycle. Panels are arranged in
+     * irregular bands of sea-lantern bays separated by dark framing, and occasionally a single
+     * amber panel. Density drifts so some districts read as daylight and others as gloom.
+     */
+    private void undersidePanels(Cube c, int x, int z, int y) {
+        // District-scale density so whole regions share one quality of light.
+        long hd = H.h(seed, 0x551, Math.floorDiv(x, 256), Math.floorDiv(z, 256));
+        double density = 0.20 + H.u(hd) * 0.55;
+        // Band structure: a band is a run of lit bays between dark framing strips.
+        long hb = H.h(seed, 0x552, x, z);
+        if (!H.chance(hb, density)) return;
+        byte mat = H.chance(H.h(hb, 1), 0.08) ? Mat.LAMP_AMBER : Mat.SEA_LANTERN;
+        c.set(x, y, z, mat);
+    }
 
     static final int D_NONE = 0, D_FULL = 1, D_HOLED = 2, D_PARTIAL = 3, D_LATTICE = 4, D_BLOCK = 5;
     static final int K_VOID = 0, K_FRAME = 1, K_BLOCK = 2;
