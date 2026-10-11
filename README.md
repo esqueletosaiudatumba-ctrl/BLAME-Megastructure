@@ -47,4 +47,4 @@ These offline checks do not replace launching the Minecraft client. See the curr
 
 ## Status
 
-The current handoff documents generator v8 and an authored Toha monument beside the arrival basin. Offline core checks and the Forge 1.12.2 build passed on recent revisions; the newest v8 geometry and packaging edits are being revalidated in GitHub Actions. The Minecraft client has not been launched for final visual, traversal, lighting, or performance sign-off.
+The current handoff documents generator v9 and an authored Toha monument beside the arrival basin. Its kilometre-scale tiers are hollow wall shells and the precinct is a thin girder-supported deck. Recent offline core checks and the Forge 1.12.2 build have passed; the v9 geometry/package is being revalidated in GitHub Actions. The Minecraft client has not been launched for final visual, traversal, lighting, or performance sign-off.
