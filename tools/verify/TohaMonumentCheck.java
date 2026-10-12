@@ -71,7 +71,7 @@ public final class TohaMonumentCheck {
             int x = Toha.caveCenterX(i);
             int y = Toha.CAVE_Y[i];
             int z = Toha.caveCenterZ(i);
-            int side = Toha.CAVE_DIR_FOR_CHECK[i];
+            int side = Toha.caveDirection(i);
             if (side == 0) z += 4;
             else if (side == 1) x += 4;
             else if (side == 2) z -= 4;
