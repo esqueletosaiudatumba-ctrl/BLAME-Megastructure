@@ -28,11 +28,17 @@ INSTALL
 
 TOHA HEAVY INDUSTRIES — AUTHORED MONUMENT
 -----------------------------------------
-Toha is now a single fixed architectural composition, not the old randomized
-150 km industrial district grid. It sits at X=0, Z=-4608, spans roughly 6 km
-across its precinct, and rises to Y=2030, close to the dark artificial ceiling.
-Its silhouette is hand-authored and seed-invariant: stepped pale/black shells,
-deep slit apertures, thirteen staggered AI cave chambers with recessed control slabs and fixed spindle/gyro/cage/pressure-vessel mechanisms, a hollow central nave, a tapered gravity furnace, six fused machine spines, an off-axis mast rising to Y≈1975, four precinct pylons, and a south processional causeway with a monumental portal. The main tiers are hollow perimeter walls and the precinct is a thin plate supported by deep orthogonal girders.
+Toha is now a single fixed cylindrical megastructure, not the old randomized
+150 km industrial district grid. Its anchor is X=0, Z=-4608; the 5.6 km circular
+precinct rises from Y=60 and the stepped hull reaches Y=1950, with its off-axis
+service mast rising to Y≈1975 near the artificial ceiling.
+The lower hull is 4.4 km in diameter, built from a true hollow annular wall; the
+higher tiers step inward to form broad circular shoulders. The deck is a thin
+circular plate on concentric girders and radial spokes. Thirteen staggered cave
+mouths follow the cylinder surface and contain fixed spindle/gyro/cage/pressure-
+vessel mechanisms. A hollow nave, gravity furnace, six exterior machine spines,
+off-axis mast, asymmetric east transfer mass, west cantilever, curved retaining
+wall, and monumental southern processional gate complete the authored landmark.
 
 Read GRAND_GOAL_VISION.md and docs/TOHA_MONUMENT_DESIGN.md inside this package for
 the full visual north star and authored monument design contract.
