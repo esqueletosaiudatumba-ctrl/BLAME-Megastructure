@@ -667,11 +667,59 @@ public final class Toha {
             c.box(1012, y + 9, CZ - 850, 1020, y + 34, CZ + 180, Mat.IRON_BARS);
         }
 
+        // A narrow maintenance stair links each of the partial east-side platforms.
+        // It zigzags through the nave and stays well clear of the gravity furnace sightline.
+        drawInteriorTransferStairs(c);
+
         // Two enormous inclined braces and hanging service lines in the open volume.
         c.beam(-1010, 330, CZ + 170, -620, 1540, CZ - 850, 26, Mat.S_TOHA_MASS);
         c.beam(1010, 330, CZ + 170, 620, 1540, CZ - 850, 26, Mat.S_TOHA_MASS);
         c.beam(-870, 1640, CZ - 830, -820, 630, CZ - 720, 2, Mat.CABLE);
         c.beam(870, 1640, CZ - 830, 820, 630, CZ - 720, 2, Mat.CABLE);
+    }
+
+    /**
+     * Fixed three-flight service stair. Each tread rises one block for every two blocks
+     * of travel, with the upper and lower treads flush with the partial nave platforms.
+     * The open stair follows the east wall of the nave; it is intentionally narrow and
+     * leaves the central furnace and most of the vertical void unobstructed.
+     */
+    private void drawInteriorTransferStairs(Cube c) {
+        drawServiceStair(c, 770, 780, 438, 798, 160, -1);
+        drawServiceStair(c, 770, 780, 798, 1158, -560, 1);
+        drawServiceStair(c, 770, 780, 1158, 1498, 160, -1);
+    }
+
+    private void drawServiceStair(Cube c, int x0, int x1, int startTopY, int endTopY,
+                                  int startZ, int direction) {
+        int rise = endTopY - startTopY;
+        int finishZ = startZ + direction * rise * 2;
+        int minZ = Math.min(startZ, finishZ) - 2;
+        int maxZ = Math.max(startZ, finishZ) + 2;
+        if (!c.hits(x0 - 4, startTopY, minZ, x1 + 4, endTopY + 5, maxZ)) return;
+
+        // Two thin diagonal cable rails make the route readable without turning it into
+        // another massive brace. The handrails sit outside the walking width.
+        c.beam(x0 - 3, startTopY + 3, startZ + 0.5,
+               x0 - 3, endTopY + 3, finishZ + 0.5, 1, Mat.CABLE);
+        c.beam(x1 + 3, startTopY + 3, startZ + 0.5,
+               x1 + 3, endTopY + 3, finishZ + 0.5, 1, Mat.CABLE);
+
+        // Restrict raster work to the current cube's Y slice; a flight spans hundreds of
+        // blocks, but a cube can intersect only a small handful of individual treads.
+        int firstStep = Math.max(0, c.y0 - startTopY - 4);
+        int lastStep = Math.min(rise, c.y0 + 15 - startTopY);
+        for (int i = firstStep; i <= lastStep; i++) {
+            int y = startTopY + i;
+            int z = startZ + direction * i * 2;
+            c.box(x0, y, z, x1, y, z + 1, Mat.S_TOHA_DECK);
+
+            // Sparse guard posts are enough to imply a maintenance route at this scale.
+            if (i == 0 || i == rise || i % 48 == 0) {
+                c.box(x0 - 2, y + 1, z, x0 - 2, y + 4, z + 1, Mat.IRON_BARS);
+                c.box(x1 + 2, y + 1, z, x1 + 2, y + 4, z + 1, Mat.IRON_BARS);
+            }
+        }
     }
 
     private void drawGravityFurnace(Cube c) {
