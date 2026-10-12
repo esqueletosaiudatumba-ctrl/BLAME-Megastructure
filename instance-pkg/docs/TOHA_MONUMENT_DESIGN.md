@@ -57,6 +57,8 @@ Eight tall, shallow curved fins are placed against the authored surface at selec
 
 The repeated-pitch slit helper is replaced by twenty-seven fixed aperture records. Each slit has its own x, bottom elevation, width, height, shell radius, and cut depth (86–112 blocks). Openings remain real voids cut into the curved wall; none is selected from the world seed. This creates an authored negative-space rhythm without compromising the thirteen larger cave portals.
 
+Generator v14 also widens the Toha shell's screentone rule pitch from 32 to 96 blocks. At multi-kilometre scale, the old rule made otherwise monolithic concrete read like tightly spaced bars. The wider pitch keeps ruled surfaces and deterministic mineral weathering, while letting each facade mass read as a large continuous surface from a distance. The floor/deck keeps its finer marking scale.
+
 ## Thirteen fixed cave mouths
 
 The curved hull contains thirteen authored cave mouths: five in the lower tier, four in the second, three in the third, and one isolated crown mouth. Each opening is projected to the cylinder surface at its actual X position; the front is not a single flat plane. Their horizontal centres, heights and widths are intentionally irregular; the grouping is legible from a distance without becoming a repeated window grid. The openings have fixed centres, widths and heights, and their face offsets are computed from the cylinder radius rather than a shared flat-front Z coordinate. Their deep square cuts, dark inner reveals, heavy lintels, and sparse local lamps create a strong readable rhythm. They are architectural rooms/passages, not a random cave-placement algorithm.
