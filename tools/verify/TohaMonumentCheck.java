@@ -38,10 +38,11 @@ public final class TohaMonumentCheck {
         check(shell.get(1100, 300, Toha.CZ + 1340) == Mat.AIR,
                 "the cylindrical hull must remain hollow well inside its lower wall");
 
-        Cube roundEdge = new Cube(Math.floorDiv(2199, 16), Math.floorDiv(300, 16), czCube);
+        int tangentZ = Toha.CZ - 2199;
+        Cube roundEdge = new Cube(0, Math.floorDiv(300, 16), Math.floorDiv(tangentZ, 16));
         toha.draw(roundEdge);
-        check(Mat.isStructure(roundEdge.get(2199, 300, Toha.CZ)),
-                "the lower hull must reach its circular east tangent");
+        check(Mat.isStructure(roundEdge.get(0, 300, tangentZ)),
+                "the lower hull must reach its circular rear tangent");
         Cube squareCorner = new Cube(Math.floorDiv(2400, 16), Math.floorDiv(300, 16), czCube);
         toha.draw(squareCorner);
         check(squareCorner.get(2400, 300, Toha.CZ) == Mat.AIR,
