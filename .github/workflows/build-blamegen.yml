@@ -15,6 +15,12 @@ on:
 permissions:
   contents: write
 
+# This workflow renders a large set of Toha views. Keep only the newest master
+# revision active so a later source or camera fix cancels stale preview renders.
+concurrency:
+  group: blamegen-master-build
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
