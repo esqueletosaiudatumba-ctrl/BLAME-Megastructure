@@ -61,7 +61,7 @@ public class BlameCommand extends CommandBase {
 
     @Override
     public String getUsage(ICommandSender sender) {
-        return "/blame list | /blame tp <landmark> | /blame tp <x> <y> <z>";
+        return "/blame tp <destination|x y z> | /blame toha [part] | /blame destinations";
     }
 
     @Override
@@ -74,16 +74,81 @@ public class BlameCommand extends CommandBase {
         return true;
     }
 
+    private static boolean isTeleportVerb(String verb) {
+        return "tp".equalsIgnoreCase(verb)
+                || "teleport".equalsIgnoreCase(verb)
+                || "goto".equalsIgnoreCase(verb);
+    }
+
+    private static boolean isListVerb(String verb) {
+        return "list".equalsIgnoreCase(verb)
+                || "destinations".equalsIgnoreCase(verb)
+                || "landmarks".equalsIgnoreCase(verb);
+    }
+
+    /**
+     * Accept concise destination names and the full names printed by /blame destinations.
+     * "toha" alone means the main gate; /blame tp toha <part> selects a specific edge or core.
+     */
+    private static Spot findSpot(String destination) {
+        String key = destination.toLowerCase(java.util.Locale.ROOT).replace('_', '-');
+        if (key.startsWith("toha-")) key = key.substring("toha-".length());
+
+        if ("toha".equals(key) || "gate".equals(key) || "entrance".equals(key)
+                || "portal".equals(key) || "main-gate".equals(key)) {
+            key = "toha-gate";
+        } else if ("spawn".equals(key) || "arrival".equals(key) || "shore".equals(key)) {
+            key = "beach";
+        } else if ("south".equals(key) || "south-wall".equals(key)
+                || "approach".equals(key) || "precinct".equals(key)) {
+            key = "toha-south";
+        } else if ("north".equals(key) || "north-wall".equals(key)) {
+            key = "toha-north";
+        } else if ("east".equals(key) || "east-wall".equals(key)) {
+            key = "toha-east";
+        } else if ("west".equals(key) || "west-wall".equals(key)) {
+            key = "toha-west";
+        } else if ("center".equals(key) || "centre".equals(key) || "core".equals(key)
+                || "engine".equals(key) || "furnace".equals(key) || "interior".equals(key)
+                || "main-chamber".equals(key)) {
+            key = "toha-center";
+        } else if ("gate".equals(key)) {
+            key = "toha-gate";
+        }
+
+        for (Spot spot : spots()) {
+            if (spot.name.equalsIgnoreCase(key)) return spot;
+        }
+        return null;
+    }
+
+    private static void listSpots(ICommandSender sender) {
+        reply(sender, "Destinations — use /blame tp <name> or /blame tp toha <part>:");
+        for (Spot spot : spots()) {
+            reply(sender, spot.name + "  " + (int) spot.x + " " + (int) spot.y + " " + (int) spot.z
+                    + "  - " + spot.blurb);
+        }
+        reply(sender, "Shortcuts: gate/entrance, center/core, south, north, east, west, beach/spawn");
+    }
+
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-        if (args.length == 0) throw new WrongUsageException(getUsage(sender));
-        if (args[0].equalsIgnoreCase("list")) {
-            for (Spot sp : spots()) {
-                reply(sender, sp.name + "  " + (int) sp.x + " " + (int) sp.y + " " + (int) sp.z + "  - " + sp.blurb);
-            }
+        if (args.length == 0 || "help".equalsIgnoreCase(args[0])) {
+            reply(sender, getUsage(sender));
+            reply(sender, "Examples: /blame tp gate | /blame tp toha core | /blame goto center | /blame tp 0 100 -3800");
             return;
         }
-        if (!args[0].equalsIgnoreCase("tp") || args.length < 2) throw new WrongUsageException(getUsage(sender));
+        if (isListVerb(args[0])) {
+            listSpots(sender);
+            return;
+        }
+
+        boolean directToha = "toha".equalsIgnoreCase(args[0]);
+        if (!directToha && !isTeleportVerb(args[0])) {
+            throw new WrongUsageException(getUsage(sender));
+        }
+        if (directToha && args.length > 2) throw new WrongUsageException(getUsage(sender));
+        if (!directToha && args.length < 2) throw new WrongUsageException(getUsage(sender));
 
         EntityPlayerMP player = getCommandSenderAsPlayer(sender);
         World world = player.world;
@@ -92,15 +157,28 @@ public class BlameCommand extends CommandBase {
         double x, y, z;
         float yaw = player.rotationYaw, pitch = 0F;
         String label;
-        if (args.length >= 4) {
+        if (!directToha && args.length == 4) {
             x = parseDouble(args[1]);
             y = parseDouble(args[2]);
             z = parseDouble(args[3]);
             label = (int) x + " " + (int) y + " " + (int) z;
         } else {
-            Spot found = null;
-            for (Spot sp : spots()) if (sp.name.equalsIgnoreCase(args[1])) found = sp;
-            if (found == null) throw new CommandException("Unknown landmark '" + args[1] + "'. Try /blame list");
+            String destination;
+            if (directToha) {
+                destination = args.length == 1 ? "gate" : "toha-" + args[1];
+            } else if (args.length == 2) {
+                destination = args[1];
+            } else if (args.length == 3 && "toha".equalsIgnoreCase(args[1])) {
+                destination = args[2];
+            } else {
+                throw new WrongUsageException(getUsage(sender));
+            }
+
+            Spot found = findSpot(destination);
+            if (found == null) {
+                throw new CommandException("Unknown destination '" + destination
+                        + "'. Try /blame destinations, or use gate, center, north, south, east, or west.");
+            }
             x = found.x;
             y = found.y;
             z = found.z;
@@ -114,7 +192,8 @@ public class BlameCommand extends CommandBase {
         player.dismountRidingEntity();
         player.connection.setPlayerLocation(x, ty, z, yaw, pitch);
         player.fallDistance = 0F;
-        reply(sender, "Teleported to " + label + (stand == null ? " (no floor found nearby, placed as given)" : ""));
+        reply(sender, "Teleported to " + label
+                + (stand == null ? " (no floor found nearby, placed as given)" : ""));
     }
 
     /**
@@ -142,11 +221,25 @@ public class BlameCommand extends CommandBase {
 
     @Override
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos) {
-        if (args.length == 1) return getListOfStringsMatchingLastWord(args, Arrays.asList("list", "tp"));
-        if (args.length == 2 && args[0].equalsIgnoreCase("tp")) {
-            List<String> names = new ArrayList<String>();
-            for (Spot sp : spots()) names.add(sp.name);
-            return getListOfStringsMatchingLastWord(args, names);
+        if (args.length == 1) {
+            return getListOfStringsMatchingLastWord(args,
+                    Arrays.asList("help", "list", "destinations", "tp", "teleport", "goto", "toha"));
+        }
+        if (args.length == 2 && "toha".equalsIgnoreCase(args[0])) {
+            return getListOfStringsMatchingLastWord(args,
+                    Arrays.asList("gate", "entrance", "south", "north", "east", "west", "center", "core"));
+        }
+        if (args.length == 2 && isTeleportVerb(args[0])) {
+            return getListOfStringsMatchingLastWord(args, Arrays.asList(
+                    "beach", "spawn", "gate", "entrance", "toha", "toha-gate",
+                    "south", "north", "east", "west", "center", "centre", "core",
+                    "engine", "furnace", "interior", "toha-south", "toha-north",
+                    "toha-east", "toha-west", "toha-center"));
+        }
+        if (args.length == 3 && isTeleportVerb(args[0])
+                && "toha".equalsIgnoreCase(args[1])) {
+            return getListOfStringsMatchingLastWord(args,
+                    Arrays.asList("gate", "entrance", "south", "north", "east", "west", "center", "core"));
         }
         return new ArrayList<String>();
     }
