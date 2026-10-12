@@ -191,8 +191,11 @@ public final class Toha {
     private void drawMainShell(Cube c) {
         // Immense shells are vertical wall envelopes, not solid rectangular volumes.
         // The interior belongs to the nave, service bridges and cave chambers.
-        wallShell(c, -2050, 64, CZ - 2200, 2050, 200, CZ + 1600, 24, Mat.S_TOHA_PALE);
-        rectBand(c, 2100, -2220, 1640, 180, 236, Mat.S_TOHA_MASS);
+        // A shallow rear plinth projects forward only below the entry tier. Above it,
+        // the main face steps back to the actual cave-mouth plane so the openings are real.
+        wallShell(c, -2050, 64, CZ - 2200, 2050, 128, CZ + 1600, 24, Mat.S_TOHA_PALE);
+        wallShell(c, -2100, 128, CZ - 2220, 2100, 200, CZ + 1350, 24, Mat.S_TOHA_PALE);
+        rectBand(c, 2100, -2220, 1350, 180, 236, Mat.S_TOHA_MASS);
 
         // The lower black body, broad shoulder, pale middle mass, and receding crown.
         wallShell(c, -1850, 200, CZ - 1900, 1850, 640, CZ + 1350, 28, Mat.S_TOHA_MASS);
@@ -259,14 +262,22 @@ public final class Toha {
     }
 
     private void drawFacade(Cube c) {
-        // Thick vertical ribs and deep-set apertures are part of the silhouette,
-        // not random decoration. Their absolute pitch makes neighbouring cubes agree.
-        facadeBand(c, -1850, 1850, 200, 620, 1350);
-        facadeBand(c, -1580, 1580, 640, 1000, 1130);
-        facadeBand(c, -1320, 1320, 1020, 1410, 850);
-        facadeBand(c, -1050, 1050, 1450, 1720, 630);
+        // Sparse, oversized load ribs. A fixed irregular rhythm avoids a barcode /
+        // apartment-grid effect and lets the cave mouths dominate the facade.
+        frontRibs(c, new int[] {-1800, -1270, -900, -390, 390, 1060, 1740},
+                200, 620, 1350, new int[] {42, 58, 36, 52, 46, 64, 48});
+        frontRibs(c, new int[] {-1500, -820, -610, -30, 230, 830, 1460},
+                640, 1000, 1130, new int[] {54, 38, 62, 44, 50, 36, 58});
+        frontRibs(c, new int[] {-1230, -940, -540, -220, 420, 1020, 1270},
+                1020, 1410, 850, new int[] {40, 58, 34, 46, 60, 38, 52});
+        frontRibs(c, new int[] {-990, -700, -400, 420, 700, 990},
+                1450, 1720, 630, new int[] {42, 30, 56, 48, 34, 44});
 
-        // Narrow apertures are true void cuts applied after the surface bands.
+        // One massive off-centre lintel on the middle tier, interrupted by the
+        // main cave and the displaced right-hand service entrance.
+        c.box(-1520, 1004, CZ + 1090, -520, 1028, CZ + 1190, Mat.S_TOHA_MASS);
+        c.box(720, 1004, CZ + 1090, 1510, 1028, CZ + 1190, Mat.S_TOHA_MASS);
+        c.box(-1490, 1000, CZ + 1190, -540, 1006, CZ + 1210, Mat.S_TOHA_PALE);
 
         // Giant blind slots on both flanks continue the façade language around the mass.
         flankSlots(c, -1850, 1350, 200, 640);
@@ -274,11 +285,16 @@ public final class Toha {
         flankSlots(c, -1320, 850, 1020, 1450);
     }
 
-    private void facadeBand(Cube c, int xMin, int xMax, int yMin, int yMax, int front) {
-        if (!c.hits(xMin, yMin, CZ + front, xMax, yMax, CZ + front + 24)) return;
-        for (int x = Math.max(xMin, c.x0); x <= Math.min(xMax, c.x0 + 15); x++) {
-            if (Math.floorMod(x - xMin, 112) >= 8) continue;
-            c.box(x, yMin, CZ + front + 3, x + 5, yMax, CZ + front + 26, Mat.S_TOHA_MASS);
+    private void frontRibs(Cube c, int[] xs, int yMin, int yMax, int front, int[] widths) {
+        for (int i = 0; i < xs.length; i++) {
+            int x = xs[i], w = widths[i];
+            if (!c.hits(x - w / 2, yMin, CZ + front + 1,
+                        x + w / 2, yMax, CZ + front + 96)) continue;
+            c.box(x - w / 2, yMin, CZ + front + 1,
+                  x + w / 2, yMax, CZ + front + 72, Mat.S_TOHA_MASS);
+            // A narrow pale arris gives each rib a concrete edge rather than stripes.
+            c.box(x - 2, yMin + 24, CZ + front + 73,
+                  x + 2, yMax - 24, CZ + front + 84, Mat.S_TOHA_PALE);
         }
     }
 
