@@ -654,16 +654,16 @@ public final class Toha {
     }
 
     private void drawCourtyardPylons(Cube c) {
-        // Four boundary obelisks, all placed by design and aligned to the wall corners.
-        drawSpine(c, -2480, CZ - 2440, 600, 155, 85);
-        drawSpine(c, 2480, CZ - 2440, 540, 145, 80);
-        drawSpine(c, -2480, CZ + 2440, 510, 135, 75);
-        drawSpine(c, 2480, CZ + 2440, 640, 170, 82);
+        // Four isolated pylons align to the circular perimeter; none blocks the southern portal.
+        drawSpine(c, -2200, CZ - 1500, 600, 155, 85);
+        drawSpine(c, 2200, CZ - 1500, 540, 145, 80);
+        drawSpine(c, -2200, CZ + 1500, 510, 135, 75);
+        drawSpine(c, 2200, CZ + 1500, 640, 170, 82);
 
-        // Isolated transfer columns at the sides; the empty courtyard stays mostly empty.
-        c.taper(-2200.5, CZ - 700.5, 82, 45, GROUND, 770, 24, Mat.S_TOHA_PALE);
-        c.taper(2200.5, CZ - 700.5, 82, 45, GROUND, 710, 24, Mat.S_TOHA_PALE);
-        c.cylinder(-2200.5, CZ - 700.5, 105, 82, 1, 1, 420, 434, 0, 0, Mat.S_TOHA_RING);
-        c.cylinder(2200.5, CZ - 700.5, 105, 82, 1, 1, 420, 434, 0, 0, Mat.S_TOHA_RING);
+        // Two tall transfer columns sit on the side arcs of the empty approach ring.
+        c.taper(-2320.5, CZ - 200.5, 82, 45, GROUND, 770, 24, Mat.S_TOHA_PALE);
+        c.taper(2320.5, CZ - 200.5, 82, 45, GROUND, 710, 24, Mat.S_TOHA_PALE);
+        c.cylinder(-2320.5, CZ - 200.5, 105, 82, 1, 1, 420, 434, 0, 0, Mat.S_TOHA_RING);
+        c.cylinder(2320.5, CZ - 200.5, 105, 82, 1, 1, 420, 434, 0, 0, Mat.S_TOHA_RING);
     }
 }
