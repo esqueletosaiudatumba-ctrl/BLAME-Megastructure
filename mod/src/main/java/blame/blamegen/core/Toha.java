@@ -275,7 +275,7 @@ public final class Toha {
                     for (int x = lo; x <= hi; x++) {
                         int front = projectedFrontZ(x, y) - 12;
                         if (front + 4 < c.z0 || front + 1 > c.z0 + 15) continue;
-                        c.box(x, y, front + 1, x, y + cell - 1, front + 4, Mat.S_TOHA_PALE);
+                        c.box(x, y, front + 1, x, y + cell - 1, front + 4, Mat.COAL);
                     }
                 }
             }

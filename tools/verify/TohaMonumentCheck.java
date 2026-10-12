@@ -41,7 +41,7 @@ public final class TohaMonumentCheck {
         Cube inscription = new Cube(Math.floorDiv(markX, 16), Math.floorDiv(markY, 16),
                 Math.floorDiv(markZ, 16));
         toha.draw(inscription);
-        check(inscription.get(markX, markY, markZ) == Mat.S_TOHA_PALE,
+        check(inscription.get(markX, markY, markZ) == Mat.COAL,
                 "the exterior must carry the curved 東亜重工 hull inscription");
 
         int galleryX = 1020, galleryY = 480, galleryZ = Toha.CZ + 2240;
