@@ -787,6 +787,11 @@ public final class Toha {
             c.ring(x, z, width / 3.0, depth / 3.0, y0 + 25, y0 + 48, 8, Mat.COPPER_RAW);
             c.beam(x - width / 3, y0 + 36, z, x + width / 3, y0 + 36, z, 4, Mat.IRON_BLOCK);
             c.beam(x, y0 + 36, z - depth / 3, x, y0 + 36, z + depth / 3, 4, Mat.IRON_BLOCK);
+            c.box(x - width / 3, y0 + 35, z - 2, x + width / 3, y0 + 35, z + 2, Mat.RAIL);
+            for (int sign : new int[] {-1, 1}) {
+                int px = x + sign * width / 3;
+                c.box(px - 6, y0 + 30, z - 6, px + 6, y0 + 42, z + 6, Mat.MACHINE_PISTON);
+            }
             c.box(x - 6, y0 + 20, z - 6, x + 6, y1 - 20, z + 6, Mat.VENT);
         } else if (kind % 4 == 2) {
             for (int yy = y0 + 24; yy < y1 - 18; yy += 28) {
