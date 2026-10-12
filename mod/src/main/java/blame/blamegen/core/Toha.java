@@ -92,6 +92,10 @@ public final class Toha {
         return cylinderRadiusAtY(CAVE_Y[i]);
     }
 
+    static int caveDirection(int i) {
+        return CAVE_DIR[i];
+    }
+
     static int caveFrontAt(int i, int x) {
         return cylinderFrontOffset(caveRadius(i), x);
     }
