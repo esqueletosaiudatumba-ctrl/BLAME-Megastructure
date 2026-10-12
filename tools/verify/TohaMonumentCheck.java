@@ -104,7 +104,7 @@ public final class TohaMonumentCheck {
 
         // The three fixed service flights must connect the existing partial floor levels
         // without filling the central nave around the gravity furnace.
-        int stairX = 775, stairY = 600;
+        int stairX = 772, stairY = 600;
         int stairZ = Toha.CZ + 160 - (stairY - 438) * 2;
         Cube serviceStair = new Cube(Math.floorDiv(stairX, 16), Math.floorDiv(stairY, 16),
                 Math.floorDiv(stairZ, 16));
@@ -116,7 +116,7 @@ public final class TohaMonumentCheck {
         Cube upperStair = new Cube(Math.floorDiv(775, 16), Math.floorDiv(topStairY, 16),
                 Math.floorDiv(topStairZ, 16));
         toha.draw(upperStair);
-        check(upperStair.get(775, topStairY, topStairZ) == Mat.S_TOHA_DECK,
+        check(upperStair.get(772, topStairY, topStairZ) == Mat.S_TOHA_DECK,
                 "the upper service flight must continue toward the crown platform");
 
         int slitX = -870, slitY = 390;
