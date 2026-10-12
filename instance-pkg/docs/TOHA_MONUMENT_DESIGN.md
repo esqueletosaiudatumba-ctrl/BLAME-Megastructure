@@ -2,7 +2,7 @@
 
 ## Intent
 
-Toha is one fixed architectural set piece, not the previous 150 km randomized industrial field. The surrounding BLAME! world remains deterministic and procedural; the Toha site itself is an authored silhouette with intentionally chosen dimensions, elevations, openings, and approach sequence.
+Toha is one fixed architectural set piece, not the previous 150 km randomized industrial field. The surrounding BLAME! world remains deterministic and procedural; the Toha site itself is an authored silhouette with intentionally chosen dimensions, elevations, openings, and approach sequence. Its kilometre-scale shells are hollow wall envelopes rather than solid boxes, so the central voids, side chambers and exterior view corridors are real geometry.
 
 The target is manga-faithful architectural grammar: monumental stepped volumes, pale ruled concrete, near-black setbacks, deep cave-like voids, sparse slit apertures, heavy braces, mechanical ring courses, a long empty approach, and a core that nearly meets the dark ceiling. The cave mouths are deliberately staggered rather than mirrored, with a heavy east-side transfer mass and a separate west-side cantilever to break the temple-like symmetry. Avoid generic industrial-city repetition, randomized structures, billboard signage, saturated lights, or decorative clutter.
 
@@ -15,7 +15,7 @@ The target is manga-faithful architectural grammar: monumental stepped volumes, 
 | Maximum authored height | Y=2030 (the ceiling underside begins no lower than about Y=2080) |
 | Main building width | About 4,200 blocks at the broad base |
 | Main building depth | About 3,860 blocks at the base plinth |
-| Precinct deck | 5,600 × 5,600 blocks, Y=0–63 |
+| Precinct deck | 5,600 × 5,600 blocks, thin plate at Y=60–63 on girders at Y=48–59 |
 | Site edge | Low outer walls with a deliberate south entrance gap |
 | Orientation | Monumental façade faces +Z (south); player approaches from the arrival basin |
 
@@ -38,13 +38,21 @@ The façade contains thirteen authored apertures: five in the lower tier, four i
 
 The large lower central mouth is the primary arrival into the interior. Side mouths are deep service cavities. Upper mouths are smaller and more isolated so the façade does not read like a regular hotel or apartment tower. Each chamber has a fixed recessed AI control slab; the primary and crown chambers retain tiny live indicators, while the other panels stay dark.
 
+## Chamber mechanisms and upper mast
+
+The thirteen chamber AIs have fixed mechanical apparatus inside their cave volumes; these are deliberate, coordinate-authored parts of the monument, not a random prop scatter. Four authored machine grammars recur through the subordinate caves: hollow tapered spindles with bearing collars, exposed gyro rings held by service arms, open rectangular maintenance cages, and paired pressure vessels joined by low service bridges. Their dimensions follow the cave envelope so they remain attached to the chamber architecture.
+
+The principal cave is kept as a sightline into the gravity furnace. Its AI machinery is split into two flanking mechanisms rather than a centre-blocking prop. The recessed control panel and rare local status lights remain visible from the entry without turning the whole façade into a neon display.
+
+One off-axis service mast rises to Y≈1975, close to the ceiling but not merged into it. Long, heavy braces pin it back into the upper mass; a small cyan index lamp marks the mast near its crown. The mast intentionally breaks the otherwise stepped roofline, making the silhouette feel industrial and unbalanced rather than like a symmetrical temple.
+
 ## Interior
 
 The central hollow gravity furnace is the focal machine, rising to just below the artificial ceiling. It uses a thick tapered shell, a hollow bore, six stepped ring courses, and sparse service arms rather than neon ornament.
 
-The central nave is carved out of the solid exterior so the structure has actual negative space. Four ring-collared structural piers, partial service platforms, two inclined braces, hanging lines, and the hollow gravity furnace are visible from the lower cave mouths. Floors do not fill the chamber: a large uninterrupted void around the engine is essential to the scale.
+The central nave is a true open void within the wall shells; major tiers do not contain solid kilometre-wide interiors. Its perimeter is carried by deep wall envelopes, terrace collars and discrete structural members. Four ring-collared structural piers, partial service platforms, two inclined braces, hanging lines, and the hollow gravity furnace are visible from the lower cave mouths. Floors do not fill the chamber: a large uninterrupted void around the engine is essential to the scale.
 
-The core shell and side spines have hollow interiors. Preserve this when changing the material palette or expanding the geometry. The large shape should still look strong as a black silhouette; detail comes second.
+The core shell, side spines, main tiers and transfer masses have hollow interiors. The precinct platform is a four-block plate supported by an orthogonal grid of eight-block-wide, twelve-block-high girders at 512-block spacing. Preserve this sparse load-bearing logic when changing the material palette or expanding the geometry. The large shape should still look strong as a black silhouette; detail comes second.
 
 ## South approach
 
@@ -65,7 +73,7 @@ Material style resolution may weather the same surfaces differently per seed, bu
 ## Code and verification
 
 - Implementation: mod/src/main/java/blame/blamegen/core/Toha.java
-- World integration and generator version: mod/src/main/java/blame/blamegen/core/Megastructure.java
+- World integration and generator version (v11): mod/src/main/java/blame/blamegen/core/Megastructure.java
 - Landmark access: /blame tp toha-gate, /blame tp toha-south, /blame tp toha-north, /blame tp toha-east, /blame tp toha-west, /blame tp toha-center
 - Regression check: tools/verify/TohaMonumentCheck.java
 - The GitHub Actions workflow compiles the pure-Java core and runs the monument, determinism, seam, survey, and benchmark checks before attempting the Forge mod build.
