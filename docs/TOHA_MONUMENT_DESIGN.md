@@ -23,11 +23,11 @@ The site is now next to the arrival basin rather than 90,000 blocks away. The em
 
 ## Authored silhouette
 
-1. **Footing:** a broad pale plinth, ~4.2 km wide, with an oversized black course around it. The footprint is deliberately circular and readable from very far away; the X/Z rectangle above exists only to bound chunk generation efficiently.
+1. **Footing:** a 5.6 km circular deck plate on radial and concentric girders, with a dark annular rim and a separate circular retaining wall interrupted by the monumental southern gate.
 2. **Lower hull:** a 4.4 km-diameter dark cylindrical annulus from Y=64–639, with real hollow interior and a broad projecting circumferential shoulder.
 3. **Middle hull:** a pale cylindrical annulus, 3.8 km diameter from Y=640–1019, inset sharply from the lower hull.
 4. **Upper hull:** a dark 3.2 km-diameter cylindrical annulus from Y=1020–1449, with a continuous curve and few apertures.
-5. **Crown:** concentric pale/dark cylindrical tiers of 2.64, 2.10, 1.64 and 1.64 km scale from Y=1450–1950, stepped inward toward the artificial ceiling.
+5. **Crown:** concentric pale/dark cylindrical tiers of 2.64 km diameter at Y=1450–1759, 2.10 km at Y=1760–1919, and 1.64 km at Y=1920–1950, stepped inward toward the artificial ceiling.
 6. **Core engine:** a hollow, tapered industrial shaft from Y=210 to Y=2030, with several concentric ring-courses and radial service arms.
 7. **Exterior spines:** six fixed, hollow tapered machines fused into the flanks, plus four smaller boundary pylons. A broad eastern transfer mass and a westward crown cantilever break the otherwise immense main shell. They support the skyline without becoming a forest of unrelated towers.
 8. **Terrace bands:** oversized horizontal collars at the main elevation changes. These emphasise constructional layers and interrupt the otherwise uninterrupted vertical faces.
