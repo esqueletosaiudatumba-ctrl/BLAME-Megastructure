@@ -698,12 +698,17 @@ public final class Toha {
         int maxZ = Math.max(startZ, finishZ) + 2;
         if (!c.hits(x0 - 4, startTopY, minZ, x1 + 4, endTopY + 5, maxZ)) return;
 
-        // Two thin diagonal cable rails make the route readable without turning it into
-        // another massive brace. The handrails sit outside the walking width.
-        c.beam(x0 - 3, startTopY + 3, startZ + 0.5,
-               x0 - 3, endTopY + 3, finishZ + 0.5, 1, Mat.CABLE);
-        c.beam(x1 + 3, startTopY + 3, startZ + 0.5,
-               x1 + 3, endTopY + 3, finishZ + 0.5, 1, Mat.CABLE);
+        // Segment the cable rails into short spans. Long diagonal beams otherwise have a
+        // large Y/Z bounding box and would make unrelated cubes along the whole flight pay
+        // the raster cost even when they are far from the actual rail.
+        for (int y = startTopY; y < endTopY;) {
+            int nextY = Math.min(endTopY, y + 24);
+            double zA = startZ + direction * (y - startTopY) * 2.0 + 0.5;
+            double zB = startZ + direction * (nextY - startTopY) * 2.0 + 0.5;
+            c.beam(x0 - 3, y + 3, zA, x0 - 3, nextY + 3, zB, 1, Mat.CABLE);
+            c.beam(x1 + 3, y + 3, zA, x1 + 3, nextY + 3, zB, 1, Mat.CABLE);
+            y = nextY;
+        }
 
         // Restrict raster work to the current cube's Y slice; a flight spans hundreds of
         // blocks, but a cube can intersect only a small handful of individual treads.
