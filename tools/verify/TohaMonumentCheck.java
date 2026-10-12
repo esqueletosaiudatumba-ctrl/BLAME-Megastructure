@@ -99,10 +99,11 @@ public final class TohaMonumentCheck {
                 "cross-valley paths must connect the cliff infrastructure to the spire");
 
         // Machine yard equipment must be block-real and richly detailed at human scale.
-        Cube yard = cubeAt(-930, 69, Toha.CZ + 520);
+        int machineRoofY = 64 + 220 + 12;
+        Cube yard = cubeAt(-930, machineRoofY, Toha.CZ + 520);
         toha.draw(yard);
-        check(yard.get(-930, 69, Toha.CZ + 520) == Mat.SLAB_TOP,
-                "the machine yard must contain slab-topped service modules");
+        check(yard.get(-930, machineRoofY, Toha.CZ + 520) == Mat.SLAB_BOTTOM,
+                "the machine yard must use slab-clad machinery roofs");
 
         int markX = -6, markY = 274;
         int markZ = Toha.projectedFrontZ(markX, markY) - 12 + 2;
