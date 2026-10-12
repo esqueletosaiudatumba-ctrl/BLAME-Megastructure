@@ -45,6 +45,9 @@ jobs:
           # One wide 3D silhouette view from outside the south gate, at reduced sampling density.
           timeout 75s java -Xmx1400m -cp build/pv Preview toha-persp toha-monument.png 0 800 1000 180 -3 65 960 540 7000
           echo "wide silhouette render exit=$?"
+          # Front-normal detail view: inspect the hull lettering at a scale that the kilometre-wide overview cannot resolve.
+          timeout 60s java -Xmx1400m -cp build/pv Preview toha-persp toha-inscription.png 2520 355 -2470 130 0 45 960 540 2000
+          echo "hull inscription close-up exit=$?"
           timeout 100s java -Xmx2g -cp build/pv Preview toha-section toha-cross-section.png -4603 0 1030 5000 2200 5
           echo "central cut render exit=$?"
           # Frontal elevation, one block behind the lower façade: the thirteen cave mouths are visible.
@@ -63,6 +66,7 @@ jobs:
           name: toha-monument-preview
           path: |
             toha-monument.png
+            toha-inscription.png
             toha-oblique.png
             toha-cross-section.png
             toha-elevation.png
