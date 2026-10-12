@@ -1,110 +1,130 @@
-# Toha Heavy Industries — authored monument
+# Toha Heavy Industries — spire in the industrial valley
 
-## Intent
+## Design goal
 
-Toha is one fixed architectural set piece, not the previous 150 km randomized industrial field. The surrounding BLAME! world remains deterministic and procedural; the Toha site itself is an authored silhouette with intentionally chosen dimensions, elevations, openings, and approach sequence. Its kilometre-scale shells are hollow wall envelopes rather than solid boxes, so the central voids, side chambers and exterior view corridors are real geometry.
+Generator v19 replaces the previous broad, stepped cylinder with a **narrow hollow spire inside a megastructure-scale canyon**. The tower is the central silhouette, but the valley supplies the scale: stratified walls rise beside it, equipment bays are cut into the cliffs, interrupted catwalks climb the walls, and slab-backed routes pass through yards, gantries, lift towers and chambers. The space should feel like a cross-section through an immense, older machine city rather than a freestanding skyscraper on a round plaza.
 
-The target is manga-faithful architectural grammar: an immense stepped cylindrical hull, pale ruled concrete, near-black annular setbacks, deep cave-like voids, sparse slit apertures, heavy braces, mechanical ring courses, a long empty approach, and an off-axis core/mast that nearly meets the dark ceiling. The cave mouths are deliberately staggered rather than mirrored, with a heavy east-side transfer mass and a separate west-side cantilever to break the temple-like symmetry. Avoid generic industrial-city repetition, randomized structures, billboard signage, saturated lights, or decorative clutter.
+The design uses the visual language of *BLAME!* without reproducing individual manga panels: a thin tapering black mass, huge pale structural cuts, severe dark concrete, long vertical voids, asymmetrical bridges, irregular caverns, small cold indicator lights and machine assemblies that seem to have an industrial purpose. For Minecraft-scale detailing, the authored palette now also uses slabs, stairs, iron trapdoors, rails, pistons, dispensers and hoppers alongside tanks, vent grills, pipework, bars and cables. These are structural and mechanical details, not decorative scatter.
 
-## Fixed placement and scale
+The environment should be **densely infrastructural but not uniformly full**. Machines are concentrated along routes, in equipment yards and inside deep wall apertures. Huge open spans remain between them so the view can communicate the canyon's depth and the spire's height.
 
-| Element | Design |
+## Fixed placement and envelope
+
+| Element | Authored value |
 |---|---|
 | Anchor | X=0, Z=-4608 |
-| Worldgen footprint | X [-3072, 3072), Z [-7680, -1536); rectangular broad-phase bound only |
-| Maximum authored height | Y=2030 (the ceiling underside begins no lower than about Y=2080) |
-| Main building width | 4,400-block lower-hull diameter, with stepped rings of 3,800 / 3,200 / 2,640 / 2,100 / 1,640 blocks |
-| Main building depth | Same as its 4,400-block circular lower hull; projecting machinery extends farther on the east side |
-| Precinct deck | 5,600-block circular plate, Y=60–63, on concentric girders and radial spokes at Y=48–59 |
-| Site edge | Low outer walls with a deliberate south entrance gap |
-| Orientation | Monumental façade faces +Z (south); player approaches from the arrival basin |
+| World-generation bounds | X [-4096, 4096), Z [-8704, -512) |
+| Geometry height | Y=64 through Y=2030 |
+| Spire radius | approximately 420 blocks at the foot, narrowing to 18 blocks at the crown |
+| Spire interior | carved hollow; roughly 384-block lower radius tapering to a 3-block bore near the top |
+| Valley walls | inner edges around X=-2940 and X=+2940, with wall thickness around 120 blocks |
+| Valley length | about 7,120 blocks between the near and far wall faces |
+| Cliff access | broken platforms at Y=210, 455, 735, 1015, 1300, 1585 and 1870 |
+| Gravity furnace | offset 36 blocks to the north of the spire centre; hollow taper from radius 118 to 13 |
+| AI chambers | thirteen fixed chambers between Y=120 and Y=1912 |
 
-The site is now next to the arrival basin rather than 90,000 blocks away. The empty span between the arrival gate and Toha is intentional: the building should dominate the view before the player reaches it, while the /blame tp landmarks provide reliable direct access.
+The large X/Z owner bounds are a conservative broad-phase region for the canyon, not a filled rectangular prism. Every large mass is separately bounded and clipped by the current 16³ Cube before raster work. Toha geometry is fixed and independent of the world seed; only materials resolved through `Styles` may vary.
 
-## Authored silhouette
+## Composition from far to near
 
-1. **Footing:** a 5.6 km circular deck plate on radial and concentric girders, with a dark annular rim and a separate circular retaining wall interrupted by the monumental southern gate.
-2. **Lower hull:** a 4.4 km-diameter dark cylindrical annulus from Y=64–639, with real hollow interior and a broad projecting circumferential shoulder.
-3. **Middle hull:** a pale cylindrical annulus, 3.8 km diameter from Y=640–1019, inset sharply from the lower hull.
-4. **Upper hull:** a dark 3.2 km-diameter cylindrical annulus from Y=1020–1449, with a continuous curve and few apertures.
-5. **Crown:** concentric pale/dark cylindrical tiers of 2.64 km diameter at Y=1450–1759, 2.10 km at Y=1760–1919, and 1.64 km at Y=1920–1950, stepped inward toward the artificial ceiling.
-6. **Core engine:** a hollow, tapered industrial shaft from Y=210 to Y=2030, with several concentric ring-courses and radial service arms.
-7. **Exterior spines:** six fixed, hollow tapered machines fused into the flanks, plus four smaller boundary pylons. A broad eastern transfer mass and a westward crown cantilever break the otherwise immense main shell. They support the skyline without becoming a forest of unrelated towers.
-8. **Terrace bands:** oversized horizontal collars at the main elevation changes. These emphasise constructional layers and interrupt the otherwise uninterrupted vertical faces.
+### 1. Canyon envelope
 
-## Cylindrical hull geometry
+The valley's east and west walls are thick dark mass shells on the order of three kilometres from the centreline. They reach from the low canyon floor to around Y=2008, and read as immense cliff-like megastructure walls rather than natural rock. Large rectangular machinery mouths, irregular slots and massive lintels interrupt the inner faces. Some openings reveal darkness; others have deep side reveals and pale structural lips.
 
-The source anchor is `CX=0, CZ=-4608`. The circular deck has a 2,800-block radius. The primary hull uses true annular walls rather than a square box or a filled cylinder:
+Long vertical ribs join the cliff faces to the roofward mass. Their widths and heights vary by authored position; not every rib reaches the same level. Deep vertical slots, narrow black service seams and exposed shafts make the walls read as multiple layers of infrastructure. The north end remains fractured with unequal wall sections, while the south gate has a clear central opening framed by tall piers and a crosshead. Both directions retain a route into the canyon.
 
-| Vertical tier | Elevation | Outer radius | Wall thickness | Material intent |
-|---|---:|---:|---:|---|
-| Lower hull | Y=64–639 | 2,200 | 36 | near-black monolith |
-| Second hull | Y=640–1019 | 1,900 | 36 | pale ruled concrete |
-| Third hull | Y=1020–1449 | 1,600 | 36 | near-black mass |
-| Fourth hull | Y=1450–1759 | 1,320 | 36 | pale shell |
-| Crown lower tier | Y=1760–1919 | 1,050 | 32 | dark machine shell |
-| Crown cap | Y=1920–1950 | 820 | 28 | pale cap |
+### 2. The spire
 
-Each tier clears its own interior radius and draws only the annular wall, so the central volume stays genuinely empty until the authored nave, platforms, furnace, braces and chambers are added. Circumferential collars at the setbacks exaggerate the layer transitions; eight irregular axial ribs break the outline without creating a repeated apartment/window grid. The upper service mast and east transfer module intentionally breach the smooth circle.
+The central body is a single hollow, tapered mast, not a stack of wide drums. Its outer skin narrows continuously from a radius of about 420 at Y=64 to 18 at Y=2030. The body is formed from a dark industrial shell with an inner air carve. Seven irregular pale/dark longitudinal ribs climb in short, bounded segments so that the tower feels reinforced without becoming a regular fluted column.
 
-The X/Z footprint remains a conservative rectangular overlap bound to avoid expensive circular tests during chunk selection. It is not the shape of the structure. Circularity is established by the deck, retaining wall, primary hull, collar courses, cave-mouth depth, and radial structure.
+Thin course marks punctuate the height. Broken orbital maintenance decks step outward from the skin at unequal intervals, with different angular spans and elevations. Their arcs never become complete, continuous balconies. Short brackets transfer load back to the shell, and some platforms are attached to the external helix or to one of the bridge landings.
 
-## Broken orbital galleries and brutal facade cuts
+The south-east-facing lower spire carries the matte-black `東亜重工` mark in compact 3-block raster cells, projected to the local tapered surface. The mark remains small and part of the architecture; it is not a floating sign.
 
-Generator v13 retains the six principal shell diameters and all thirteen fixed AI cave mouths, but interrupts the smooth drum silhouette with four hand-authored tiers of broken orbital gallery. The courses sit at Y=466–491 (outer/inner radii 2,520/2,376), 910–940 (2,185/2,042), 1,365–1,395 (1,810/1,685), and 1,630–1,658 (1,495/1,372). Each is a collection of unequal angular segments, not a continuous ring: the south-facing arcs split around the approach, and large gaps remain. Short outriggers transfer load to the hull; four hollow-section diagonal compression members stitch separate tiers together at non-mirrored angles.
+### 3. Hollow interior and gravity furnace
 
-Eight tall, shallow curved fins are placed against the authored surface at selected x positions. Every x-column is projected to its tier's actual circular surface, so a fin follows the hull rather than becoming a flat wall. Contrasting arrises catch light, but there is no regular window-grid rhythm. Their placement is deliberately uneven: heavier lower flanks, differently proportioned middle cheeks, a broken upper pair, and a short crown blade.
+The shell's interior is a real void. An eccentric hollow gravity furnace stands within it, slightly north of the geometric centreline. Its tapered dark casing, open bore, narrow course rings, radial arms and pressure-line bands provide a second vertical focus behind the outer spire. The interior floors are partial arcs, not full horizontal slabs that would seal the void.
 
-The repeated-pitch slit helper is replaced by twenty-seven fixed aperture records. Each slit has its own x, bottom elevation, width, height, shell radius, and cut depth (86–112 blocks). Openings remain real voids cut into the curved wall; none is selected from the world seed. This creates an authored negative-space rhythm without compromising the thirteen larger cave portals.
+At seven heights, transverse slab bridges reach from the cliff-side routes through the spire shell to the corresponding internal gallery. The bridges are separated by large vertical gaps and use structural undersides, railings, and short truss spans. Their central ends meet partial platforms around the furnace, not a solid central shaft. Preserve the open sightline around the machine.
 
-Generator v14 widened the Toha shell's screentone rule pitch from 32 to 96 blocks. Generator v15 added the manga's identifying 東亜重工 mark as four vertical block-raster glyphs attached directly to the outer cylinder at the southeast-facing lower hull. V16 changed the strokes to matte-black COAL blocks. V17 increased the glyph cells from 6 to 10 blocks so the characters survive the multi-kilometre view, and updated depth culling to follow the stepped hull surface at each tier transition. V18 adds a fixed three-flight service stair between partial east-nave platforms. Every glyph pixel remains attached to the local circular radius; there is no flat billboard. The regression test checks a real black glyph block, and the placement leaves the thirteen major cave portals intact. The CI preview artifact includes `toha-inscription.png`, a front-normal close-up of the inscription, because the full-width monument view cannot establish small-glyph legibility.
+### 4. Thirteen AI chambers
 
-At multi-kilometre scale, the old 32-block rule made otherwise monolithic concrete read like tightly spaced bars. The wider pitch keeps ruled surfaces and deterministic mineral weathering, while letting each facade mass read as a large continuous surface from a distance. The floor/deck keeps its finer marking scale.
+Thirteen authored chambers are placed at uneven heights from Y=120 to Y=1912. Their dimensions shrink with the spire. Each opening is a real void cut through the shell and faces one of four directions; later chambers are moved off the centreline where necessary to avoid the furnace and preserve a clear doorway. The openings have pale side jambs, heavy dark lintels, occasional slab sills, recessed control faces and sparse status indicators.
 
-## Thirteen fixed cave mouths
+Each chamber uses one of four fixed machine grammars:
+- paired pressure vessels with collars and hopper-like feeder blocks;
+- a gyro/rotor frame with metal crossbars, piston details and a maintenance rail;
+- a rack cage with repeated half-height slab floors and dark reinforced glass;
+- a hollow tapered spindle with bearing collars and attached pipework.
 
-The curved hull contains thirteen authored cave mouths: five in the lower tier, four in the second, three in the third, and one isolated crown mouth. Each opening is projected to the cylinder surface at its actual X position; the front is not a single flat plane. Their horizontal centres, heights and widths are intentionally irregular; the grouping is legible from a distance without becoming a repeated window grid. The openings have fixed centres, widths and heights, and their face offsets are computed from the cylinder radius rather than a shared flat-front Z coordinate. Their deep square cuts, dark inner reveals, heavy lintels, and sparse local lamps create a strong readable rhythm. They are architectural rooms/passages, not a random cave-placement algorithm.
+The chambers are not independently randomized. Their position, orientation, dimensions and machine type are hand-authored and regression-tested.
 
-The large lower central mouth is the primary arrival into the interior. Side mouths are deep service cavities. Upper mouths are smaller and more isolated so the façade does not read like a regular hotel or apartment tower. Each chamber has a fixed recessed AI control slab; the primary and crown chambers retain tiny live indicators, while the other panels stay dark.
+## Traversal and machine logistics
 
-## Chamber mechanisms and upper mast
+### Exterior and cliff routes
 
-The thirteen chamber AIs have fixed mechanical apparatus inside their cave volumes; these are deliberate, coordinate-authored parts of the monument, not a random prop scatter. Four authored machine grammars recur through the subordinate caves: hollow tapered spindles with bearing collars, exposed gyro rings held by service arms, open rectangular maintenance cages, and paired pressure vessels joined by low service bridges. Their dimensions follow the cave envelope so they remain attached to the chamber architecture.
+A helical maintenance path follows the spire from the lower shell towards the crown. It uses short overlapping half-slabs as treads, periodic posts and rare cyan route lights. The helix is deliberately steep and industrial; it is not a decorative smooth staircase. Chamber mouths are carved after the helix so a landing cannot seal a doorway.
 
-The principal cave is kept as a sightline into the gravity furnace. Its AI machinery is split into two flanking mechanisms rather than a centre-blocking prop. The recessed control panel and rare local status lights remain visible from the entry without turning the whole façade into a neon display.
+Both cliff walls have seven levels of broken half-slab/catwalk access. Their exposed brackets, intermittent rails and gaps imply a route that has been partly damaged or extended over centuries. Lift-like equipment towers attach to the walls at authored intervals. These are hollow tapered frames with repeated ring courses, small machinery details and top landings.
 
-One off-axis service mast rises to Y≈1975, close to the ceiling but not merged into it. Long, heavy braces pin it back into the upper mass; a small cyan index lamp marks the mast near its crown. The mast intentionally breaks the otherwise stepped roofline, making the silhouette feel industrial and unbalanced rather than like a symmetrical temple.
+### Ground logistics
 
-## Interior
+The valley floor is a set of wide structural plates, not a flat circular plaza. Nine unequal plate bands are divided by open trenches. Some trenches have short grated or slab bridges, while narrow stepping lanes and black expansion joints indicate routes across the plates.
 
-The central hollow gravity furnace is the focal machine, rising to just below the artificial ceiling. The furnace uses a thick tapered shell, a hollow bore, six stepped ring courses, and sparse service arms rather than neon ornament. A fixed three-flight maintenance stair links the east-side partial platforms at Y≈430, 790, 1150 and 1490. It follows the nave perimeter with narrow deck treads, sparse handrails and alternating runs; it does not bridge across or fill the furnace sightline.
+A south causeway and a north causeway terminate at separate low portals through the foot of the spire. Both have paired load members, underside cross-ties, modest route lamps and copper utility marks. The interior path continues between the two base entrances.
 
-The central nave is a true open void within the wall shells; major tiers do not contain solid kilometre-wide interiors. Its perimeter is carried by deep wall envelopes, terrace collars and discrete structural members. Four ring-collared structural piers, partial service platforms, two inclined braces, hanging lines, and the hollow gravity furnace are visible from the lower cave mouths. Floors do not fill the chamber: a large uninterrupted void around the engine is essential to the scale.
+### Machine yard, cargo and gantries
 
-The core shell, side spines, main tiers and transfer masses have hollow interiors. The precinct platform is a four-block plate supported by an orthogonal grid of eight-block-wide, twelve-block-high girders at 512-block spacing. Preserve this sparse load-bearing logic when changing the material palette or expanding the geometry. The large shape should still look strong as a black silhouette; detail comes second.
+Twenty fixed machine modules form several non-mirrored clusters around the spire. Each module has a footing, four load-bearing legs, a crosshead, a slab-topped service landing and visible connections to a second module or a service route. Equipment types include pressure-tank pairs, rotor rings, framed vent racks, transformer stacks, dispenser-like control blocks, hopper-like feeders, trapdoor covers and rare cyan status lamps.
 
-## South approach
+Four ground-level paired cargo rails cross the valley along slab foundations. Raised conveyors at multiple elevations carry tray-like channels between machine rows. Their repeated supports have copper collars and piston-like details. Two large and one smaller loading gantries suspend hopper-like lifting heads on cables; their offset legs and crossheads avoid a perfectly symmetrical frame. Access walks cling to each conveyor at a different height.
 
-The approach is a narrow processional causeway crossing a mostly empty forecourt. A deep side-pier portal with a heavy pale crosshead anchors the south perimeter opening; it stays clear in the middle for entry. Five fixed industrial frames grow wider and taller toward the façade. Twin recessed feed channels and restrained cyan marks identify the route. The boundary wall is low relative to the building and leaves a wide southern gate, so the monument remains visually dominant.
+Conduits and routes must appear to lead somewhere: a yard module, a wall aperture, a gantry or the spire. Do not add isolated machinery merely to increase block count. Keep the industrial density around the equipment routes, with wider negative-space bands in the canyon between major clusters.
 
-## Materials and lighting
+## Minecraft block language
 
-- **S_TOHA_PALE:** ruled pale concrete for the plinth, inset shells, lintels, and selected braces.
-- **S_TOHA_MASS:** near-black monolithic surfaces with sparse panel seams.
-- **S_TOHA_RING:** dark curved shells and industrial ring courses.
-- **S_TOHA_DECK:** floor and platform plates.
-- **S_DARK, COAL, ANDESITE:** deep recesses, support metal, and structural contrast.
-- **BIO_CYAN / SEA_LANTERN:** very rare orientation cues at the principal cave, crown, and final approach frame only.
-- **LAMP_RED:** a couple of machine status marks, never a continuous neon outline.
+The generator maps its material IDs to real Minecraft 1.12.2 block states. The added mechanical materials include dispensers, hoppers, pistons, iron trapdoors, rails and stone-brick stairs. Alongside them, use the existing stone half-slabs, iron bars, reinforced dark glass, vents, raw/oxidized copper-colour blocks, tanks, rebar, concrete variants and rare sea-lantern/cyan indicators.
 
-Material style resolution may weather the same surfaces differently per seed, but all geometry and structure positions remain fixed.
+- **Primary mass:** near-black concrete-style surfaces and dark ring shells.
+- **Structural cuts:** pale ruled concrete and battered slab lips.
+- **Walking surface:** bottom/top slabs, short stair segments and framed landing pads.
+- **Load structure:** heavy ribs, trusses, iron blocks and ring-collared piers.
+- **Mechanical detail:** pressure cylinders, hopper feeders, piston-driven rotor assemblies, dispensers, trapdoor covers, vents, piping and rails.
+- **Lighting:** restrained cyan/sea lanterns at route markers and key machine states; do not outline every edge in neon.
+- **Weathering:** keep deterministic mineral variation and the low-saturation charcoal/ash/pale-concrete palette.
 
-## Code and verification
+When a new block ID is added to `Mat.java`, also add its 1.12.2 mapping in `BlameCubeGenerator.java` and preview colour in `tools/preview/Preview.java`. Increase `Mat.COUNT` accordingly and check both `isStructure` and `isSolid` for non-blocking types such as rails.
 
-- Implementation: mod/src/main/java/blame/blamegen/core/Toha.java
-- World integration and generator version (v18): mod/src/main/java/blame/blamegen/core/Megastructure.java
-- Landmark access: /blame tp gate (or /blame tp toha-gate), /blame tp south, /blame tp north, /blame tp east, /blame tp west, /blame tp center (or /blame tp toha-center), /blame tp toha core, /blame goto north, /blame destinations, or /blame tp <x> <y> <z>
-- Regression check: tools/verify/TohaMonumentCheck.java
-- The GitHub Actions workflow compiles the pure-Java core and runs the monument, determinism, seam, survey, and benchmark checks before attempting the Forge mod build.
+## Pathfinding landmarks
 
-Do not call this a verified in-game monument until a compatible Forge 1.12.2 + CubicChunks build launches and the structure is inspected in-client. An offline schematic render and passing core tests do not prove in-game lighting, block mapping, traversal, or performance.
+The `/blame` teleport landmarks have been retargeted to the new spatial layout:
+- `/blame tp gate`: southern valley mouth, looking towards the spire.
+- `/blame tp south`: southern causeway.
+- `/blame tp north`: far causeway.
+- `/blame tp east` and `/blame tp west`: east/west cliff catwalks at Y=455.
+- `/blame tp center`: base apron beside the entrance.
+- Short aliases, `/blame tp toha <part>`, `/blame goto <destination>`, `/blame destinations`, and XYZ teleporting remain available.
+
+A new world is needed to see changed world-generation geometry in positions whose cubes were already saved.
+
+## Verification
+
+`tools/verify/TohaMonumentCheck.java` verifies:
+- the expanded valley owner bounds and narrow spire profile;
+- shell material and hollow interior;
+- real valley wall masses and clear canyon negative space;
+- passable south gate;
+- all thirteen directional AI chamber openings;
+- a helical slab tread and transverse slab bridge;
+- a slab-clad module roof and the spire inscription.
+
+GitHub Actions compiles the pure-Java core, runs Toha regression checks, `Probe`, `SeamCheck`, `Survey`, `LandmarkSurvey` and the benchmark, then produces a large batch of isolated Toha perspectives, plans, sections and elevations. A preview is still an offline schematic, not proof of Minecraft lighting, collisions or in-game traversal. Those require an actual Forge 1.12.2 + CubicChunks client run.
+
+## Source of truth
+
+- Generator: `mod/src/main/java/blame/blamegen/core/Toha.java`
+- Material IDs: `mod/src/main/java/blame/blamegen/core/Mat.java`
+- Minecraft block mapping: `mod/src/main/java/blame/blamegen/BlameCubeGenerator.java`
+- Offline art renderer: `tools/preview/Preview.java`
+- Preview contact sheets: generated by `tools/preview/ContactSheet.java`
+- Regression checks: `tools/verify/TohaMonumentCheck.java`
