@@ -69,7 +69,14 @@ public final class Mat {
     public static final byte REBAR = 43;
     /** Reinforced glass: dark tinted panes in structural windows. */
     public static final byte GLASS_REINFORCED = 44;
-    public static final byte COUNT = 45;
+    /** Functional-looking Minecraft components used as exposed industrial details. */
+    public static final byte MACHINE_DISPENSER = 45;
+    public static final byte MACHINE_HOPPER = 46;
+    public static final byte MACHINE_PISTON = 47;
+    public static final byte IRON_TRAPDOOR = 48;
+    public static final byte RAIL = 49;
+    public static final byte STONE_BRICK_STAIRS = 50;
+    public static final byte COUNT = 51;
 
     public static final byte STYLE_BASE = 64;
     /** Weathered grey concrete with dark patches and vertical streaks: walls and masses. */
@@ -107,11 +114,11 @@ public final class Mat {
      */
     public static boolean isStructure(byte m) {
         return m != AIR && m != WATER && m != IRON_BARS
-                && m != LADDER_N && m != LADDER_S && m != LADDER_W && m != LADDER_E;
+                && m != LADDER_N && m != LADDER_S && m != LADDER_W && m != LADDER_E && m != RAIL;
     }
 
     public static boolean isSolid(byte m) {
         return m != AIR && m != WATER && m != IRON_BARS && m != END_ROD_UP && m != END_ROD_DOWN
-                && m != LADDER_N && m != LADDER_S && m != LADDER_W && m != LADDER_E;
+                && m != LADDER_N && m != LADDER_S && m != LADDER_W && m != LADDER_E && m != RAIL;
     }
 }
