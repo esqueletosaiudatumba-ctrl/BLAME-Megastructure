@@ -615,7 +615,7 @@ public final class Toha {
     // ------------------------------------------------------------------
 
     private void drawApproach(Cube c) {
-        int zBack = CZ + 2760, zFront = CZ + 1460;
+        int zBack = CZ + 2660, zFront = CZ + 1360;
         c.box(-640, 63, zFront, 640, 82, zBack, Mat.S_TOHA_DECK);
         c.box(-580, 83, zFront, -565, 86, zBack, Mat.S_TOHA_MASS);
         c.box(565, 83, zFront, 580, 86, zBack, Mat.S_TOHA_MASS);
@@ -629,9 +629,9 @@ public final class Toha {
         }
 
         // Two deep feed channels and crossheads parallel the road, not a decorative plaza.
-        c.box(-930, 28, CZ + 1830, -830, 60, CZ + 2700, Mat.S_TOHA_MASS);
-        c.box(830, 28, CZ + 1830, 930, 60, CZ + 2700, Mat.S_TOHA_MASS);
-        for (int z = CZ + 1900; z <= CZ + 2650; z += 150) {
+        c.box(-930, 28, CZ + 1720, -830, 60, CZ + 2590, Mat.S_TOHA_MASS);
+        c.box(830, 28, CZ + 1720, 930, 60, CZ + 2590, Mat.S_TOHA_MASS);
+        for (int z = CZ + 1790; z <= CZ + 2540; z += 150) {
             c.box(-965, 60, z, -800, 65, z + 10, Mat.S_TOHA_RING);
             c.box(800, 60, z, 965, 65, z + 10, Mat.S_TOHA_RING);
         }
