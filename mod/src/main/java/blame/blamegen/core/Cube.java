@@ -180,6 +180,37 @@ public final class Cube {
     }
 
     /**
+     * Vertical circular wall shell with caller-defined thickness.
+     * Unlike a solid prism followed by an air carve, this writes only the annular wall.
+     * This is useful for huge hollow cylinders such as Toha Heavy Industries.
+     */
+    public void shellPrism(double cx, double cz, double outerR, double innerR,
+                           int minY, int maxY, byte material) {
+        if (outerR <= 0 || innerR < 0 || innerR >= outerR || maxY < minY) return;
+        int minX = (int) Math.floor(cx - outerR) - 1;
+        int maxX = (int) Math.ceil(cx + outerR) + 1;
+        int minZ = (int) Math.floor(cz - outerR) - 1;
+        int maxZ = (int) Math.ceil(cz + outerR) + 1;
+        if (!hits(minX, minY, minZ, maxX, maxY, maxZ)) return;
+        int ax = Math.max(minX, x0), bx = Math.min(maxX, x0 + 15);
+        int az = Math.max(minZ, z0), bz = Math.min(maxZ, z0 + 15);
+        int ay = Math.max(minY, y0), by = Math.min(maxY, y0 + 15);
+        double outer2 = outerR * outerR, inner2 = innerR * innerR;
+        for (int z = az; z <= bz; z++) {
+            double dz = z + 0.5 - cz;
+            for (int x = ax; x <= bx; x++) {
+                double dx = x + 0.5 - cx;
+                double d2 = dx * dx + dz * dz;
+                if (d2 > outer2 || d2 < inner2) continue;
+                int base = (z - z0) << 4 | (x - x0);
+                for (int y = ay; y <= by; y++) {
+                    b[(y - y0) << 8 | base] = material;
+                }
+            }
+        }
+    }
+
+    /**
      * Vertical prism with an arbitrary cross-section, optional rotation about Y, optional
      * shear (leaning) and optional hollow interior. Used for the shapeless districts:
      * octagons, tilted squares, drums and leaning masses that never repeat.
