@@ -41,21 +41,21 @@ jobs:
         run: |
           set +e
           # Wide hero and orthographic reference views retained from the original preview pass.
-          timeout 75s java -Xmx1400m -cp build/pv Preview toha-persp toha-monument.png 0 800 1000 180 -3 65 960 540 7000
+          timeout 75s java -Xmx1400m -cp build/pv Preview toha-persp toha-monument.png 0 760 400 180 -4 66 960 540 5600
           echo "wide silhouette render exit=$?"
-          timeout 60s java -Xmx1400m -cp build/pv Preview toha-persp toha-inscription.png 2400 355 -2500 135 0 55 960 540 1800
+          timeout 60s java -Xmx1400m -cp build/pv Preview toha-persp toha-inscription.png 0 190  -4050 180 -2 55 960 540 1200
           echo "hull inscription close-up exit=$?"
-          timeout 100s java -Xmx2g -cp build/pv Preview toha-section toha-cross-section.png -4603 0 1030 5000 2200 5
+          timeout 100s java -Xmx2g -cp build/pv Preview toha-section toha-cross-section.png -4608 0 1030 7000 2200 5
           echo "central cut render exit=$?"
-          timeout 60s java -Xmx2g -cp build/pv Preview toha-section toha-elevation.png -3259 0 1030 4400 2100 4
+          timeout 60s java -Xmx2g -cp build/pv Preview toha-section toha-elevation.png -4308 0 1030 7000 2100 5
           echo "front section render exit=$?"
           timeout 70s java -Xmx2g -cp build/pv Preview toha-elevation toha-front-elevation.png 0 1030 4400 2100 4
           echo "tier-aware front elevation exit=$?"
-          timeout 100s java -Xmx2g -cp build/pv Preview toha-slice toha-plan.png 800 0 -4608 6500 8
+          timeout 100s java -Xmx2g -cp build/pv Preview toha-slice toha-plan.png 800 0 -4608 7500 10
           echo "mid-level plan exit=$?"
 
           # Exterior perspectives: rear, flanks, corners, low arrival, upper crown and service mast.
-          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-south-low-angle.png 0 92 -1400 180 -14 65 640 360 4200
+          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-south-low-angle.png 0 92 -1400 180 -14 65 640 360 5200
           echo "south low angle exit=$?"
           timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-gate-close.png 0 280 -1720 180 -3 58 640 360 3200
           echo "gate close-up exit=$?"
@@ -89,9 +89,9 @@ jobs:
           echo "east nave exit=$?"
           timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-service-stair.png 900 610 -4700 119 0 70 640 360 1000
           echo "service stair exit=$?"
-          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-main-ai-chamber.png 0 380 -3108 0 0 70 640 360 1300
+          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-main-ai-chamber.png -110 145 -4048 180 0 70 640 360 800
           echo "main AI chamber exit=$?"
-          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-upper-ai-chamber.png -340 820 -3300 0 0 68 640 360 1300
+          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-upper-ai-chamber.png 400 850 -4683 90 0 68 640 360 800
           echo "upper AI chamber exit=$?"
 
           # Orbital-gallery and material-detail shots.
@@ -105,28 +105,48 @@ jobs:
           echo "hull detail exit=$?"
 
           # Plans at five elevations reveal how the hollow hull and broken rings change with height.
-          timeout 60s java -Xmx1500m -cp build/pv Preview toha-slice toha-plan-foundation.png 55 0 -4608 6500 10
+          timeout 60s java -Xmx1500m -cp build/pv Preview toha-slice toha-plan-foundation.png 63 0 -4608 7500 10
           echo "foundation plan exit=$?"
-          timeout 60s java -Xmx1500m -cp build/pv Preview toha-slice toha-plan-lower.png 480 0 -4608 6500 10
+          timeout 60s java -Xmx1500m -cp build/pv Preview toha-slice toha-plan-lower.png 224 0 -4608 7500 10
           echo "lower gallery plan exit=$?"
-          timeout 60s java -Xmx1500m -cp build/pv Preview toha-slice toha-plan-middle.png 950 0 -4608 6500 10
+          timeout 60s java -Xmx1500m -cp build/pv Preview toha-slice toha-plan-middle.png 555 0 -4608 7500 10
           echo "middle gallery plan exit=$?"
-          timeout 60s java -Xmx1500m -cp build/pv Preview toha-slice toha-plan-upper.png 1500 0 -4608 6500 10
+          timeout 60s java -Xmx1500m -cp build/pv Preview toha-slice toha-plan-upper.png 1135 0 -4608 7500 10
           echo "upper gallery plan exit=$?"
-          timeout 60s java -Xmx1500m -cp build/pv Preview toha-slice toha-plan-crown.png 1900 0 -4608 6500 10
+          timeout 60s java -Xmx1500m -cp build/pv Preview toha-slice toha-plan-crown.png 1920 0 -4608 7500 10
           echo "crown plan exit=$?"
 
           # Additional sections and elevations isolate the chamber openings and hull profile.
-          timeout 70s java -Xmx1500m -cp build/pv Preview toha-section toha-section-furnace.png -5168 0 1030 5000 2200 6
+          timeout 70s java -Xmx1500m -cp build/pv Preview toha-section toha-section-furnace.png -4644 0 1030 7000 2200 6
           echo "furnace section exit=$?"
-          timeout 70s java -Xmx1500m -cp build/pv Preview toha-section toha-section-nave.png -4408 0 1030 5000 2200 6
+          timeout 70s java -Xmx1500m -cp build/pv Preview toha-section toha-section-nave.png -4608 0 1030 7000 2200 6
           echo "nave section exit=$?"
-          timeout 70s java -Xmx1500m -cp build/pv Preview toha-section toha-section-rear.png -6408 0 1030 5000 2200 6
+          timeout 70s java -Xmx1500m -cp build/pv Preview toha-section toha-section-rear.png -5208 0 1030 7000 2200 6
           echo "rear wall section exit=$?"
-          timeout 70s java -Xmx1500m -cp build/pv Preview toha-elevation toha-lower-facade.png 0 430 4600 900 4
+          timeout 70s java -Xmx1500m -cp build/pv Preview toha-elevation toha-lower-facade.png 0 250 1000 4
           echo "lower facade elevation exit=$?"
-          timeout 70s java -Xmx1500m -cp build/pv Preview toha-elevation toha-upper-facade.png 0 1540 3600 980 4
+          timeout 70s java -Xmx1500m -cp build/pv Preview toha-elevation toha-upper-facade.png 0 1520 900 4
           echo "upper facade elevation exit=$?"
+
+          # New valley-first angles: show the tower in its canyon rather than centring it as a freestanding cylinder.
+          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-valley-mouth.png 0 250 -400 180 -4 68 640 360 5600
+          echo "valley mouth view exit=$?"
+          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-west-catwalk.png -2800 470 -3900 90 -2 70 640 360 2200
+          echo "west cliff catwalk exit=$?"
+          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-east-catwalk.png 2800 760 -5050 270 -4 70 640 360 2200
+          echo "east cliff catwalk exit=$?"
+          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-base-ingress.png 0 100 -4190 180 0 70 640 360 900
+          echo "base ingress exit=$?"
+          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-north-ingress.png 0 105 -5080 0 0 70 640 360 950
+          echo "north ingress exit=$?"
+          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-machine-yard.png -780 135 -4030 142 -2 70 640 360 1500
+          echo "machine yard exit=$?"
+          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-bridge-network.png 1800 610 -4608 90 -6 70 640 360 4000
+          echo "bridge network exit=$?"
+          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-spire-close.png 0 510 -3920 180 -4 65 640 360 1500
+          echo "spire close exit=$?"
+          timeout 70s java -Xmx2g -cp build/pv Preview toha-section toha-valley-cross-section.png -4608 0 1030 7500 2200 5
+          echo "valley cross-section exit=$?"
 
           # One labeled sheet lets the full collection be scanned quickly.
           java -Djava.awt.headless=true -cp build/pv ContactSheet toha-contact-sheet.png toha-*.png
@@ -137,10 +157,10 @@ jobs:
           These are offline schematic renders generated from the committed Java monument source.
           They are not Minecraft screenshots; in-game lighting, block faces and traversal may differ.
 
-          - Perspectives: exterior silhouettes, approach, rear and side profiles, high overlook,
+          - Perspectives: valley mouth, exterior silhouettes, approach, catwalks, rear and side profiles, high overlook,
             hull inscription, exterior machinery and broken orbital galleries.
-          - Interior perspectives: gravity furnace, nave, AI chambers and the new service stair.
-          - Plans: horizontal slices through the foundation, lower/middle/upper gallery tiers and crown.
+          - Interior perspectives: gravity furnace, nave, AI chambers, base ingress, machine yards, bridge network and the helical service stair.
+          - Plans: horizontal slices through the broken valley floor, lower/middle/upper gallery tiers and crown.
           - Sections/elevations: internal nave/furnace cutaways and tier-aware front facade projections.
           - toha-contact-sheet.png is the labeled overview. Open individual PNGs for full resolution.
           EOF
