@@ -353,8 +353,10 @@ public class Preview {
             int y = cy + height / 2 - j * scale;
             for (int i = 0; i < nw; i++) {
                 int x = cx - width / 2 + i * scale;
-                // The cylindrical hull's visible depth varies continuously across the facade.
-                int z = Toha.projectedFrontZ(x, y);
+                // The helper returns the outer surface plus a 12-block reveal offset.
+                // Sample 6 blocks inside the real hull wall so the projection shows solid
+                // material, while carved caves and slits still appear as actual black voids.
+                int z = Toha.projectedFrontZ(x, y) - 18;
                 byte m = get(x, y, z);
                 int col = m == Mat.AIR ? 0x0b0c12 : COL[m];
                 img.setRGB(i, j, col);
