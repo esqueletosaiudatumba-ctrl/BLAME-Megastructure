@@ -57,7 +57,7 @@ Eight tall, shallow curved fins are placed against the authored surface at selec
 
 The repeated-pitch slit helper is replaced by twenty-seven fixed aperture records. Each slit has its own x, bottom elevation, width, height, shell radius, and cut depth (86–112 blocks). Openings remain real voids cut into the curved wall; none is selected from the world seed. This creates an authored negative-space rhythm without compromising the thirteen larger cave portals.
 
-Generator v14 widened the Toha shell's screentone rule pitch from 32 to 96 blocks. Generator v15 added the manga's identifying 東亜重工 mark as four vertical block-raster glyphs attached directly to the outer cylinder at the southeast-facing lower hull. V16 changed the strokes to matte-black COAL blocks. V17 increases the glyph cells from 6 to 10 blocks so the characters survive the multi-kilometre view, and updates depth culling to follow the stepped hull surface at each tier transition. Every glyph pixel remains attached to the local circular radius; there is no flat billboard. The regression test checks a real black glyph block, and the placement leaves the thirteen major cave portals intact. The CI preview artifact includes `toha-inscription.png`, a front-normal close-up of the inscription, because the full-width monument view cannot establish small-glyph legibility.
+Generator v14 widened the Toha shell's screentone rule pitch from 32 to 96 blocks. Generator v15 added the manga's identifying 東亜重工 mark as four vertical block-raster glyphs attached directly to the outer cylinder at the southeast-facing lower hull. V16 changed the strokes to matte-black COAL blocks. V17 increased the glyph cells from 6 to 10 blocks so the characters survive the multi-kilometre view, and updated depth culling to follow the stepped hull surface at each tier transition. V18 adds a fixed three-flight service stair between partial east-nave platforms. Every glyph pixel remains attached to the local circular radius; there is no flat billboard. The regression test checks a real black glyph block, and the placement leaves the thirteen major cave portals intact. The CI preview artifact includes `toha-inscription.png`, a front-normal close-up of the inscription, because the full-width monument view cannot establish small-glyph legibility.
 
 At multi-kilometre scale, the old 32-block rule made otherwise monolithic concrete read like tightly spaced bars. The wider pitch keeps ruled surfaces and deterministic mineral weathering, while letting each facade mass read as a large continuous surface from a distance. The floor/deck keeps its finer marking scale.
 
@@ -77,7 +77,7 @@ One off-axis service mast rises to Y≈1975, close to the ceiling but not merged
 
 ## Interior
 
-The central hollow gravity furnace is the focal machine, rising to just below the artificial ceiling. It uses a thick tapered shell, a hollow bore, six stepped ring courses, and sparse service arms rather than neon ornament.
+The central hollow gravity furnace is the focal machine, rising to just below the artificial ceiling. The furnace uses a thick tapered shell, a hollow bore, six stepped ring courses, and sparse service arms rather than neon ornament. A fixed three-flight maintenance stair links the east-side partial platforms at Y≈430, 790, 1150 and 1490. It follows the nave perimeter with narrow deck treads, sparse handrails and alternating runs; it does not bridge across or fill the furnace sightline.
 
 The central nave is a true open void within the wall shells; major tiers do not contain solid kilometre-wide interiors. Its perimeter is carried by deep wall envelopes, terrace collars and discrete structural members. Four ring-collared structural piers, partial service platforms, two inclined braces, hanging lines, and the hollow gravity furnace are visible from the lower cave mouths. Floors do not fill the chamber: a large uninterrupted void around the engine is essential to the scale.
 
@@ -102,8 +102,8 @@ Material style resolution may weather the same surfaces differently per seed, bu
 ## Code and verification
 
 - Implementation: mod/src/main/java/blame/blamegen/core/Toha.java
-- World integration and generator version (v12): mod/src/main/java/blame/blamegen/core/Megastructure.java
-- Landmark access: /blame tp toha-gate, /blame tp toha-south, /blame tp toha-north, /blame tp toha-east, /blame tp toha-west, /blame tp toha-center
+- World integration and generator version (v18): mod/src/main/java/blame/blamegen/core/Megastructure.java
+- Landmark access: /blame tp gate (or /blame tp toha-gate), /blame tp south, /blame tp north, /blame tp east, /blame tp west, /blame tp center (or /blame tp toha-center), /blame tp toha core, /blame goto north, /blame destinations, or /blame tp <x> <y> <z>
 - Regression check: tools/verify/TohaMonumentCheck.java
 - The GitHub Actions workflow compiles the pure-Java core and runs the monument, determinism, seam, survey, and benchmark checks before attempting the Forge mod build.
 
