@@ -49,6 +49,14 @@ Each tier clears its own interior radius and draws only the annular wall, so the
 
 The X/Z footprint remains a conservative rectangular overlap bound to avoid expensive circular tests during chunk selection. It is not the shape of the structure. Circularity is established by the deck, retaining wall, primary hull, collar courses, cave-mouth depth, and radial structure.
 
+## Broken orbital galleries and brutal facade cuts
+
+Generator v13 retains the six principal shell diameters and all thirteen fixed AI cave mouths, but interrupts the smooth drum silhouette with four hand-authored tiers of broken orbital gallery. The courses sit at Y=466–491 (outer/inner radii 2,520/2,376), 910–940 (2,185/2,042), 1,365–1,395 (1,810/1,685), and 1,630–1,658 (1,495/1,372). Each is a collection of unequal angular segments, not a continuous ring: the south-facing arcs split around the approach, and large gaps remain. Short outriggers transfer load to the hull; four hollow-section diagonal compression members stitch separate tiers together at non-mirrored angles.
+
+Eight tall, shallow curved fins are placed against the authored surface at selected x positions. Every x-column is projected to its tier's actual circular surface, so a fin follows the hull rather than becoming a flat wall. Contrasting arrises catch light, but there is no regular window-grid rhythm. Their placement is deliberately uneven: heavier lower flanks, differently proportioned middle cheeks, a broken upper pair, and a short crown blade.
+
+The repeated-pitch slit helper is replaced by twenty-seven fixed aperture records. Each slit has its own x, bottom elevation, width, height, shell radius, and cut depth (86–112 blocks). Openings remain real voids cut into the curved wall; none is selected from the world seed. This creates an authored negative-space rhythm without compromising the thirteen larger cave portals.
+
 ## Thirteen fixed cave mouths
 
 The curved hull contains thirteen authored cave mouths: five in the lower tier, four in the second, three in the third, and one isolated crown mouth. Each opening is projected to the cylinder surface at its actual X position; the front is not a single flat plane. Their horizontal centres, heights and widths are intentionally irregular; the grouping is legible from a distance without becoming a repeated window grid. The openings have fixed centres, widths and heights, and their face offsets are computed from the cylinder radius rather than a shared flat-front Z coordinate. Their deep square cuts, dark inner reveals, heavy lintels, and sparse local lamps create a strong readable rhythm. They are architectural rooms/passages, not a random cave-placement algorithm.
