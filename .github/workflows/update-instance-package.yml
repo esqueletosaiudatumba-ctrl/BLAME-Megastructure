@@ -5,6 +5,8 @@ on:
     branches: [master]
     paths:
       - "instance-pkg/**"
+      - "docs/TOHA_MONUMENT_DESIGN.md"
+      - "GRAND_GOAL_VISION.md"
       - ".github/workflows/update-instance-package.yml"
   workflow_dispatch:
 
@@ -24,6 +26,11 @@ jobs:
         with:
           ref: master
           fetch-depth: 0
+
+      - name: Sync canonical Toha design documents
+        run: |
+          install -D GRAND_GOAL_VISION.md instance-pkg/GRAND_GOAL_VISION.md
+          install -D docs/TOHA_MONUMENT_DESIGN.md instance-pkg/docs/TOHA_MONUMENT_DESIGN.md
 
       - name: Build deterministic instance ZIP
         shell: bash
