@@ -171,6 +171,7 @@ public final class Toha {
         drawBaseIngressFrames(c);
         drawFurnaceAndInnerPlatforms(c);
         drawCrossValleyLinks(c);
+        drawElevatedProcessPods(c);
         drawCliffEquipment(c);
         drawMachineYard(c);
         drawApproachCauseway(c);
@@ -651,6 +652,113 @@ public final class Toha {
                         1, 1, y - 2, y + 1, Math.toRadians(25 + i * 31), Math.toRadians(0.8),
                         Mat.SLAB_TOP);
             }
+        }
+    }
+
+    /**
+     * Elevated equipment pods are docked directly to the transverse bridge tiers. Each
+     * gets a slab spur, handrails, an open load frame and a different machine grammar.
+     * This second layer of circulation puts usable detail into the vertical valley volume
+     * rather than leaving all industry as small objects on the ground.
+     *
+     * Record: X, Z offset from Toha centre, deck Y, width, depth, height, machine kind.
+     */
+    private void drawElevatedProcessPods(Cube c) {
+        int[][] pods = {
+            {-1950, 180, 285, 280, 200, 150, 0},
+            {1800, -180, 285, 240, 180, 170, 1},
+            {-1600, -180, 555, 280, 200, 180, 2},
+            {2050, 180, 555, 320, 210, 200, 3},
+            {-2200, 200, 840, 260, 180, 190, 1},
+            {2000, -180, 840, 300, 220, 210, 0},
+            {-1750, -180, 1135, 300, 220, 200, 3},
+            {1740, 200, 1135, 280, 180, 190, 2},
+            {-2200, 190, 1430, 300, 210, 190, 0},
+            {2000, -180, 1430, 280, 200, 200, 1},
+            {-1700, -180, 1725, 260, 180, 140, 2},
+            {1700, 170, 1725, 280, 200, 150, 3}
+        };
+
+        for (int[] pod : pods) {
+            int x = pod[0], z = CZ + pod[1], y = pod[2];
+            int w = pod[3], d = pod[4], h = pod[5], kind = pod[6];
+            int x0 = x - w / 2, x1 = x + w / 2;
+            int z0 = z - d / 2, z1 = z + d / 2;
+            int top = y + h;
+            if (!c.hits(x0 - 18, y - 8, z0 - 36, x1 + 18, top + 22, z1 + 36)) continue;
+
+            // Side spur joins the pod floor to the main bridge while preserving a lane
+            // down its centre. The spur and pod land at the same slab elevation.
+            int bridgeEdge = CZ + (pod[1] > 0 ? 20 : -20);
+            int podEdge = pod[1] > 0 ? z0 : z1;
+            c.box(x - 14, y, Math.min(bridgeEdge, podEdge),
+                  x + 14, y + 1, Math.max(bridgeEdge, podEdge), Mat.SLAB_TOP);
+            c.box(x0, y, z0, x1, y + 1, z1, Mat.SLAB_BOTTOM);
+            c.box(x0 + 12, y + 1, z0 + 12, x1 - 12, y + 2, z1 - 12, Mat.SLAB_TOP);
+
+            int leg = 8 + kind * 2;
+            for (int lx : new int[] {x0 + 10, x1 - 10}) {
+                for (int lz : new int[] {z0 + 10, z1 - 10}) {
+                    c.box(lx - leg, y + 2, lz - leg, lx + leg, top - 9, lz + leg,
+                          (kind % 2 == 0) ? Mat.S_TOHA_PALE : Mat.S_TOHA_RING);
+                    c.box(lx - leg - 3, top - 30, lz - leg - 3,
+                          lx + leg + 3, top - 24, lz + leg + 3, Mat.COPPER_PATINA);
+                }
+            }
+            c.box(x0 - 8, top - 12, z0 - 8, x1 + 8, top - 4, z1 + 8, Mat.S_TOHA_MASS);
+            c.box(x0 + 10, top - 4, z0 + 10, x1 - 10, top - 3, z1 - 10, Mat.SLAB_BOTTOM);
+            c.box(x0 - 12, y + 2, z0 - 8, x0 - 8, top - 14, z1 + 8, Mat.IRON_BARS);
+            c.box(x1 + 8, y + 2, z0 - 8, x1 + 12, top - 14, z1 + 8, Mat.IRON_BARS);
+
+            if (kind == 0) {
+                // Paired pressure vessels on short plinths, with copper bearing collars.
+                int radius = Math.min(38, w / 8);
+                for (int sign : new int[] {-1, 1}) {
+                    int tx = x + sign * w / 4;
+                    c.box(tx - radius, y + 4, z - radius, tx + radius, y + 10, z + radius, Mat.MACHINE_HOPPER);
+                    c.cylinder(tx, z, radius, Math.max(8, radius - 10), 1, 1,
+                            y + 11, top - 22, 0, 0, Mat.S_TOHA_TANK);
+                    c.cylinder(tx, z, radius + 5, Math.max(8, radius - 10), 1, 1,
+                            y + 18, y + 24, 0, 0, Mat.COPPER_RAW);
+                    c.cylinder(tx, z, radius + 5, Math.max(8, radius - 10), 1, 1,
+                            top - 32, top - 26, 0, 0, Mat.COPPER_PATINA);
+                    c.box(tx - 6, top - 21, z - 6, tx + 6, top - 12, z + 6, Mat.MACHINE_DISPENSER);
+                }
+            } else if (kind == 1) {
+                // A gyro cage with an exposed rotor, piston-bearing blocks and rail markers.
+                c.ring(x, z, w * 0.27, d * 0.28, y + 28, y + 40, 8, Mat.COPPER_RAW);
+                c.ring(x, z, w * 0.27, d * 0.28, y + 52, y + 64, 8, Mat.S_TOHA_RING);
+                c.beam(x - w / 3, y + 46, z, x + w / 3, y + 46, z, 5, Mat.IRON_BLOCK);
+                c.beam(x, y + 46, z - d / 3, x, y + 46, z + d / 3, 5, Mat.IRON_BLOCK);
+                c.box(x - 10, y + 40, z - 10, x + 10, y + 52, z + 10, Mat.MACHINE_PISTON);
+                c.box(x - w / 4, y + 2, z0 + 6, x + w / 4, y + 5, z0 + 10, Mat.RAIL);
+            } else if (kind == 2) {
+                // A multilevel maintenance rack with stair treads behind reinforced glass.
+                for (int yy = y + 24; yy < top - 24; yy += 28) {
+                    c.box(x0 + 22, yy, z0 + 22, x1 - 22, yy + 2, z1 - 22, Mat.SLAB_BOTTOM);
+                    c.box(x0 + 22, yy + 3, z0 + 22, x0 + 26, yy + 19, z0 + 26, Mat.IRON_BARS);
+                    c.box(x1 - 26, yy + 3, z1 - 26, x1 - 22, yy + 19, z1 - 22, Mat.IRON_BARS);
+                    if ((yy - y) % 56 == 24) {
+                        c.box(x0 + 30, yy + 3, z0 + 30, x0 + 48, yy + 6, z0 + 36,
+                              Mat.STONE_BRICK_STAIRS);
+                    }
+                }
+                c.box(x0 + 12, y + 12, z0 - 4, x1 - 12, top - 20, z0 + 2, Mat.GLASS_REINFORCED);
+                c.box(x - 8, top - 48, z1 + 4, x + 8, top - 22, z1 + 10, Mat.VENT);
+            } else {
+                // A transformer stack with exposed dark bus bars and service controls.
+                c.box(x0 + 28, y + 20, z0 + 28, x1 - 28, top - 22, z1 - 28, Mat.COAL);
+                c.box(x0 + 38, y + 34, z0 + 38, x1 - 38, top - 36, z1 - 38, Mat.IRON_BLOCK);
+                c.box(x - 12, y + 24, z - 12, x + 12, top - 24, z + 12, Mat.VENT);
+                c.box(x - w / 4, y + 12, z1 + 3, x - w / 4 + 12, y + 38, z1 + 9, Mat.MACHINE_DISPENSER);
+                c.box(x + w / 4 - 12, top - 42, z1 + 3, x + w / 4, top - 20, z1 + 9, Mat.BIO_CYAN);
+            }
+
+            // Cable stays below each pod and lamps under the route give the structure a load path.
+            c.box(x0 + 14, y - 36, z0 + 14, x0 + 19, y - 2, z0 + 19, Mat.CABLE);
+            c.box(x1 - 19, y - 36, z1 - 19, x1 - 14, y - 2, z1 - 14, Mat.CABLE);
+            c.box(x - 3, y - 8, z - 3, x + 3, y - 4, z + 3,
+                  (kind == 0 || kind == 3) ? Mat.SEA_LANTERN : Mat.COPPER_PATINA);
         }
     }
 
