@@ -123,9 +123,9 @@ jobs:
           echo "nave section exit=$?"
           timeout 70s java -Xmx1500m -cp build/pv Preview toha-section toha-section-rear.png -5208 0 1030 7000 2200 6
           echo "rear wall section exit=$?"
-          timeout 70s java -Xmx1500m -cp build/pv Preview toha-elevation toha-lower-facade.png 0 250 1000 4
+          timeout 70s java -Xmx1500m -cp build/pv Preview toha-elevation toha-lower-facade.png 0 250 4600 900 5
           echo "lower facade elevation exit=$?"
-          timeout 70s java -Xmx1500m -cp build/pv Preview toha-elevation toha-upper-facade.png 0 1520 900 4
+          timeout 70s java -Xmx1500m -cp build/pv Preview toha-elevation toha-upper-facade.png 0 1520 3600 1000 4
           echo "upper facade elevation exit=$?"
 
           # New valley-first angles: show the tower in its canyon rather than centring it as a freestanding cylinder.
