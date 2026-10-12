@@ -298,10 +298,17 @@ public final class Toha {
     }
 
     private void drawTerraceBands(Cube c) {
-        rectBand(c, 1980, -2020, 1460, 612, 640, Mat.S_TOHA_MASS);
-        rectBand(c, 1695, -1805, 1240, 992, 1018, Mat.S_TOHA_RING);
-        rectBand(c, 1430, -1545, 960, 1414, 1448, Mat.S_TOHA_MASS);
-        rectBand(c, 1190, -1260, 760, 1728, 1758, Mat.S_TOHA_RING);
+        // Circumferential collars create enormous ledges where the hull steps inward.
+        ringCourse(c, 2300, 1840, 610, 650, Mat.S_TOHA_MASS);
+        ringCourse(c, 2320, 2288, 620, 644, Mat.S_TOHA_PALE);
+        ringCourse(c, 2000, 1540, 995, 1035, Mat.S_TOHA_RING);
+        ringCourse(c, 1700, 1260, 1425, 1465, Mat.S_TOHA_MASS);
+        ringCourse(c, 1400, 1000, 1735, 1775, Mat.S_TOHA_RING);
+        ringCourse(c, 1110, 785, 1898, 1932, Mat.S_TOHA_PALE);
+    }
+
+    private void ringCourse(Cube c, int outerR, int innerR, int y0, int y1, byte material) {
+        c.cylinder(CX + 0.5, CZ + 0.5, outerR, innerR, 1, 1, y0, y1, 0, 0, material);
     }
 
     private void rectBand(Cube c, int halfX, int back, int front, int y0, int y1, byte material) {
