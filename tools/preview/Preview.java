@@ -50,6 +50,9 @@ public class Preview {
         COL[Mat.COPPER_WEATHERED] = 0x6a9a4a; COL[Mat.CONC_RUST] = 0x9a3a2a; COL[Mat.BIO_CYAN] = 0x44ffff;
         COL[Mat.BIO_MAGENTA] = 0xff44aa; COL[Mat.CABLE] = 0x4a4a4a; COL[Mat.VENT] = 0x3a3a3a;
         COL[Mat.REBAR] = 0x5a5a5a; COL[Mat.GLASS_REINFORCED] = 0x1a1a2a;
+        COL[Mat.MACHINE_DISPENSER] = 0x686b70; COL[Mat.MACHINE_HOPPER] = 0x393b40;
+        COL[Mat.MACHINE_PISTON] = 0x888982; COL[Mat.IRON_TRAPDOOR] = 0x4b4e53;
+        COL[Mat.RAIL] = 0x8a8172; COL[Mat.STONE_BRICK_STAIRS] = 0x777875;
     }
 
     static boolean emissive(byte m) {
