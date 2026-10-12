@@ -33,6 +33,45 @@ public final class Toha {
     private static final int[] SHELL_Y = {64, 640, 1020, 1450, 1760, 1920};
     private static final int[] SHELL_R = {2200, 1900, 1600, 1320, 1050, 820};
 
+    // Fixed angular segments for the broken orbital galleries. Gaps are authored,
+    // not selected from a seed, and the south-facing approach is kept visibly open.
+    private static final int[] LOWER_GALLERY_ARCS = {24, 66, 116, 154, 210, 274, 330};
+    private static final int[] MIDDLE_GALLERY_ARCS = {18, 61, 128, 174, 224, 292, 337};
+    private static final int[] UPPER_GALLERY_ARCS = {16, 64, 132, 193, 244, 306, 348};
+    private static final int[] CROWN_GALLERY_ARCS = {35, 143, 208, 282, 326};
+
+    // Hand-authored facade apertures: x, bottom Y, width, height, tier radius, cut depth.
+    // Unequal spacing and dimensions intentionally reject an apartment/window-grid read.
+    private static final int[][] SOUTH_SLITS = {
+        {-1840, 290, 12, 82, 2200, 96},
+        {-1610, 430, 18, 116, 2200, 108},
+        {-1210, 340, 10, 62, 2200, 86},
+        {-870, 330, 18, 110, 2200, 104},
+        {-560, 465, 12, 74, 2200, 96},
+        {370, 290, 12, 58, 2200, 88},
+        {610, 438, 16, 94, 2200, 100},
+        {1280, 325, 10, 80, 2200, 90},
+        {1810, 405, 20, 126, 2200, 112},
+        {-1660, 720, 12, 98, 1900, 92},
+        {-1420, 875, 16, 70, 1900, 104},
+        {-780, 760, 10, 110, 1900, 88},
+        {-90, 902, 12, 64, 1900, 100},
+        {340, 815, 18, 96, 1900, 102},
+        {925, 690, 10, 74, 1900, 96},
+        {1450, 820, 18, 112, 1900, 96},
+        {-1310, 1095, 12, 88, 1600, 92},
+        {-530, 1160, 10, 74, 1600, 88},
+        {390, 1315, 12, 84, 1600, 100},
+        {1010, 1078, 16, 118, 1600, 96},
+        {1370, 1250, 10, 68, 1600, 90},
+        {-1110, 1530, 10, 72, 1320, 96},
+        {-640, 1660, 12, 58, 1320, 88},
+        {620, 1570, 14, 78, 1320, 96},
+        {980, 1690, 10, 64, 1320, 86},
+        {-890, 1800, 10, 84, 1050, 92},
+        {760, 1840, 12, 55, 1050, 88}
+    };
+
     static int cylinderRadiusAtY(int y) {
         if (y < 640) return 2200;
         if (y < 1020) return 1900;
@@ -115,6 +154,7 @@ public final class Toha {
         drawAsymmetricTransferMass(c);
         drawFacade(c);
         drawTerraceBands(c);
+        drawMonumentalAccretions(c);
         carveSlitApertures(c);
         carveNave(c);
         carveCaves(c);
@@ -314,6 +354,130 @@ public final class Toha {
         c.cylinder(CX + 0.5, CZ + 0.5, outerR, innerR, 1, 1, y0, y1, 0, 0, material);
     }
 
+    /**
+     * Fractured orbital galleries, attached facade plates and diagonal load paths
+     * break the otherwise perfect concentric silhouette. These are authored elements,
+     * not randomized dressing or a procedural selection of tower types.
+     */
+    private void drawMonumentalAccretions(Cube c) {
+        drawSegmentedCourse(c, 2520, 2376, 466, 491, LOWER_GALLERY_ARCS, 34, Mat.S_TOHA_MASS);
+        drawSegmentedCourse(c, 2185, 2042, 910, 940, MIDDLE_GALLERY_ARCS, 29, Mat.S_TOHA_RING);
+        drawSegmentedCourse(c, 1810, 1685, 1365, 1395, UPPER_GALLERY_ARCS, 33, Mat.S_TOHA_MASS);
+        drawSegmentedCourse(c, 1495, 1372, 1630, 1658, CROWN_GALLERY_ARCS, 25, Mat.S_TOHA_PALE);
+
+        // Short, thick outriggers join the galleries to the load-bearing shell.
+        radialSupport(c, 26, 2190, 414, 2425, 468, 28, Mat.S_TOHA_RING);
+        radialSupport(c, 151, 2190, 365, 2425, 468, 32, Mat.S_TOHA_PALE);
+        radialSupport(c, 230, 2190, 405, 2425, 468, 26, Mat.S_TOHA_MASS);
+        radialSupport(c, 326, 2190, 345, 2425, 468, 30, Mat.S_TOHA_PALE);
+
+        radialSupport(c, 52, 1890, 865, 2090, 920, 24, Mat.S_TOHA_PALE);
+        radialSupport(c, 176, 1890, 830, 2090, 920, 28, Mat.S_TOHA_MASS);
+        radialSupport(c, 292, 1890, 880, 2090, 920, 22, Mat.S_TOHA_PALE);
+
+        radialSupport(c, 58, 1590, 1310, 1740, 1380, 22, Mat.S_TOHA_RING);
+        radialSupport(c, 198, 1590, 1280, 1740, 1380, 25, Mat.S_TOHA_PALE);
+        radialSupport(c, 306, 1590, 1325, 1740, 1380, 21, Mat.S_TOHA_MASS);
+
+        // Curved, almost-flat wall fins catch light at widely separated elevations.
+        // Each x-column follows the tier's real circular surface instead of a flat Z plane.
+        frontFlankPlate(c, -1995, 2200, 220, 615, 30, 116, Mat.S_TOHA_MASS, Mat.S_TOHA_PALE);
+        frontFlankPlate(c, 2020, 2200, 300, 625, 26, 96, Mat.S_TOHA_RING, Mat.S_TOHA_PALE);
+        frontFlankPlate(c, -1740, 1900, 665, 1000, 32, 120, Mat.S_TOHA_PALE, Mat.S_TOHA_MASS);
+        frontFlankPlate(c, 1705, 1900, 725, 985, 24, 104, Mat.S_TOHA_MASS, Mat.S_TOHA_PALE);
+        frontFlankPlate(c, -1400, 1600, 1075, 1425, 28, 112, Mat.S_TOHA_MASS, Mat.S_TOHA_PALE);
+        frontFlankPlate(c, 1430, 1600, 1110, 1440, 24, 126, Mat.S_TOHA_RING, Mat.S_TOHA_PALE);
+        frontFlankPlate(c, -1170, 1320, 1500, 1730, 20, 100, Mat.S_TOHA_PALE, Mat.S_TOHA_RING);
+        frontFlankPlate(c, 1000, 1050, 1770, 1905, 20, 90, Mat.S_TOHA_MASS, Mat.S_TOHA_PALE);
+
+        // Four major diagonal compression members stitch tiers at non-mirrored angles.
+        diagonalMember(c, 25, 2165, 285, 34, 1880, 1030, 64, 22, Mat.S_TOHA_MASS);
+        diagonalMember(c, 155, 2160, 330, 143, 1585, 1440, 72, 26, Mat.S_TOHA_PALE);
+        diagonalMember(c, 222, 1895, 710, 239, 1310, 1735, 56, 20, Mat.S_TOHA_RING);
+        diagonalMember(c, 319, 2160, 190, 302, 1580, 1215, 80, 30, Mat.S_TOHA_MASS);
+    }
+
+    /**
+     * Draw only the angular portion of an annulus that survives the supplied gap.
+     * Segment-specific broad-phase checks prevent a short arc from raster-testing the
+     * entire square bounding box of a several-kilometre cylinder.
+     */
+    private void drawSegmentedCourse(Cube c, int outerRadius, int innerRadius,
+                                     int y0, int y1, int[] centresDegrees,
+                                     int spanDegrees, byte material) {
+        double half = Math.toRadians(spanDegrees / 2.0);
+        for (int degrees : centresDegrees) {
+            double centre = Math.toRadians(degrees);
+            double start = centre - half, end = centre + half;
+            if (!arcBoundsHit(c, outerRadius, start, end, y0, y1)) continue;
+            c.cylinder(CX + 0.5, CZ + 0.5, outerRadius, innerRadius, 1, 1,
+                    y0, y1, end, 2 * Math.PI - 2 * half, material);
+        }
+    }
+
+    private boolean arcBoundsHit(Cube c, int radius, double start, double end, int y0, int y1) {
+        double minX = Math.min(CX + 0.5 + radius * Math.cos(start),
+                               CX + 0.5 + radius * Math.cos(end));
+        double maxX = Math.max(CX + 0.5 + radius * Math.cos(start),
+                               CX + 0.5 + radius * Math.cos(end));
+        double minZ = Math.min(CZ + 0.5 + radius * Math.sin(start),
+                               CZ + 0.5 + radius * Math.sin(end));
+        double maxZ = Math.max(CZ + 0.5 + radius * Math.sin(start),
+                               CZ + 0.5 + radius * Math.sin(end));
+        double quarter = Math.PI / 2.0;
+        int first = (int) Math.ceil(start / quarter);
+        int last = (int) Math.floor(end / quarter);
+        for (int k = first; k <= last; k++) {
+            double a = k * quarter;
+            double x = CX + 0.5 + radius * Math.cos(a);
+            double z = CZ + 0.5 + radius * Math.sin(a);
+            minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+            minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
+        }
+        int pad = 3; // account for voxel-centre sampling and primitive rounding
+        return c.hits((int) Math.floor(minX) - pad, y0, (int) Math.floor(minZ) - pad,
+                      (int) Math.ceil(maxX) + pad, y1, (int) Math.ceil(maxZ) + pad);
+    }
+
+    private void radialSupport(Cube c, double degrees, int innerRadius, int innerY,
+                               int outerRadius, int outerY, int halfWidth, byte material) {
+        double a = Math.toRadians(degrees);
+        double x0 = CX + 0.5 + Math.cos(a) * innerRadius;
+        double z0 = CZ + 0.5 + Math.sin(a) * innerRadius;
+        double x1 = CX + 0.5 + Math.cos(a) * outerRadius;
+        double z1 = CZ + 0.5 + Math.sin(a) * outerRadius;
+        c.beam(x0, innerY, z0, x1, outerY, z1, halfWidth, material);
+    }
+
+    private void frontFlankPlate(Cube c, int centreX, int radius, int y0, int y1,
+                                 int halfWidth, int depth, byte material, byte edgeMaterial) {
+        int centreFront = CZ + cylinderFrontOffset(radius, centreX);
+        int reach = halfWidth * 7 + depth + 24;
+        if (!c.hits(centreX - halfWidth, y0, centreFront - reach,
+                    centreX + halfWidth, y1, centreFront + depth + reach)) return;
+        for (int x = Math.max(centreX - halfWidth, c.x0);
+             x <= Math.min(centreX + halfWidth, c.x0 + 15); x++) {
+            int front = CZ + cylinderFrontOffset(radius, x);
+            c.box(x, y0, front - 14, x, y1, front + depth, material);
+        }
+        int ridgeX = centreX + Math.max(-halfWidth + 3, halfWidth / 2);
+        int ridgeFront = CZ + cylinderFrontOffset(radius, ridgeX);
+        c.box(ridgeX - 2, y0 + 18, ridgeFront + depth - 2,
+              ridgeX + 2, y1 - 18, ridgeFront + depth + 4, edgeMaterial);
+    }
+
+    private void diagonalMember(Cube c, double startDegrees, int startRadius, int startY,
+                                double endDegrees, int endRadius, int endY,
+                                double outerWidth, double innerWidth, byte material) {
+        double a0 = Math.toRadians(startDegrees), a1 = Math.toRadians(endDegrees);
+        c.tube(CX + 0.5 + Math.cos(a0) * startRadius, startY,
+               CZ + 0.5 + Math.sin(a0) * startRadius,
+               CX + 0.5 + Math.cos(a1) * endRadius, endY,
+               CZ + 0.5 + Math.sin(a1) * endRadius,
+               outerWidth, innerWidth, material);
+    }
+
+
     private void rectBand(Cube c, int halfX, int back, int front, int y0, int y1, byte material) {
         int t = 24;
         c.box(-halfX, y0, CZ + back, -halfX + t, y1, CZ + front, material);
@@ -328,24 +492,14 @@ public final class Toha {
      * the shell so that the opening reads as a deep black slot from far away.
      */
     private void carveSlitApertures(Cube c) {
-        apertureTier(c, -1850, 1850, 270, 575, 2200, 280, 128, 9, 46);
-        apertureTier(c, -1540, 1540, 700, 940, 1900, 260, 136, 9, 40);
-        apertureTier(c, -1240, 1240, 1080, 1360, 1600, 240, 136, 8, 44);
-        apertureTier(c, -1000, 1000, 1500, 1690, 1320, 220, 120, 7, 36);
-    }
-
-    private void apertureTier(Cube c, int xMin, int xMax, int yMin, int yMax,
-                              int radius, int pitch, int rowPitch, int width, int height) {
-        int index = 0;
-        for (int x = xMin + pitch / 2; x <= xMax - pitch / 2; x += pitch, index++) {
-            int phase = (index & 1) == 0 ? 0 : rowPitch / 3;
+        for (int[] slit : SOUTH_SLITS) {
+            int x = slit[0], y = slit[1], width = slit[2], height = slit[3];
+            int radius = slit[4], depth = slit[5];
             int front = CZ + cylinderFrontOffset(radius, x);
-            for (int y = yMin + rowPitch / 2 + phase; y + height <= yMax; y += rowPitch) {
-                if (!c.hits(x - width / 2, y, front - 84,
-                            x + width / 2, y + height, front + 1)) continue;
-                c.box(x - width / 2, y, front - 84,
-                      x + width / 2, y + height, front + 1, Mat.AIR);
-            }
+            if (!c.hits(x - width / 2, y, front - depth,
+                        x + width / 2, y + height, front + 1)) continue;
+            c.box(x - width / 2, y, front - depth,
+                  x + width / 2, y + height, front + 1, Mat.AIR);
         }
     }
 

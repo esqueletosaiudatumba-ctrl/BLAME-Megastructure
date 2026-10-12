@@ -35,6 +35,13 @@ public final class TohaMonumentCheck {
         toha.draw(shell);
         check(Mat.isStructure(shell.get(1100, 300, shellZ)),
                 "the lower cylindrical hull must occupy its curved surface sample");
+
+        int galleryX = 1020, galleryY = 480, galleryZ = Toha.CZ + 2240;
+        Cube gallery = new Cube(Math.floorDiv(galleryX, 16), Math.floorDiv(galleryY, 16),
+                Math.floorDiv(galleryZ, 16));
+        toha.draw(gallery);
+        check(Mat.isStructure(gallery.get(galleryX, galleryY, galleryZ)),
+                "the front-east broken orbital gallery must be a real generated annular structure");
         check(shell.get(1100, 300, Toha.CZ + 1340) == Mat.AIR,
                 "the cylindrical hull must remain hollow well inside its lower wall");
 
