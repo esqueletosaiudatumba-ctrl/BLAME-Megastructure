@@ -94,8 +94,8 @@ jobs:
           sha256sum "$jar"
           cp "$jar" /tmp/blamegen-built.jar
           git fetch origin master
-          if ! git diff --quiet "$GITHUB_SHA" origin/master -- mod .github/workflows/build-blamegen.yml; then
-            echo "Master has newer generator/build sources; skipping this stale JAR."
+          if ! git diff --quiet "$GITHUB_SHA" origin/master -- mod tools/verify/TohaMonumentCheck.java; then
+            echo "Master has newer generator or monument-test sources; skipping this stale JAR."
             exit 0
           fi
           git checkout -B publish-instance origin/master
