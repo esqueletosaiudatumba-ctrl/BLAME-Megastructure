@@ -165,12 +165,12 @@ public final class Toha {
         drawBaseApron(c);
         drawSpireShell(c);
         drawSpireRibsAndCourses(c);
+        drawSpiralWalkway(c); // carve the chamber doors after the route so the landings remain open
         carveCaveMouths(c);
         carveBaseIngress(c);
         drawCaveFramesAndMachines(c);
         drawBaseIngressFrames(c);
         drawFurnaceAndInnerPlatforms(c);
-        drawSpiralWalkway(c);
         drawCrossValleyLinks(c);
         drawCliffEquipment(c);
         drawMachineYard(c);
