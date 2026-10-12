@@ -54,7 +54,9 @@ public final class TohaMonumentCheck {
         for (int i = 0; i < Toha.CAVE_X.length; i++) {
             int x = Toha.CAVE_X[i];
             int y = Toha.CAVE_Y[i] + Toha.CAVE_H[i] / 2;
-            int z = Toha.CZ + Toha.CAVE_FRONT[i] - 8;
+            // Sample just outside the intended exterior plane: behind-wall AIR is
+            // insufficient because a plinth or rib can still block the entrance.
+            int z = Toha.CZ + Toha.CAVE_FRONT[i] + 12;
             Cube cave = new Cube(Math.floorDiv(x, 16), Math.floorDiv(y, 16), Math.floorDiv(z, 16));
             toha.draw(cave);
             if (cave.get(x, y, z) == Mat.AIR) openCaves++;
