@@ -694,12 +694,12 @@ public final class Toha {
             c.box(x - 14, y, Math.min(bridgeEdge, podEdge),
                   x + 14, y + 1, Math.max(bridgeEdge, podEdge), Mat.SLAB_TOP);
             c.box(x0, y, z0, x1, y + 1, z1, Mat.SLAB_BOTTOM);
-            c.box(x0 + 12, y + 1, z0 + 12, x1 - 12, y + 2, z1 - 12, Mat.SLAB_TOP);
+            // The bottom slab is the walking surface; leave the next block open for headroom.
 
             int leg = 8 + kind * 2;
             for (int lx : new int[] {x0 + 10, x1 - 10}) {
                 for (int lz : new int[] {z0 + 10, z1 - 10}) {
-                    c.box(lx - leg, y + 2, lz - leg, lx + leg, top - 9, lz + leg,
+                    c.box(lx - leg, y, lz - leg, lx + leg, top - 9, lz + leg,
                           (kind % 2 == 0) ? Mat.S_TOHA_PALE : Mat.S_TOHA_RING);
                     c.box(lx - leg - 3, top - 30, lz - leg - 3,
                           lx + leg + 3, top - 24, lz + leg + 3, Mat.COPPER_PATINA);
@@ -755,8 +755,8 @@ public final class Toha {
             }
 
             // Cable stays below each pod and lamps under the route give the structure a load path.
-            c.box(x0 + 14, y - 36, z0 + 14, x0 + 19, y - 2, z0 + 19, Mat.CABLE);
-            c.box(x1 - 19, y - 36, z1 - 19, x1 - 14, y - 2, z1 - 14, Mat.CABLE);
+            c.box(x0 + 14, y - 36, z0 + 14, x0 + 19, y - 1, z0 + 19, Mat.CABLE);
+            c.box(x1 - 19, y - 36, z1 - 19, x1 - 14, y - 1, z1 - 14, Mat.CABLE);
             c.box(x - 3, y - 8, z - 3, x + 3, y - 4, z + 3,
                   (kind == 0 || kind == 3) ? Mat.SEA_LANTERN : Mat.COPPER_PATINA);
         }
