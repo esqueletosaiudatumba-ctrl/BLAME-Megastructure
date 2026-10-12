@@ -253,27 +253,24 @@ public final class Toha {
     }
 
     private void drawFacade(Cube c) {
-        // Sparse, oversized load ribs. A fixed irregular rhythm avoids a barcode /
-        // apartment-grid effect and lets the cave mouths dominate the facade.
-        frontRibs(c, new int[] {-1800, -1270, -900, -390, 390, 1060, 1740},
-                200, 620, 1350, new int[] {42, 58, 36, 52, 46, 64, 48});
-        frontRibs(c, new int[] {-1500, -820, -610, -30, 230, 830, 1460},
-                640, 1000, 1130, new int[] {54, 38, 62, 44, 50, 36, 58});
-        frontRibs(c, new int[] {-1230, -940, -540, -220, 420, 1020, 1270},
-                1020, 1410, 850, new int[] {40, 58, 34, 46, 60, 38, 52});
-        frontRibs(c, new int[] {-990, -700, -400, 420, 700, 990},
-                1450, 1720, 630, new int[] {42, 30, 56, 48, 34, 44});
+        drawAxialRibs(c);
+    }
 
-        // One massive off-centre lintel on the middle tier, interrupted by the
-        // main cave and the displaced right-hand service entrance.
-        c.box(-1520, 1004, CZ + 1090, -520, 1028, CZ + 1190, Mat.S_TOHA_MASS);
-        c.box(720, 1004, CZ + 1090, 1510, 1028, CZ + 1190, Mat.S_TOHA_MASS);
-        c.box(-1490, 1000, CZ + 1190, -540, 1006, CZ + 1210, Mat.S_TOHA_PALE);
-
-        // Giant blind slots on both flanks continue the façade language around the mass.
-        flankSlots(c, -1850, 1350, 200, 640);
-        flankSlots(c, -1580, 1130, 640, 1020);
-        flankSlots(c, -1320, 850, 1020, 1450);
+    private void drawAxialRibs(Cube c) {
+        // Eight fixed, oversized ribs follow the hull's changing radius. They
+        // sit between cave groups rather than repeating as apartment-like stripes.
+        int[] degrees = {-160, -125, -90, -55, 55, 90, 125, 160};
+        for (int deg : degrees) {
+            double a = Math.toRadians(deg);
+            for (int i = 0; i < SHELL_Y.length - 1; i++) {
+                int y0 = SHELL_Y[i], y1 = SHELL_Y[i + 1];
+                int r0 = SHELL_R[i] + 34, r1 = SHELL_R[i + 1] + 34;
+                double x0 = CX + Math.sin(a) * r0, z0 = CZ + Math.cos(a) * r0;
+                double x1 = CX + Math.sin(a) * r1, z1 = CZ + Math.cos(a) * r1;
+                c.tube(x0, y0, z0, x1, y1, z1, 30, 16, Mat.S_TOHA_MASS);
+                c.tube(x0, y0, z0, x1, y1, z1, 7, 0, Mat.S_TOHA_PALE);
+            }
+        }
     }
 
     private void frontRibs(Cube c, int[] xs, int yMin, int yMax, int front, int[] widths) {
