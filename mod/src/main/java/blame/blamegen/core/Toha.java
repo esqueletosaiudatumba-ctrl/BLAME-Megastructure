@@ -685,9 +685,9 @@ public final class Toha {
      * leaves the central furnace and most of the vertical void unobstructed.
      */
     private void drawInteriorTransferStairs(Cube c) {
-        drawServiceStair(c, 770, 774, 438, 798, 160, -1);
-        drawServiceStair(c, 770, 774, 798, 1158, -560, 1);
-        drawServiceStair(c, 770, 774, 1158, 1498, 160, -1);
+        drawServiceStair(c, 770, 774, 438, 798, CZ + 160, -1);
+        drawServiceStair(c, 770, 774, 798, 1158, CZ - 560, 1);
+        drawServiceStair(c, 770, 774, 1158, 1498, CZ + 160, -1);
     }
 
     private void drawServiceStair(Cube c, int x0, int x1, int startTopY, int endTopY,
