@@ -29,11 +29,14 @@ public final class TohaMonumentCheck {
         check(gate.get(0, 100, Toha.CZ + 2600) == Mat.AIR,
                 "the centre of the south gate must remain passable");
 
+        int shellZ = Toha.CZ + Toha.cylinderFrontOffset(2200, 1100) - 18;
         Cube shell = new Cube(Math.floorDiv(1100, 16), Math.floorDiv(300, 16),
-                Math.floorDiv(Toha.CZ + 1340, 16));
+                Math.floorDiv(shellZ, 16));
         toha.draw(shell);
-        check(Mat.isStructure(shell.get(1100, 300, Toha.CZ + 1340)),
-                "authored lower front wall must occupy its designed sample");
+        check(Mat.isStructure(shell.get(1100, 300, shellZ)),
+                "the lower cylindrical hull must occupy its curved surface sample");
+        check(shell.get(1100, 300, Toha.CZ + 1340) == Mat.AIR,
+                "the cylindrical hull must remain hollow well inside its lower wall");
 
         Cube underDeck = new Cube(0, 1, czCube);
         toha.draw(underDeck);
@@ -56,7 +59,7 @@ public final class TohaMonumentCheck {
             int y = Toha.CAVE_Y[i] + Toha.CAVE_H[i] / 2;
             // Sample just outside the intended exterior plane: behind-wall AIR is
             // insufficient because a plinth or rib can still block the entrance.
-            int z = Toha.CZ + Toha.CAVE_FRONT[i] + 12;
+            int z = Toha.CZ + Toha.caveFrontAt(i, x) - 18;
             Cube cave = new Cube(Math.floorDiv(x, 16), Math.floorDiv(y, 16), Math.floorDiv(z, 16));
             toha.draw(cave);
             if (cave.get(x, y, z) == Mat.AIR) openCaves++;
@@ -70,31 +73,36 @@ public final class TohaMonumentCheck {
         check(nave.get(0, 800, Toha.CZ + 100) == Mat.AIR,
                 "central nave must preserve a large open interior");
 
-        Cube aperture = new Cube(Math.floorDiv(-860, 16), Math.floorDiv(370, 16),
-                Math.floorDiv(Toha.CZ + 1310, 16));
+        int slitX = -870, slitY = 390;
+        int slitZ = Toha.CZ + Toha.cylinderFrontOffset(2200, slitX) - 30;
+        Cube aperture = new Cube(Math.floorDiv(slitX, 16), Math.floorDiv(slitY, 16),
+                Math.floorDiv(slitZ, 16));
         toha.draw(aperture);
-        check(aperture.get(-860, 370, Toha.CZ + 1310) == Mat.AIR,
-                "the south façade needs a genuine, deep slit aperture");
+        check(aperture.get(slitX, slitY, slitZ) == Mat.AIR,
+                "the cylindrical facade needs a genuine, deep slit aperture");
 
-        Cube aiPanel = new Cube(Math.floorDiv(215, 16), Math.floorDiv(410, 16),
-                Math.floorDiv(Toha.CZ + 1140, 16));
+        int aiX = Toha.CAVE_X[2] + Toha.CAVE_W[2] / 2 - 22;
+        int aiY = Toha.CAVE_Y[2] + Math.max(22, Toha.CAVE_H[2] / 2 - 42) + 40;
+        int aiZ = Toha.CZ + Toha.CAVE_FRONT[2] - 198;
+        Cube aiPanel = new Cube(Math.floorDiv(aiX, 16), Math.floorDiv(aiY, 16),
+                Math.floorDiv(aiZ, 16));
         toha.draw(aiPanel);
-        check(Mat.isStructure(aiPanel.get(215, 410, Toha.CZ + 1140)),
+        check(Mat.isStructure(aiPanel.get(aiX, aiY, aiZ)),
                 "the principal cave must contain its fixed AI control slab");
 
-        check(Toha.projectedFrontZ(500) == Toha.CZ + 1350,
-                "lower elevation must project its own forward shell");
-        check(Toha.projectedFrontZ(800) == Toha.CZ + 1130,
-                "middle elevation must account for shell setback");
-        check(Toha.projectedFrontZ(1200) == Toha.CZ + 850,
-                "upper elevation must account for shell setback");
+        check(Toha.projectedFrontZ(0, 500) == Toha.CZ + Toha.cylinderFrontOffset(2200, 0),
+                "lower elevation must follow the circular hull at the centreline");
+        check(Toha.projectedFrontZ(800, 800) == Toha.CZ + Toha.cylinderFrontOffset(1900, 800),
+                "middle elevation must account for the cylinder's curved surface");
+        check(Toha.projectedFrontZ(1200, 1200) == Toha.CZ + Toha.cylinderFrontOffset(1600, 1200),
+                "upper elevation must follow the smaller cylindrical tier");
 
-        Cube transferMass = new Cube(Math.floorDiv(1830, 16), Math.floorDiv(800, 16),
-                Math.floorDiv(Toha.CZ + 950, 16));
+        Cube transferMass = new Cube(Math.floorDiv(2520, 16), Math.floorDiv(800, 16),
+                Math.floorDiv(Toha.CZ + 500, 16));
         toha.draw(transferMass);
-        check(Mat.isStructure(transferMass.get(1830, 800, Toha.CZ + 950)),
+        check(Mat.isStructure(transferMass.get(2520, 800, Toha.CZ + 500)),
                 "the deliberately asymmetric eastern transfer wall must be present");
-        check(transferMass.get(1700, 800, Toha.CZ + 950) == Mat.AIR,
+        check(transferMass.get(2300, 800, Toha.CZ + 500) == Mat.AIR,
                 "the eastern transfer mass must remain hollow behind its wall");
 
         Cube engine = new Cube(Math.floorDiv(260, 16), Math.floorDiv(500, 16),
@@ -103,10 +111,12 @@ public final class TohaMonumentCheck {
         check(Mat.isStructure(engine.get(260, 500, Toha.CZ - 560)),
                 "gravity furnace shell must be present");
 
-        Cube caveMachine = new Cube(Math.floorDiv(-1465, 16), Math.floorDiv(310, 16),
-                Math.floorDiv(Toha.CZ + 970, 16));
+        int machineX = -1500, machineY = 310;
+        int machineZ = Toha.CZ + Toha.CAVE_FRONT[0] - 380;
+        Cube caveMachine = new Cube(Math.floorDiv(machineX, 16), Math.floorDiv(machineY, 16),
+                Math.floorDiv(machineZ, 16));
         toha.draw(caveMachine);
-        check(Mat.isStructure(caveMachine.get(-1465, 310, Toha.CZ + 970)),
+        check(Mat.isStructure(caveMachine.get(machineX, machineY, machineZ)),
                 "each subordinate cave must receive its fixed chamber machine");
 
         Cube crownMast = new Cube(Math.floorDiv(2115, 16), Math.floorDiv(1900, 16),
