@@ -221,20 +221,18 @@ public final class Toha {
      * western upper cantilever break the symmetry with functional industrial bulk.
      */
     private void drawAsymmetricTransferMass(Cube c) {
-        // A broad, setback transfer mass grows out of the east shoulder.
-        wallShell(c, 1510, 720, CZ - 1650, 1840, 1110, CZ + 1040, 24, Mat.S_TOHA_MASS);
-        rectBand(c, 1900, -1410, 900, 1040, 1190, Mat.S_TOHA_PALE);
-        wallShell(c, 1570, 1160, CZ - 1320, 1880, 1460, CZ + 720, 24, Mat.S_TOHA_MASS);
+        // East-side transfer machinery projects through the cylindrical hull in two stages.
+        wallShell(c, 2040, 720, CZ - 1450, 2530, 1110, CZ + 720, 32, Mat.S_TOHA_MASS);
+        c.box(2050, 1036, CZ - 1420, 2580, 1074, CZ + 760, Mat.S_TOHA_PALE);
+        wallShell(c, 2160, 1160, CZ - 1180, 2620, 1460, CZ + 520, 28, Mat.S_TOHA_MASS);
 
-        // A deep slot cuts the exposed end wall; it is a machine access trench, not a window.
-        c.box(1834, 790, CZ + 260, 1842, 1040, CZ + 720, Mat.AIR);
-        c.box(1834, 1075, CZ + 260, 1842, 1092, CZ + 720, Mat.S_TOHA_PALE);
+        // Deep vertical service trench in the exposed outer end wall.
+        c.box(2516, 790, CZ + 220, 2524, 1040, CZ + 650, Mat.AIR);
+        c.box(2516, 1075, CZ + 220, 2524, 1092, CZ + 650, Mat.S_TOHA_PALE);
+        c.beam(2440, 770, CZ + 680, 2050, 1190, CZ - 1380, 42, Mat.S_TOHA_PALE);
+        c.beam(2480, 820, CZ + 640, 2100, 1110, CZ - 1320, 18, Mat.S_TOHA_RING);
 
-        // The east transfer mass is pinned into the rear shell by a long diagonal brace.
-        c.beam(1810, 770, CZ + 980, 1600, 1190, CZ - 1540, 38, Mat.S_TOHA_PALE);
-        c.beam(1850, 820, CZ + 940, 1650, 1110, CZ - 1460, 14, Mat.S_TOHA_RING);
-
-        // Opposite side: a single upper cantilever, deliberately not mirrored.
+        // Opposite side: a single upper cantilever breaks the cylinder asymmetrically.
         wallShell(c, -1770, 1480, CZ - 1080, -1040, 1560, CZ + 420, 16, Mat.S_TOHA_MASS);
         c.box(-1840, 1510, CZ - 980, -1764, 1550, CZ + 360, Mat.S_TOHA_PALE);
         c.beam(-1710, 1485, CZ + 380, -1090, 1670, CZ - 900, 28, Mat.S_TOHA_RING);
