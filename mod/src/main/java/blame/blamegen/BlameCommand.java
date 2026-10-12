@@ -45,12 +45,12 @@ public class BlameCommand extends CommandBase {
     private static List<Spot> spots() {
         List<Spot> s = new ArrayList<Spot>();
         s.add(new Spot("beach", 0.5, WorldEvents.SPAWN_Y, 202.5, 180F, "the arrival beach (world spawn)"));
-        s.add(new Spot("toha-gate", Toha.CX + 0.5, 64, Toha.CZ + 2732.5, 180F, "beneath the monumental south gate portal"));
-        s.add(new Spot("toha-south", Toha.CX + 0.5, 64, Toha.CZ + 2600.5, 180F, "inside the precinct, facing the monumental approach"));
-        s.add(new Spot("toha-north", Toha.CX + 0.5, 64, Toha.CZ - 2600.5, 0F, "inside the precinct at the north wall"));
-        s.add(new Spot("toha-east", Toha.CX + 2660.5, 64, Toha.CZ + 0.5, 90F, "inside the precinct at the east wall"));
-        s.add(new Spot("toha-west", Toha.CX - 2660.5, 64, Toha.CZ + 0.5, 270F, "inside the precinct at the west wall"));
-        s.add(new Spot("toha-center", Toha.CX + 0.5, 130, Toha.CZ + 800.5, 180F, "inside the principal cave mouth, facing the core furnace"));
+        s.add(new Spot("toha-gate", Toha.CX + 0.5, 64, Toha.CZ + 3780.5, 180F, "at the southern valley mouth, facing the Toha spire"));
+        s.add(new Spot("toha-south", Toha.CX + 0.5, 64, Toha.CZ + 2500.5, 180F, "on the southern valley causeway, looking toward the spire"));
+        s.add(new Spot("toha-north", Toha.CX + 0.5, 64, Toha.CZ - 3200.5, 0F, "at the far valley causeway, facing south toward Toha"));
+        s.add(new Spot("toha-east", Toha.CX + 3000.5, 455, Toha.CZ + 0.5, 90F, "on the eastern cliff catwalk, facing the spire"));
+        s.add(new Spot("toha-west", Toha.CX - 3000.5, 455, Toha.CZ + 0.5, 270F, "on the western cliff catwalk, facing the spire"));
+        s.add(new Spot("toha-center", Toha.CX + 0.5, 70, Toha.CZ + 610.5, 180F, "on the base apron beside the spire entrance"));
         return s;
     }
 
