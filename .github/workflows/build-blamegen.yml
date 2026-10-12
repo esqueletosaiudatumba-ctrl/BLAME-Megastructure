@@ -7,6 +7,8 @@ on:
       - "mod/**"
       - "tools/preview/**"
       - "tools/verify/**"
+      - "docs/TOHA_MONUMENT_DESIGN.md"
+      - "GRAND_GOAL_VISION.md"
       - ".github/workflows/build-blamegen.yml"
   workflow_dispatch:
 
