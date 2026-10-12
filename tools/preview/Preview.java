@@ -351,9 +351,10 @@ public class Preview {
         BufferedImage img = new BufferedImage(nw, nh, BufferedImage.TYPE_INT_RGB);
         IntStream.range(0, nh).parallel().forEach(j -> {
             int y = cy + height / 2 - j * scale;
-            int z = Toha.projectedFrontZ(y);
             for (int i = 0; i < nw; i++) {
                 int x = cx - width / 2 + i * scale;
+                // The cylindrical hull's visible depth varies continuously across the facade.
+                int z = Toha.projectedFrontZ(x, y);
                 byte m = get(x, y, z);
                 int col = m == Mat.AIR ? 0x0b0c12 : COL[m];
                 img.setRGB(i, j, col);
