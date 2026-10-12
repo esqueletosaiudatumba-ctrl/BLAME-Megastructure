@@ -1,12 +1,12 @@
 # BUILD LOG + EXACT STOPPING POINT (2026-10-11)
 
-> **Status update — authored Toha monument, generator v17:** offline tests, the Forge build, generated runtime JAR, and instance ZIP refresh all passed. V17 makes the black 東亜重工 glyphs larger (10-block cells) and makes their surface-depth culling tier-aware. A preview-only workflow update now adds a front-normal close-up image for checking the lettering at a readable scale. The 96-block seam rhythm, 960×540 overview, four segmented gallery courses, eight curved face fins, irregular slits, thirteen caves and hollow interior remain. This preview update does not alter generator geometry. No in-client Minecraft launch or visual/performance sign-off has been completed.
+> **Current source state — authored Toha monument, generator v18:** the latest committed changes add a three-flight, narrow maintenance stair linking the east-side partial nave platforms, with regression samples in `TohaMonumentCheck`. Teleport UX now accepts short names and aliases (`gate`, `center`, `core`, compass directions, `spawn`), `/blame tp toha <part>`, `/blame goto <destination>`, `/blame destinations`, and direct XYZ coordinates; existing full `toha-*` names remain supported. V17’s 10-block matte-black 東亜重工 glyphs and tier-aware hull projection remain unchanged. V18 is awaiting the latest CI verification after these changes. The Minecraft client still has not been launched for a live visual/performance sign-off.
 
 ## Toha monument update
 
 - Fixed authored site at X=0, Z=-4608, with a roughly 6 km precinct and height to Y=2030.
 - Stepped hollow hull with four tiers of broken orbital galleries, eight curved facade fins and four hollow diagonal braces; thirteen curved AI caves with fixed controls/machines; a circular girder-supported thin deck; near-ceiling off-axis mast; hollow nave and gravity furnace; twenty-seven authored irregular slit apertures; four vertical 東亜重工 glyphs in matte-black COAL blocks along the curved southeast hull, now sized with 10-block cells and tier-aware depth culling; fixed external machine spines; and monumental south portal/causeway. V14–V17 uses 96-block facade seam spacing. Preview artifacts include `toha-inscription.png` for front-normal detail inspection.
-- Commands: /blame tp toha-gate and /blame tp toha-center reach the authored site.
+- Commands: /blame tp gate, /blame tp center, /blame tp toha core, /blame goto north, /blame destinations, or /blame tp <x> <y> <z>; full toha-* names also work.
 - tools/verify/TohaMonumentCheck.java checks the bounds, gate opening, shell, actual slit void, principal cave, AI panel, open nave, and gravity furnace.
 - Architecture contract: docs/TOHA_MONUMENT_DESIGN.md. The offline preview supports isolated rendering with Preview toha-persp, toha-section, toha-elevation, and toha-slice; toha-elevation projects the stepped facade instead of sampling one depth plane.
 
