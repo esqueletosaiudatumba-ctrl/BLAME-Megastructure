@@ -692,7 +692,7 @@ public final class Toha {
             int bridgeEdge = CZ + (pod[1] > 0 ? 20 : -20);
             int podEdge = pod[1] > 0 ? z0 : z1;
             c.box(x - 14, y, Math.min(bridgeEdge, podEdge),
-                  x + 14, y + 1, Math.max(bridgeEdge, podEdge), Mat.SLAB_TOP);
+                  x + 14, y + 1, Math.max(bridgeEdge, podEdge), Mat.SLAB_BOTTOM);
             c.box(x0, y, z0, x1, y + 1, z1, Mat.SLAB_BOTTOM);
             // The bottom slab is the walking surface; leave the next block open for headroom.
 
