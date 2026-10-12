@@ -77,7 +77,7 @@ One off-axis service mast rises to Y≈1975, close to the ceiling but not merged
 
 ## Interior
 
-The central hollow gravity furnace is the focal machine, rising to just below the artificial ceiling. A fixed three-flight maintenance stair now links the east-side partial platforms at Y≈430, 790, 1150 and 1490. It follows the nave perimeter with narrow deck treads, sparse handrails and alternating runs; it does not bridge across or fill the furnace sightline. It uses a thick tapered shell, a hollow bore, six stepped ring courses, and sparse service arms rather than neon ornament.
+The central hollow gravity furnace is the focal machine, rising to just below the artificial ceiling. The furnace uses a thick tapered shell, a hollow bore, six stepped ring courses, and sparse service arms rather than neon ornament. A fixed three-flight maintenance stair links the east-side partial platforms at Y≈430, 790, 1150 and 1490. It follows the nave perimeter with narrow deck treads, sparse handrails and alternating runs; it does not bridge across or fill the furnace sightline.
 
 The central nave is a true open void within the wall shells; major tiers do not contain solid kilometre-wide interiors. Its perimeter is carried by deep wall envelopes, terrace collars and discrete structural members. Four ring-collared structural piers, partial service platforms, two inclined braces, hanging lines, and the hollow gravity furnace are visible from the lower cave mouths. Floors do not fill the chamber: a large uninterrupted void around the engine is essential to the scale.
 
@@ -103,7 +103,7 @@ Material style resolution may weather the same surfaces differently per seed, bu
 
 - Implementation: mod/src/main/java/blame/blamegen/core/Toha.java
 - World integration and generator version (v12): mod/src/main/java/blame/blamegen/core/Megastructure.java
-- Landmark access: /blame tp toha-gate, /blame tp toha-south, /blame tp toha-north, /blame tp toha-east, /blame tp toha-west, /blame tp toha-center
+- Landmark access: /blame tp gate (or /blame tp toha-gate), /blame tp south, /blame tp north, /blame tp east, /blame tp west, /blame tp center (or /blame tp toha-center), /blame tp toha core, /blame goto north, /blame destinations, or /blame tp <x> <y> <z>
 - Regression check: tools/verify/TohaMonumentCheck.java
 - The GitHub Actions workflow compiles the pure-Java core and runs the monument, determinism, seam, survey, and benchmark checks before attempting the Forge mod build.
 
