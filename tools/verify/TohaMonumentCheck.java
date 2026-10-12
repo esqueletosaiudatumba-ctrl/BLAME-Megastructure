@@ -102,6 +102,23 @@ public final class TohaMonumentCheck {
         check(nave.get(0, 800, Toha.CZ + 100) == Mat.AIR,
                 "central nave must preserve a large open interior");
 
+        // The three fixed service flights must connect the existing partial floor levels
+        // without filling the central nave around the gravity furnace.
+        int stairX = 775, stairY = 600;
+        int stairZ = Toha.CZ + 160 - (stairY - 438) * 2;
+        Cube serviceStair = new Cube(Math.floorDiv(stairX, 16), Math.floorDiv(stairY, 16),
+                Math.floorDiv(stairZ, 16));
+        toha.draw(serviceStair);
+        check(serviceStair.get(stairX, stairY, stairZ) == Mat.S_TOHA_DECK,
+                "the east nave service stair must have a real tread between gallery floors");
+        int topStairY = 1300;
+        int topStairZ = Toha.CZ + 160 - (topStairY - 1158) * 2;
+        Cube upperStair = new Cube(Math.floorDiv(775, 16), Math.floorDiv(topStairY, 16),
+                Math.floorDiv(topStairZ, 16));
+        toha.draw(upperStair);
+        check(upperStair.get(775, topStairY, topStairZ) == Mat.S_TOHA_DECK,
+                "the upper service flight must continue toward the crown platform");
+
         int slitX = -870, slitY = 390;
         int slitZ = Toha.CZ + Toha.cylinderFrontOffset(2200, slitX) - 30;
         Cube aperture = new Cube(Math.floorDiv(slitX, 16), Math.floorDiv(slitY, 16),
