@@ -904,6 +904,17 @@ public final class Toha {
 
         int xA = Math.max(x0, c.x0), xB = Math.min(x1, c.x0 + 15);
         int yA = Math.max(bottomY, c.y0), yB = Math.min(topY, c.y0 + 15);
+        // A narrow curved pale inlay separates the black lettering from the near-black
+        // concrete. The backing follows the local taper one x-column at a time; it is part
+        // of the skin, not a flat sign attached to the tower.
+        int panelX0 = x0 - 7, panelX1 = x1 + 7;
+        for (int x = Math.max(panelX0, c.x0); x <= Math.min(panelX1, c.x0 + 15); x++) {
+            for (int y = Math.max(bottomY - 8, c.y0); y <= Math.min(topY + 8, c.y0 + 15); y++) {
+                int face = projectedFrontZ(x, y) - 12;
+                for (int z = face - 3; z <= face; z++) c.set(x, y, z, Mat.S_TOHA_PALE);
+            }
+        }
+
         for (int g = 0; g < HULL_INSCRIPTION.length; g++) {
             int glyphBottom = bottomY + (HULL_INSCRIPTION.length - 1 - g) * stride;
             String[] glyph = HULL_INSCRIPTION[g];
