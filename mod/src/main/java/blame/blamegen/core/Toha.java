@@ -152,29 +152,21 @@ public final class Toha {
     }
 
     private void drawOuterWalls(Cube c) {
-        int y0 = GROUND, y1 = 350;
-        // Rear wall and two long flanks.
-        c.box(-2750, y0, CZ - 2750, 2750, y1, CZ - 2716, Mat.S_TOHA_PALE);
-        c.box(-2750, y0, CZ - 2716, -2716, y1, CZ + 2750, Mat.S_TOHA_MASS);
-        c.box(2716, y0, CZ - 2716, 2750, y1, CZ + 2750, Mat.S_TOHA_MASS);
+        // Circular retaining wall with a wide opening aligned to the south portal.
+        c.cylinder(CX + 0.5, CZ + 0.5, 2760, 2720, 1, 1,
+                GROUND, 350, Math.PI / 2 - 0.28, 0.56, Mat.S_TOHA_PALE);
+        c.cylinder(CX + 0.5, CZ + 0.5, 2780, 2760, 1, 1,
+                350, 378, Math.PI / 2 - 0.28, 0.56, Mat.S_TOHA_MASS);
 
-        // South wall is deliberately split around the processional entrance.
-        c.box(-2750, y0, CZ + 2716, -700, y1, CZ + 2750, Mat.S_TOHA_PALE);
-        c.box(700, y0, CZ + 2716, 2750, y1, CZ + 2750, Mat.S_TOHA_PALE);
-
-        // Heavy, sparse buttresses on the walls. No perimeter clutter field.
-        for (int i = 0; i < 5; i++) {
-            int x = -2200 + i * 1100;
-            c.box(x - 18, 350, CZ - 2755, x + 18, 405, CZ - 2710, Mat.S_TOHA_MASS);
-            if (i != 2) {
-                c.box(x - 18, 350, CZ + 2710, x + 18, 405, CZ + 2755, Mat.S_TOHA_MASS);
-            }
-        }
-        for (int s = -1; s <= 1; s += 2) {
-            for (int i = 0; i < 5; i++) {
-                int z = CZ - 2200 + i * 1100;
-                c.box(s * 2710 - 28, 350, z - 18, s * 2755 + 28, 405, z + 18, Mat.S_TOHA_MASS);
-            }
+        // Sparse buttresses around the ring. The front gate sector remains clear.
+        int[] degrees = {35, 65, 115, 145, 200, 230, 270, 310, 340};
+        for (int deg : degrees) {
+            double a = Math.toRadians(deg);
+            int x0 = (int) Math.round(Math.sin(a) * 2735);
+            int z0 = CZ + (int) Math.round(Math.cos(a) * 2735);
+            int x1 = (int) Math.round(Math.sin(a) * 2800);
+            int z1 = CZ + (int) Math.round(Math.cos(a) * 2800);
+            c.beam(x0, GROUND + 20, z0, x1, 390, z1, 24, Mat.S_TOHA_MASS);
         }
     }
 
