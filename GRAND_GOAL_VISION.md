@@ -96,7 +96,7 @@ Keep the existing no-mob/quiet-world direction unless an explicit future task sa
 
 ## Translate the vision into this codebase
 
-The surrounding world is a procedural, deterministic generator for Minecraft 1.12.2 and CubicChunks. Toha Heavy Industries is the deliberate exception: a hand-authored, seed-invariant monument that must remain a single coherent architectural composition.
+The surrounding world is a procedural, deterministic generator for Minecraft 1.12.2 and CubicChunks. Toha Heavy Industries is the deliberate exception: a hand-authored, seed-invariant cylindrical megastructure that must remain a single coherent architectural composition.
 
 - Treat `mod/src/main/java/blame/blamegen/core/` as pure Java. **Never add Minecraft or Forge imports to `core/`.**
 - Use `Mat.java` and `Styles.java` for material identity/style choices; use the existing `Cube` primitives and add new primitives only where they solve a real geometry need.
