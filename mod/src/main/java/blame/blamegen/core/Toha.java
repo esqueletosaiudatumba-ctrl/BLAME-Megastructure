@@ -25,6 +25,15 @@ public final class Toha {
     private static final int VALLEY_LENGTH = 3560;
     private static final double TAU = Math.PI * 2.0;
 
+    // Nine large floor plates separated by open trenches. The gaps keep the canyon
+    // from reading as a flat plaza but give every route a reliable ground datum.
+    // Band rows: relative Z min, relative Z max, half-width in X.
+    private static final int[][] VALLEY_FLOOR_BANDS = {
+        {-3560, -2920, 2380}, {-2740, -2160, 2650}, {-1980, -1410, 2300},
+        {-1190, -610, 2860}, {-390, 280, 2280}, {520, 1120, 2800},
+        {1370, 1970, 2400}, {2240, 2860, 2860}, {3100, 3560, 2480}
+    };
+
     // Thirteen authored AI chambers. CAVE_X is a local tangent offset; CAVE_DIR is
     // south/east/north/west. Entries shrink with the spire instead of making a window grid.
     static final int[] CAVE_X = {-110, 38, 120, -55, 150, -75, 35, 12, -28, 22, -8, 12, 0};
@@ -152,11 +161,14 @@ public final class Toha {
 
         drawValleyWalls(c);
         drawValleyEndMasses(c);
+        drawValleyFloor(c);
         drawBaseApron(c);
         drawSpireShell(c);
         drawSpireRibsAndCourses(c);
         carveCaveMouths(c);
+        carveBaseIngress(c);
         drawCaveFramesAndMachines(c);
+        drawBaseIngressFrames(c);
         drawFurnaceAndInnerPlatforms(c);
         drawSpiralWalkway(c);
         drawCrossValleyLinks(c);
@@ -164,6 +176,36 @@ public final class Toha {
         drawMachineYard(c);
         drawApproachCauseway(c);
         drawHullInscription(c);
+    }
+
+    private void drawValleyFloor(Cube c) {
+        for (int i = 0; i < VALLEY_FLOOR_BANDS.length; i++) {
+            int z0 = CZ + VALLEY_FLOOR_BANDS[i][0];
+            int z1 = CZ + VALLEY_FLOOR_BANDS[i][1];
+            int halfWidth = VALLEY_FLOOR_BANDS[i][2];
+            if (!c.hits(-halfWidth, 60, z0, halfWidth, 63, z1)) continue;
+            c.box(-halfWidth, 60, z0, halfWidth, 63, z1, Mat.S_TOHA_DECK);
+            // Obsidian-black expansion joints and pale battered lips articulate the plates.
+            c.box(-halfWidth, 63, z0, halfWidth, 63, z0 + 3, Mat.COAL);
+            c.box(-halfWidth, 63, z1 - 3, halfWidth, 63, z1, Mat.S_TOHA_PALE);
+            for (int x = -halfWidth + 160; x < halfWidth; x += 320) {
+                if (!c.hits(x - 2, 63, z0, x + 2, 63, z1)) continue;
+                c.box(x, 63, z0, x + 1, 63, z1, Mat.SLAB_TOP);
+            }
+        }
+
+        // Cross-cut trenches have occasional grated crossings, drainage conduits, and
+        // narrow slab stepping-lines at deliberately uneven distances.
+        int[] trenchOffsets = {-2840, -2070, -1320, -520, 390, 1250, 2110, 2990};
+        for (int i = 0; i < trenchOffsets.length; i++) {
+            int z = CZ + trenchOffsets[i];
+            if (!c.hits(-2850, 60, z - 5, 2850, 67, z + 5)) continue;
+            c.box(-2850, 60, z - 5, 2850, 63, z + 5, Mat.AIR);
+            int bridgeX = (i % 2 == 0) ? -700 : 600;
+            c.box(bridgeX - 220, 60, z - 9, bridgeX + 220, 63, z + 9, Mat.SLAB_BOTTOM);
+            c.box(bridgeX - 220, 64, z - 12, bridgeX - 214, 71, z - 9, Mat.IRON_BARS);
+            c.box(bridgeX + 214, 64, z + 9, bridgeX + 220, 71, z + 12, Mat.IRON_BARS);
+        }
     }
 
     // ---------------------------------------------------------------- valley walls
@@ -390,6 +432,34 @@ public final class Toha {
         }
     }
 
+    /**
+     * Two low service portals pass through the otherwise solid toe of the hollow spire.
+     * The paired entrances let the north and south causeways meet inside the base.
+     */
+    private void carveBaseIngress(Cube c) {
+        if (!c.hits(-56, GROUND + 1, CZ - 450, 56, 153, CZ + 450)) return;
+        c.box(-49, GROUND + 1, CZ + 286, 49, 153, CZ + 451, Mat.AIR);
+        c.box(-49, GROUND + 1, CZ - 451, 49, 153, CZ - 286, Mat.AIR);
+    }
+
+    private void drawBaseIngressFrames(Cube c) {
+        int zSouth = CZ + 432, zNorth = CZ - 432;
+        if (c.hits(-72, 64, CZ + 280, 72, 164, CZ + 454)) {
+            c.box(-62, 65, CZ + 290, -50, 145, CZ + 446, Mat.S_TOHA_RING);
+            c.box(50, 65, CZ + 290, 62, 145, CZ + 446, Mat.S_TOHA_RING);
+            c.box(-68, 145, CZ + 286, 68, 160, CZ + 450, Mat.S_TOHA_PALE);
+            c.box(-62, 148, CZ + 290, 62, 152, CZ + 446, Mat.COAL);
+            c.box(-42, 145, CZ + 443, 42, 148, CZ + 450, Mat.BIO_CYAN);
+        }
+        if (c.hits(-72, 64, CZ - 454, 72, 164, CZ - 280)) {
+            c.box(-62, 65, CZ - 446, -50, 145, CZ - 290, Mat.S_TOHA_RING);
+            c.box(50, 65, CZ - 446, 62, 145, CZ - 290, Mat.S_TOHA_RING);
+            c.box(-68, 145, CZ - 450, 68, 160, CZ - 286, Mat.S_TOHA_PALE);
+            c.box(-62, 148, CZ - 446, 62, 152, CZ - 290, Mat.COAL);
+            c.box(-42, 145, CZ - 450, 42, 148, CZ - 443, Mat.COPPER_PATINA);
+        }
+    }
+
     private void drawCaveFramesAndMachines(Cube c) {
         for (int i = 0; i < CAVE_Y.length; i++) {
             int x = caveCenterX(i), z = caveCenterZ(i), y0 = CAVE_Y[i] - CAVE_H[i] / 2;
@@ -581,34 +651,46 @@ public final class Toha {
     }
 
     private void drawApproachCauseway(Cube c) {
-        int startZ = CZ + VALLEY_LENGTH + 220;
-        int endZ = CZ + 350;
-        if (!c.hits(-100, GROUND - 8, endZ - 20, 100, GROUND + 24, startZ + 20)) return;
+        int southGateZ = CZ + VALLEY_LENGTH + 220;
+        int southBaseZ = CZ + 350;
+        int northGateZ = CZ - VALLEY_LENGTH - 220;
+        int northBaseZ = CZ - 350;
+        drawCausewaySpan(c, southGateZ, southBaseZ);
+        drawCausewaySpan(c, northGateZ, northBaseZ);
+    }
 
-        c.box(-56, GROUND, endZ, 56, GROUND, startZ, Mat.SLAB_BOTTOM);
-        c.box(-72, GROUND - 3, endZ, -62, GROUND + 1, startZ, Mat.S_TOHA_MASS);
-        c.box(62, GROUND - 3, endZ, 72, GROUND + 1, startZ, Mat.S_TOHA_MASS);
-        c.box(-16, GROUND + 1, endZ, 16, GROUND + 1, startZ, Mat.COAL);
+    /** A slab-backed approach span with ties, restrained lamps, and a framed canyon mouth. */
+    private void drawCausewaySpan(Cube c, int gateZ, int baseZ) {
+        int zMin = Math.min(gateZ, baseZ), zMax = Math.max(gateZ, baseZ);
+        if (!c.hits(-160, GROUND - 20, zMin - 40, 160, GROUND + 64, zMax + 40)) return;
 
-        // Cross-ties, underslung load members and rare route lamps provide readable scale.
-        int minZ = Math.max(endZ, c.z0 - 16);
-        int maxZ = Math.min(startZ, c.z0 + 31);
+        c.box(-56, GROUND, zMin, 56, GROUND, zMax, Mat.SLAB_BOTTOM);
+        c.box(-72, GROUND - 3, zMin, -62, GROUND + 1, zMax, Mat.S_TOHA_MASS);
+        c.box(62, GROUND - 3, zMin, 72, GROUND + 1, zMax, Mat.S_TOHA_MASS);
+        c.box(-16, GROUND + 1, zMin, 16, GROUND + 1, zMax, Mat.COAL);
+
+        int minZ = Math.max(zMin, c.z0 - 16);
+        int maxZ = Math.min(zMax, c.z0 + 31);
         for (int z = minZ; z <= maxZ; z++) {
-            if (Math.floorMod(z - endZ, 96) == 0) {
+            if (Math.floorMod(z - zMin, 96) == 0) {
                 c.box(-92, GROUND - 18, z - 7, 92, GROUND - 8, z + 7, Mat.S_TOHA_RING);
                 c.box(-74, GROUND + 1, z - 3, -61, GROUND + 4, z + 3, Mat.COPPER_PATINA);
-                c.box(61, GROUND + 1, z - 3, 74, GROUND + 4, z + 3, Mat.COPPER_PATINA);
+                c.box(61, GROUND + 1, z - 3, 74, GROUND + 4, z + 3, Mat.COPPER_RAW);
             }
-            if (Math.floorMod(z - endZ, 320) == 0) {
+            if (Math.floorMod(z - zMin, 320) == 0) {
                 c.box(-78, GROUND + 1, z - 3, -72, GROUND + 8, z + 3, Mat.SEA_LANTERN);
                 c.box(72, GROUND + 1, z - 3, 78, GROUND + 8, z + 3, Mat.SEA_LANTERN);
             }
         }
 
-        // A low underpass at the canyon mouth makes the path feel continuous with the valley.
-        c.box(-140, GROUND - 3, startZ - 28, -124, GROUND + 50, startZ + 28, Mat.S_TOHA_MASS);
-        c.box(124, GROUND - 3, startZ - 28, 140, GROUND + 50, startZ + 28, Mat.S_TOHA_MASS);
-        c.box(-150, GROUND + 48, startZ - 34, 150, GROUND + 58, startZ + 34, Mat.S_TOHA_RING);
+        // Load frame is at the outer gate end of each approach.
+        if (c.hits(-160, GROUND - 3, gateZ - 38, 160, GROUND + 64, gateZ + 38)) {
+            c.box(-140, GROUND - 3, gateZ - 28, -124, GROUND + 50, gateZ + 28, Mat.S_TOHA_MASS);
+            c.box(124, GROUND - 3, gateZ - 28, 140, GROUND + 50, gateZ + 28, Mat.S_TOHA_MASS);
+            c.box(-150, GROUND + 48, gateZ - 34, 150, GROUND + 58, gateZ + 34, Mat.S_TOHA_RING);
+            c.box(-132, GROUND + 49, gateZ - 31, -126, GROUND + 55, gateZ + 31, Mat.COPPER_PATINA);
+            c.box(126, GROUND + 49, gateZ - 31, 132, GROUND + 55, gateZ + 31, Mat.COPPER_RAW);
+        }
     }
 
     // ---------------------------------------------------------------- machinery in the valley
