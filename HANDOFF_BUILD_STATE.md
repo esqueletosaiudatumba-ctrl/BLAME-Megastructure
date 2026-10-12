@@ -1,17 +1,17 @@
 # BUILD LOG + EXACT STOPPING POINT (2026-10-11)
 
-> **Current source state — authored Toha monument, generator v18:** the latest committed changes add a three-flight, narrow maintenance stair linking the east-side partial nave platforms, with regression samples in `TohaMonumentCheck`. Teleport UX now accepts short names and aliases (`gate`, `center`, `core`, compass directions, `spawn`), `/blame tp toha <part>`, `/blame goto <destination>`, `/blame destinations`, and direct XYZ coordinates; existing full `toha-*` names remain supported. V17’s 10-block matte-black 東亜重工 glyphs and tier-aware hull projection remain unchanged. V18 is awaiting the latest CI verification after these changes. The Minecraft client still has not been launched for a live visual/performance sign-off.
+> **Current source state — Toha spire redesign, generator v19:** `Toha.java` now defines a narrow hollow spire inside a multi-kilometre industrial valley, replacing the previous broad stepped drum and round plaza. The valley has layered cliff walls and catwalks, broken floor plates, paired north/south access portals, a helical service route, 13 directional AI chambers, cross-valley slab bridges, 20 fixed machine modules, cargo rail routes, raised conveyors and loading gantries. New actual 1.12.2 block mappings include dispenser, hopper, piston, iron trapdoor, rail and stone-brick stairs. TP aliases remain and compass landmarks now point to the valley routes. CI status must be read from the latest workflow run before claiming the current source passed; the Minecraft client has still not been launched for in-game lighting/collision/traversal review.
 
 ## Toha monument update
 
-- Fixed authored site at X=0, Z=-4608, with a roughly 6 km precinct and height to Y=2030.
-- Stepped hollow hull with four tiers of broken orbital galleries, eight curved facade fins and four hollow diagonal braces; thirteen curved AI caves with fixed controls/machines; a circular girder-supported thin deck; near-ceiling off-axis mast; hollow nave and gravity furnace; twenty-seven authored irregular slit apertures; four vertical 東亜重工 glyphs in matte-black COAL blocks along the curved southeast hull, now sized with 10-block cells and tier-aware depth culling; fixed external machine spines; and monumental south portal/causeway. V14–V17 uses 96-block facade seam spacing. Preview artifacts include `toha-inscription.png` for front-normal detail inspection.
+- Fixed authored site at X=0, Z=-4608, within owner bounds X/Z ±4096 and height Y=64–2030.
+- V19 replaces the wide hull with a tapering 840-block-diameter base spire. The canyon extends about 7,120 blocks between end walls and almost 6,000 blocks between cliff faces. It includes seven cliff access levels, broken slab-floor bands, north/south portals, 13 fixed directional cave mouths, internal hollow furnace/partial decks, a helical access route, cross-valley bridges, 20 equipment modules, cargo rails, conveyors and loading gantries. The 東亜重工 glyph has been re-authored in compact 3-block cells on the spire's south-east skin. The CI renderer now makes more perspectives, plans and sections, plus overview contact sheets.
 - Commands: /blame tp gate, /blame tp center, /blame tp toha core, /blame goto north, /blame destinations, or /blame tp <x> <y> <z>; full toha-* names also work.
 - tools/verify/TohaMonumentCheck.java checks the bounds, gate opening, shell, actual slit void, principal cave, AI panel, open nave, and gravity furnace.
 - Architecture contract: docs/TOHA_MONUMENT_DESIGN.md. The offline preview supports isolated rendering with Preview toha-persp, toha-section, toha-elevation, and toha-slice; toha-elevation projects the stepped facade instead of sampling one depth plane.
 
 
-Everything below is the literal state when I stopped. Nothing is silently "done".
+The historical notes below describe earlier checkpoints. Where they conflict with the v19 summary above, the v19 source and newest Actions run are authoritative.
 
 ## What works right now
 
