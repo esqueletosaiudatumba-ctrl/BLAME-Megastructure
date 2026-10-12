@@ -250,14 +250,24 @@ public final class Toha {
      * small authored detail from adding work to unrelated world-generation cubes.
      */
     private void drawHullInscription(Cube c) {
-        final int cell = 6, gap = 8, span = 14 * cell, stride = span + gap;
+        final int cell = 10, gap = 8, span = 14 * cell, stride = span + gap;
         final int centreX = 1680, x0 = centreX - span / 2, x1 = x0 + span - 1;
-        final int bottomY = 84, topY = bottomY + 4 * span + 3 * gap - 1;
+        final int bottomY = 64, topY = bottomY + 4 * span + 3 * gap - 1;
         if (c.x0 + 15 < x0 || c.x0 > x1 || c.y0 + 15 < bottomY || c.y0 > topY) return;
 
-        int frontA = projectedFrontZ(Math.max(x0, c.x0), bottomY) - 12;
-        int frontB = projectedFrontZ(Math.min(x1, c.x0 + 15), bottomY) - 12;
-        int minFront = Math.min(frontA, frontB), maxFront = Math.max(frontA, frontB);
+        int xA = Math.max(x0, c.x0), xB = Math.min(x1, c.x0 + 15);
+        int yA = Math.max(bottomY, c.y0), yB = Math.min(topY, c.y0 + 15);
+        int minFront = Integer.MAX_VALUE, maxFront = Integer.MIN_VALUE;
+        // The hull radius steps inward at tier boundaries; bound all four X/Y
+        // corners of this slice rather than reusing the lower-tier front plane.
+        int[] sampleX = {xA, xB}, sampleY = {yA, yB};
+        for (int sx : sampleX) {
+            for (int sy : sampleY) {
+                int front = projectedFrontZ(sx, sy) - 12;
+                minFront = Math.min(minFront, front);
+                maxFront = Math.max(maxFront, front);
+            }
+        }
         if (c.z0 + 15 < minFront + 1 || c.z0 > maxFront + 4) return;
 
         for (int glyphIndex = 0; glyphIndex < HULL_INSCRIPTION.length; glyphIndex++) {

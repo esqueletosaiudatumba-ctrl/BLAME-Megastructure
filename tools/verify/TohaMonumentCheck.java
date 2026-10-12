@@ -36,7 +36,7 @@ public final class TohaMonumentCheck {
         check(Mat.isStructure(shell.get(1100, 300, shellZ)),
                 "the lower cylindrical hull must occupy its curved surface sample");
 
-        int markX = 1680, markY = 86;
+        int markX = 1680, markY = 66;
         int markZ = Toha.projectedFrontZ(markX, markY) - 12 + 2;
         Cube inscription = new Cube(Math.floorDiv(markX, 16), Math.floorDiv(markY, 16),
                 Math.floorDiv(markZ, 16));
