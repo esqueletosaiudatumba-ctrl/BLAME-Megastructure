@@ -4,18 +4,18 @@
 
 Toha is one fixed architectural set piece, not the previous 150 km randomized industrial field. The surrounding BLAME! world remains deterministic and procedural; the Toha site itself is an authored silhouette with intentionally chosen dimensions, elevations, openings, and approach sequence. Its kilometre-scale shells are hollow wall envelopes rather than solid boxes, so the central voids, side chambers and exterior view corridors are real geometry.
 
-The target is manga-faithful architectural grammar: monumental stepped volumes, pale ruled concrete, near-black setbacks, deep cave-like voids, sparse slit apertures, heavy braces, mechanical ring courses, a long empty approach, and a core that nearly meets the dark ceiling. The cave mouths are deliberately staggered rather than mirrored, with a heavy east-side transfer mass and a separate west-side cantilever to break the temple-like symmetry. Avoid generic industrial-city repetition, randomized structures, billboard signage, saturated lights, or decorative clutter.
+The target is manga-faithful architectural grammar: an immense stepped cylindrical hull, pale ruled concrete, near-black annular setbacks, deep cave-like voids, sparse slit apertures, heavy braces, mechanical ring courses, a long empty approach, and an off-axis core/mast that nearly meets the dark ceiling. The cave mouths are deliberately staggered rather than mirrored, with a heavy east-side transfer mass and a separate west-side cantilever to break the temple-like symmetry. Avoid generic industrial-city repetition, randomized structures, billboard signage, saturated lights, or decorative clutter.
 
 ## Fixed placement and scale
 
 | Element | Design |
 |---|---|
 | Anchor | X=0, Z=-4608 |
-| Worldgen footprint | X [-3072, 3072), Z [-7680, -1536) |
+| Worldgen footprint | X [-3072, 3072), Z [-7680, -1536); rectangular broad-phase bound only |
 | Maximum authored height | Y=2030 (the ceiling underside begins no lower than about Y=2080) |
-| Main building width | About 4,200 blocks at the broad base |
-| Main building depth | About 3,860 blocks at the base plinth |
-| Precinct deck | 5,600 × 5,600 blocks, thin plate at Y=60–63 on girders at Y=48–59 |
+| Main building width | 4,400-block lower-hull diameter, with stepped rings of 3,800 / 3,200 / 2,640 / 2,100 / 1,640 blocks |
+| Main building depth | Same as its 4,400-block circular lower hull; projecting machinery extends farther on the east side |
+| Precinct deck | 5,600-block circular plate, Y=60–63, on concentric girders and radial spokes at Y=48–59 |
 | Site edge | Low outer walls with a deliberate south entrance gap |
 | Orientation | Monumental façade faces +Z (south); player approaches from the arrival basin |
 
@@ -23,18 +23,35 @@ The site is now next to the arrival basin rather than 90,000 blocks away. The em
 
 ## Authored silhouette
 
-1. **Footing:** a broad pale plinth, ~4.2 km wide, with an oversized black course around it. The footprint is deliberate, squared, and readable from very far away.
-2. **Lower body:** a dark monolithic shell from roughly Y=200–640, extending beyond the middle floors to form a massive shoulder.
-3. **Middle shell:** a pale, deeply ruled volume from Y=640–1020, inset from the lower mass.
-4. **Upper shell:** a dark volume from Y=1020–1450, narrower again, with one continuous face and few apertures.
-5. **Crown:** a pale/dark stepped stack between Y=1450–1920, with a thin lip close to the artificial ceiling.
+1. **Footing:** a broad pale plinth, ~4.2 km wide, with an oversized black course around it. The footprint is deliberately circular and readable from very far away; the X/Z rectangle above exists only to bound chunk generation efficiently.
+2. **Lower hull:** a 4.4 km-diameter dark cylindrical annulus from Y=64–639, with real hollow interior and a broad projecting circumferential shoulder.
+3. **Middle hull:** a pale cylindrical annulus, 3.8 km diameter from Y=640–1019, inset sharply from the lower hull.
+4. **Upper hull:** a dark 3.2 km-diameter cylindrical annulus from Y=1020–1449, with a continuous curve and few apertures.
+5. **Crown:** concentric pale/dark cylindrical tiers of 2.64, 2.10, 1.64 and 1.64 km scale from Y=1450–1950, stepped inward toward the artificial ceiling.
 6. **Core engine:** a hollow, tapered industrial shaft from Y=210 to Y=2030, with several concentric ring-courses and radial service arms.
 7. **Exterior spines:** six fixed, hollow tapered machines fused into the flanks, plus four smaller boundary pylons. A broad eastern transfer mass and a westward crown cantilever break the otherwise immense main shell. They support the skyline without becoming a forest of unrelated towers.
 8. **Terrace bands:** oversized horizontal collars at the main elevation changes. These emphasise constructional layers and interrupt the otherwise uninterrupted vertical faces.
 
+## Cylindrical hull geometry
+
+The source anchor is `CX=0, CZ=-4608`. The circular deck has a 2,800-block radius. The primary hull uses true annular walls rather than a square box or a filled cylinder:
+
+| Vertical tier | Elevation | Outer radius | Wall thickness | Material intent |
+|---|---:|---:|---:|---|
+| Lower hull | Y=64–639 | 2,200 | 36 | near-black monolith |
+| Second hull | Y=640–1019 | 1,900 | 36 | pale ruled concrete |
+| Third hull | Y=1020–1449 | 1,600 | 36 | near-black mass |
+| Fourth hull | Y=1450–1759 | 1,320 | 36 | pale shell |
+| Crown lower tier | Y=1760–1919 | 1,050 | 32 | dark machine shell |
+| Crown cap | Y=1920–1950 | 820 | 28 | pale cap |
+
+Each tier clears its own interior radius and draws only the annular wall, so the central volume stays genuinely empty until the authored nave, platforms, furnace, braces and chambers are added. Circumferential collars at the setbacks exaggerate the layer transitions; eight irregular axial ribs break the outline without creating a repeated apartment/window grid. The upper service mast and east transfer module intentionally breach the smooth circle.
+
+The X/Z footprint remains a conservative rectangular overlap bound to avoid expensive circular tests during chunk selection. It is not the shape of the structure. Circularity is established by the deck, retaining wall, primary hull, collar courses, cave-mouth depth, and radial structure.
+
 ## Thirteen fixed cave mouths
 
-The façade contains thirteen authored apertures: five in the lower tier, four in the second, three in the third, and one isolated crown mouth. Their horizontal centres, heights and widths are intentionally irregular; the grouping is legible from a distance without becoming a repeated window grid. The openings have fixed centres, widths, heights, and face offsets. Their deep square cuts, dark inner reveals, heavy lintels, and sparse local lamps create a strong readable rhythm. They are architectural rooms/passages, not a random cave-placement algorithm.
+The curved hull contains thirteen authored cave mouths: five in the lower tier, four in the second, three in the third, and one isolated crown mouth. Each opening is projected to the cylinder surface at its actual X position; the front is not a single flat plane. Their horizontal centres, heights and widths are intentionally irregular; the grouping is legible from a distance without becoming a repeated window grid. The openings have fixed centres, widths and heights, and their face offsets are computed from the cylinder radius rather than a shared flat-front Z coordinate. Their deep square cuts, dark inner reveals, heavy lintels, and sparse local lamps create a strong readable rhythm. They are architectural rooms/passages, not a random cave-placement algorithm.
 
 The large lower central mouth is the primary arrival into the interior. Side mouths are deep service cavities. Upper mouths are smaller and more isolated so the façade does not read like a regular hotel or apartment tower. Each chamber has a fixed recessed AI control slab; the primary and crown chambers retain tiny live indicators, while the other panels stay dark.
 
@@ -73,7 +90,7 @@ Material style resolution may weather the same surfaces differently per seed, bu
 ## Code and verification
 
 - Implementation: mod/src/main/java/blame/blamegen/core/Toha.java
-- World integration and generator version (v11): mod/src/main/java/blame/blamegen/core/Megastructure.java
+- World integration and generator version (v12): mod/src/main/java/blame/blamegen/core/Megastructure.java
 - Landmark access: /blame tp toha-gate, /blame tp toha-south, /blame tp toha-north, /blame tp toha-east, /blame tp toha-west, /blame tp toha-center
 - Regression check: tools/verify/TohaMonumentCheck.java
 - The GitHub Actions workflow compiles the pure-Java core and runs the monument, determinism, seam, survey, and benchmark checks before attempting the Forge mod build.
