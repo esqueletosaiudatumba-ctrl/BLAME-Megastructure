@@ -4,14 +4,17 @@ package blame.blamegen.core;
  * TOHA HEAVY INDUSTRIES — authored monument, not a district generator.
  *
  * A single deterministic architectural composition centred at (0, -4608):
- * a 6.1 km precinct, a 3.9 km-wide stepped factory-fortress, a 2 km engine
- * stack, thirteen cave mouths with dedicated AI machines, a hollow central nave, a ceiling-height service mast, exterior machine spines,
- * and a five-frame processional causeway. All proportions and placements are
- * fixed. Only the material weathering resolved by Cube remains seed-dependent.
+ * a 5.6 km circular precinct, a 4.4 km-diameter lower hull with concentric
+ * stepped cylindrical tiers, a 2 km gravity-furnace stack, thirteen surface-
+ * curved cave mouths with fixed AI machinery, a hollow nave, a near-ceiling
+ * service mast, exterior spines, and a monumental processional causeway.
+ * All proportions and placements are fixed. Only material weathering resolved
+ * by Cube remains seed-dependent.
  *
- * The forms are designed for Minecraft-scale sightlines: a broad dark plinth,
- * pale ruled shells, black setback bands, slit openings, enormous structural
- * braces, and a nearly-ceiling-high core. There is no random cell grid, random
+ * The forms are designed for Minecraft-scale sightlines: a huge circular hull,
+ * broad annular shoulders, pale ruled shells, black setback bands, deep cave
+ * mouths, slit apertures, enormous structural braces, and sparse local lights.
+ * There is no random cell grid, random
  * district selection, random tower placement, or illuminated billboard.
  */
 public final class Toha {
