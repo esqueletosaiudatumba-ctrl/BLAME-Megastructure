@@ -83,7 +83,7 @@ public final class TohaMonumentCheck {
 
         int aiX = Toha.CAVE_X[2] + Toha.CAVE_W[2] / 2 - 22;
         int aiY = Toha.CAVE_Y[2] + Math.max(22, Toha.CAVE_H[2] / 2 - 42) + 40;
-        int aiZ = Toha.CZ + Toha.CAVE_FRONT[2] - 198;
+        int aiZ = Toha.CZ + Toha.CAVE_FRONT[2] - 202;
         Cube aiPanel = new Cube(Math.floorDiv(aiX, 16), Math.floorDiv(aiY, 16),
                 Math.floorDiv(aiZ, 16));
         toha.draw(aiPanel);
@@ -98,11 +98,11 @@ public final class TohaMonumentCheck {
                 "upper elevation must follow the smaller cylindrical tier");
 
         Cube transferMass = new Cube(Math.floorDiv(2520, 16), Math.floorDiv(800, 16),
-                Math.floorDiv(Toha.CZ + 500, 16));
+                Math.floorDiv(Toha.CZ + 100, 16));
         toha.draw(transferMass);
-        check(Mat.isStructure(transferMass.get(2520, 800, Toha.CZ + 500)),
+        check(Mat.isStructure(transferMass.get(2520, 800, Toha.CZ + 100)),
                 "the deliberately asymmetric eastern transfer wall must be present");
-        check(transferMass.get(2300, 800, Toha.CZ + 500) == Mat.AIR,
+        check(transferMass.get(2300, 800, Toha.CZ + 100) == Mat.AIR,
                 "the eastern transfer mass must remain hollow behind its wall");
 
         Cube engine = new Cube(Math.floorDiv(260, 16), Math.floorDiv(500, 16),
@@ -111,7 +111,7 @@ public final class TohaMonumentCheck {
         check(Mat.isStructure(engine.get(260, 500, Toha.CZ - 560)),
                 "gravity furnace shell must be present");
 
-        int machineX = -1500, machineY = 310;
+        int machineX = -1465, machineY = 310;
         int machineZ = Toha.CZ + Toha.CAVE_FRONT[0] - 380;
         Cube caveMachine = new Cube(Math.floorDiv(machineX, 16), Math.floorDiv(machineY, 16),
                 Math.floorDiv(machineZ, 16));
