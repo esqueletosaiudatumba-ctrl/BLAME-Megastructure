@@ -47,4 +47,4 @@ These offline checks do not replace launching the Minecraft client. See the curr
 
 ## Status
 
-The current handoff documents generator v11 and an authored Toha monument beside the arrival basin. Its kilometre-scale tiers are hollow wall shells, the precinct is a thin girder-supported deck, the thirteen cave AIs have fixed chamber machinery, and an off-axis service mast rises near the ceiling. The latest geometry/package is being revalidated in GitHub Actions. The Minecraft client has not been launched for final visual, traversal, lighting, or performance sign-off.
+The current handoff documents generator v12 and an authored cylindrical Toha megastructure beside the arrival basin. Its 4.4 km lower hull is built from hollow annular shells with stacked circular shoulders; the 5.6 km precinct uses a circular girder-supported deck, thirteen cave mouths follow the curved surface, and an off-axis service mast rises near the ceiling. The cylindrical geometry and installable package are being revalidated in GitHub Actions. The Minecraft client has not been launched for final visual, traversal, lighting, or performance sign-off.
