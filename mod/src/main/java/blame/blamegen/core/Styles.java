@@ -75,7 +75,9 @@ final class Styles {
                 return Mat.STONE;
             }
             case Mat.S_TOHA_MASS: {
-                if (Math.floorMod(x, 32) == 0 || Math.floorMod(z, 32) == 0) return Mat.COAL;
+                // At this scale, 32-block rules read as a dense grid; use a broad
+                // 96-block structural seam while retaining deterministic weathering.
+                if (Math.floorMod(x, 96) == 0 || Math.floorMod(z, 96) == 0) return Mat.COAL;
                 if (Math.floorMod(y, 96) == 0) return Mat.CONC_GRAY;
                 double n = H.noise3(seed ^ 0xD1, x, y * 0.5, z, 21);
                 if (n < 0.14) return Mat.COAL;
@@ -84,9 +86,9 @@ final class Styles {
                 return Mat.CONC_BLACK;
             }
             case Mat.S_TOHA_PALE: {
-                // Pale manga screentone: repeated fine dark rules, sparse mineral
-                // variance, and long horizontal courses instead of noisy camouflage.
-                if (Math.floorMod(x, 32) == 0 || Math.floorMod(z, 32) == 0) return Mat.COAL;
+                // Pale manga screentone: one structural rule every 96 blocks, sparse
+                // mineral variance, and long horizontal courses instead of a tight grid.
+                if (Math.floorMod(x, 96) == 0 || Math.floorMod(z, 96) == 0) return Mat.COAL;
                 if (Math.floorMod(y, 160) < 2) return Mat.CONC_BLACK;
                 double n = H.noise3(seed ^ 0xE1, x, y * 0.35, z, 27);
                 if (n < 0.10) return Mat.ANDESITE;
