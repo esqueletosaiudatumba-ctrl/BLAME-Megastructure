@@ -36,6 +36,14 @@ public final class TohaMonumentCheck {
         check(Mat.isStructure(shell.get(1100, 300, shellZ)),
                 "the lower cylindrical hull must occupy its curved surface sample");
 
+        int markX = 1680, markY = 86;
+        int markZ = Toha.projectedFrontZ(markX, markY) - 12 + 2;
+        Cube inscription = new Cube(Math.floorDiv(markX, 16), Math.floorDiv(markY, 16),
+                Math.floorDiv(markZ, 16));
+        toha.draw(inscription);
+        check(inscription.get(markX, markY, markZ) == Mat.S_TOHA_PALE,
+                "the exterior must carry the curved 東亜重工 hull inscription");
+
         int galleryX = 1020, galleryY = 480, galleryZ = Toha.CZ + 2240;
         Cube gallery = new Cube(Math.floorDiv(galleryX, 16), Math.floorDiv(galleryY, 16),
                 Math.floorDiv(galleryZ, 16));

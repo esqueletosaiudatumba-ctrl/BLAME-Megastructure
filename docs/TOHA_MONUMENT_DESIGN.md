@@ -57,7 +57,9 @@ Eight tall, shallow curved fins are placed against the authored surface at selec
 
 The repeated-pitch slit helper is replaced by twenty-seven fixed aperture records. Each slit has its own x, bottom elevation, width, height, shell radius, and cut depth (86–112 blocks). Openings remain real voids cut into the curved wall; none is selected from the world seed. This creates an authored negative-space rhythm without compromising the thirteen larger cave portals.
 
-Generator v14 also widens the Toha shell's screentone rule pitch from 32 to 96 blocks. At multi-kilometre scale, the old rule made otherwise monolithic concrete read like tightly spaced bars. The wider pitch keeps ruled surfaces and deterministic mineral weathering, while letting each facade mass read as a large continuous surface from a distance. The floor/deck keeps its finer marking scale.
+Generator v14 also widened the Toha shell's screentone rule pitch from 32 to 96 blocks. Generator v15 adds the manga's identifying 東亜重工 mark as four vertical block-raster glyphs attached directly to the outer cylinder at the southeast-facing lower hull. Every glyph pixel follows the local circular radius; there is no separate flat billboard. The mark is placed between the existing lower cave mouths and the outer shell's deep slit so the thirteen main cave portals stay intact.
+
+At multi-kilometre scale, the old 32-block rule made otherwise monolithic concrete read like tightly spaced bars. The wider pitch keeps ruled surfaces and deterministic mineral weathering, while letting each facade mass read as a large continuous surface from a distance. The floor/deck keeps its finer marking scale.
 
 ## Thirteen fixed cave mouths
 

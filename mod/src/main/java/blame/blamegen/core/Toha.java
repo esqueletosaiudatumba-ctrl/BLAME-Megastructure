@@ -72,6 +72,76 @@ public final class Toha {
         {760, 1840, 12, 55, 1050, 88}
     };
 
+    // Canonical hull mark from the manga: four vertical, block-engraved glyphs.
+    // Rows are top-to-bottom in reading order, 東亜重工. Each bit becomes a small
+    // raised strip that follows the real circular shell instead of a flat sign.
+    private static final String[][] HULL_INSCRIPTION = {
+        { // 東
+            "00000110000000",
+            "00000110000000",
+            "11111111111111",
+            "00000110000000",
+            "00011111111000",
+            "00000110000000",
+            "11111111111111",
+            "00000110000000",
+            "00111111111100",
+            "00100110001000",
+            "01100110001100",
+            "10000110000010",
+            "00000110000000",
+            "00000110000000"
+        },
+        { // 亜
+            "00111111111100",
+            "00100000000100",
+            "00100000000100",
+            "00111111111100",
+            "00000111100000",
+            "00000110100000",
+            "11111111111111",
+            "00100110100100",
+            "00100110100100",
+            "00100110100100",
+            "00111111111100",
+            "00000110100000",
+            "00000110100000",
+            "00111111111100"
+        },
+        { // 重
+            "00011111111000",
+            "00000110000000",
+            "11111111111111",
+            "00000110000000",
+            "00111111111100",
+            "00000110000000",
+            "11111111111111",
+            "00100110001000",
+            "00111111111100",
+            "00100110001000",
+            "00111111111100",
+            "00100110001000",
+            "00111111111100",
+            "11111111111111"
+        },
+        { // 工
+            "11111111111111",
+            "00000011000000",
+            "00000011000000",
+            "00000011000000",
+            "00000011000000",
+            "00000011000000",
+            "00000011000000",
+            "00000011000000",
+            "00000011000000",
+            "00000011000000",
+            "00000011000000",
+            "00000011000000",
+            "00000011000000",
+            "11111111111111"
+        }
+    };
+
     static int cylinderRadiusAtY(int y) {
         if (y < 640) return 2200;
         if (y < 1020) return 1900;
@@ -166,12 +236,51 @@ public final class Toha {
         drawExteriorSpines(c);
         drawApproach(c);
         drawCourtyardPylons(c);
+        drawHullInscription(c);
     }
 
     // ------------------------------------------------------------------
     // The precinct: a finite floor and low enclosure, leaving negative space
     // between the boundary and the main mass so the building reads as a whole.
     // ------------------------------------------------------------------
+
+    /**
+     * The outside is literally marked 東亜重工 in BLAME!. Reproduce that identifying
+     * mark as block strokes welded to the curved hull. A tight broad phase keeps this
+     * small authored detail from adding work to unrelated world-generation cubes.
+     */
+    private void drawHullInscription(Cube c) {
+        final int cell = 6, gap = 8, span = 14 * cell, stride = span + gap;
+        final int centreX = 1680, x0 = centreX - span / 2, x1 = x0 + span - 1;
+        final int bottomY = 84, topY = bottomY + 4 * span + 3 * gap - 1;
+        if (c.x0 + 15 < x0 || c.x0 > x1 || c.y0 + 15 < bottomY || c.y0 > topY) return;
+
+        int frontA = projectedFrontZ(Math.max(x0, c.x0), bottomY) - 12;
+        int frontB = projectedFrontZ(Math.min(x1, c.x0 + 15), bottomY) - 12;
+        int minFront = Math.min(frontA, frontB), maxFront = Math.max(frontA, frontB);
+        if (c.z0 + 15 < minFront + 1 || c.z0 > maxFront + 4) return;
+
+        for (int glyphIndex = 0; glyphIndex < HULL_INSCRIPTION.length; glyphIndex++) {
+            int glyphBottom = bottomY + (HULL_INSCRIPTION.length - 1 - glyphIndex) * stride;
+            if (c.y0 + 15 < glyphBottom || c.y0 > glyphBottom + span - 1) continue;
+            String[] glyph = HULL_INSCRIPTION[glyphIndex];
+            for (int row = 0; row < 14; row++) {
+                int y = glyphBottom + (13 - row) * cell;
+                if (y > c.y0 + 15 || y + cell - 1 < c.y0) continue;
+                for (int col = 0; col < 14; col++) {
+                    if (glyph[row].charAt(col) != '1') continue;
+                    int px0 = x0 + col * cell;
+                    int lo = Math.max(px0, c.x0), hi = Math.min(px0 + cell - 1, c.x0 + 15);
+                    if (lo > hi) continue;
+                    for (int x = lo; x <= hi; x++) {
+                        int front = projectedFrontZ(x, y) - 12;
+                        if (front + 4 < c.z0 || front + 1 > c.z0 + 15) continue;
+                        c.box(x, y, front + 1, x, y + cell - 1, front + 4, Mat.S_TOHA_PALE);
+                    }
+                }
+            }
+        }
+    }
 
     private void drawFoundation(Cube c) {
         // Round four-block plate under the cylindrical hull.
