@@ -131,30 +131,24 @@ public final class Toha {
     // ------------------------------------------------------------------
 
     private void drawFoundation(Cube c) {
-        // A four-block deck plate sits on an immense but sparse girder grid. The
-        // old 64-block solid slab consumed billions of blocks without adding silhouette.
-        c.box(-2800, 60, CZ - 2800, 2800, 63, CZ + 2800, Mat.S_TOHA_DECK);
+        // Round four-block plate under the cylindrical hull.
+        c.prism(CX + 0.5, CZ + 0.5, 2800, 0, 0, false, 0, 60, 63, Mat.S_TOHA_DECK);
 
-        // Main orthogonal girders are 8 blocks wide and 12 high at 512-block spacing.
+        // Concentric girders and radial spokes carry the deck instead of a solid slab.
         if (c.hitsY(48, 59)) {
-            for (int x = -2560; x <= 2560; x += 512) {
-                if (x + 4 >= c.x0 && x - 4 <= c.x0 + 15)
-                    c.box(x - 4, 48, CZ - 2800, x + 4, 59, CZ + 2800, Mat.S_TOHA_MASS);
+            int[] radii = {2700, 2200, 1700, 1200, 700};
+            for (int radius : radii) {
+                c.cylinder(CX + 0.5, CZ + 0.5, radius + 10, radius - 10,
+                        1, 1, 48, 59, 0, 0, Mat.S_TOHA_MASS);
             }
-            for (int z = -2560; z <= 2560; z += 512) {
-                int wz = CZ + z;
-                if (wz + 4 >= c.z0 && wz - 4 <= c.z0 + 15)
-                    c.box(-2800, 48, wz - 4, 2800, 59, wz + 4, Mat.S_TOHA_MASS);
+            for (int deg = 0; deg < 360; deg += 30) {
+                double a = Math.toRadians(deg);
+                int ex = (int) Math.round(Math.sin(a) * 2700);
+                int ez = (int) Math.round(Math.cos(a) * 2700);
+                c.beam(CX, 54, CZ, CX + ex, 54, CZ + ez, 10, Mat.S_TOHA_MASS);
             }
         }
-
-        // Three inset, unlit perimeter courses make the deck feel machined.
-        if (c.hitsY(63, 63)) {
-            c.box(-2720, 63, CZ - 2720, 2720, 63, CZ - 2704, Mat.S_DARK);
-            c.box(-2720, 63, CZ + 2704, 2720, 63, CZ + 2720, Mat.S_DARK);
-            c.box(-2720, 63, CZ - 2720, -2704, 63, CZ + 2720, Mat.S_DARK);
-            c.box(2704, 63, CZ - 2720, 2720, 63, CZ + 2720, Mat.S_DARK);
-        }
+        c.cylinder(CX + 0.5, CZ + 0.5, 2790, 2768, 1, 1, 63, 63, 0, 0, Mat.S_DARK);
     }
 
     private void drawOuterWalls(Cube c) {
