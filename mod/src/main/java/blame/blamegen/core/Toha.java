@@ -40,8 +40,7 @@ public final class Toha {
     static final int[] CAVE_Y = {120, 260, 405, 545, 690, 835, 990, 1145, 1300, 1455, 1608, 1780, 1912};
     static final int[] CAVE_W = {88, 64, 92, 70, 66, 58, 58, 48, 42, 36, 32, 28, 22};
     static final int[] CAVE_H = {112, 96, 120, 102, 92, 94, 92, 76, 70, 62, 52, 44, 34};
-    static final int[] CAVE_FRONT = {410, 380, 350, 323, 295, 266, 235, 206, 176, 146, 116, 78, 42};
-    private static final int[] CAVE_DIR = {0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 0, 2};
+    private static final int[] CAVE_DIR = {0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 0, 1};
     private static final int[] CAVE_DEPTH = {100, 88, 92, 84, 82, 78, 76, 70, 66, 62, 54, 48, 38};
 
     // Vertical block-raster mark 東亜重工, welded to the south-east-facing skin.
@@ -443,7 +442,6 @@ public final class Toha {
     }
 
     private void drawBaseIngressFrames(Cube c) {
-        int zSouth = CZ + 432, zNorth = CZ - 432;
         if (c.hits(-72, 64, CZ + 280, 72, 164, CZ + 454)) {
             c.box(-62, 65, CZ + 290, -50, 145, CZ + 446, Mat.S_TOHA_RING);
             c.box(50, 65, CZ + 290, 62, 145, CZ + 446, Mat.S_TOHA_RING);
