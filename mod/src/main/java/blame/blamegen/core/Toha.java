@@ -503,28 +503,37 @@ public final class Toha {
 
     private void drawCaveFrames(Cube c) {
         for (int i = 0; i < CAVE_X.length; i++) {
-            int x = CAVE_X[i], y = CAVE_Y[i], w = CAVE_W[i], h = CAVE_H[i];
-            int f = CZ + CAVE_FRONT[i];
-            int l = x - w / 2, r = x + w / 2, top = y + h;
+            int centre = CAVE_X[i], y = CAVE_Y[i], w = CAVE_W[i], h = CAVE_H[i];
+            int l = centre - w / 2, r = centre + w / 2, top = y + h;
+            if (!c.hits(l - 28, y - 22, CZ + CAVE_FRONT[i] - 220,
+                        r + 28, top + 28, CZ + CAVE_FRONT[i] + 36)) continue;
 
-            // Deep outer reveals on all thirteen mouths.
-            c.box(l - 28, y - 22, f + 3, l - 8, top + 22, f + 28, Mat.S_TOHA_PALE);
-            c.box(r + 8, y - 22, f + 3, r + 28, top + 22, f + 28, Mat.S_TOHA_PALE);
-            c.box(l - 20, top + 8, f + 3, r + 20, top + 28, f + 28, Mat.S_TOHA_MASS);
-            c.box(l - 16, y - 14, f + 3, r + 16, y + 5, f + 28, Mat.S_TOHA_MASS);
+            // The jambs and lintel follow the rounded hull surface column by column.
+            for (int x = Math.max(l - 28, c.x0); x <= Math.min(r + 28, c.x0 + 15); x++) {
+                int f = CZ + caveFrontAt(i, x);
+                if (x >= l - 28 && x <= l - 8)
+                    c.box(x, y - 22, f + 3, x, top + 22, f + 28, Mat.S_TOHA_PALE);
+                if (x >= r + 8 && x <= r + 28)
+                    c.box(x, y - 22, f + 3, x, top + 22, f + 28, Mat.S_TOHA_PALE);
+                if (x >= l - 20 && x <= r + 20)
+                    c.box(x, top + 8, f + 3, x, top + 28, f + 28, Mat.S_TOHA_MASS);
+                if (x >= l - 16 && x <= r + 16)
+                    c.box(x, y - 14, f + 3, x, y + 5, f + 28, Mat.S_TOHA_MASS);
+                if (x >= l - 7 && x <= l + 6)
+                    c.box(x, y, f - 10, x, top, f - 2, Mat.COAL);
+                if (x >= r - 6 && x <= r + 7)
+                    c.box(x, y, f - 10, x, top, f - 2, Mat.COAL);
+                if (x >= l && x <= r)
+                    c.box(x, top - 8, f - 10, x, top + 4, f - 2, Mat.S_DARK);
+            }
 
-            // Inner black lip provides a readable, deep entrance in monochrome.
-            c.box(l - 7, y, f - 10, l + 6, top, f - 2, Mat.COAL);
-            c.box(r - 6, y, f - 10, r + 7, top, f - 2, Mat.COAL);
-            c.box(l, top - 8, f - 10, r, top + 4, f - 2, Mat.S_DARK);
-
-            // Only the principal lower and crown entries get restrained luminous cues.
+            int fCentre = CZ + caveFrontAt(i, centre);
             if (i == 2) {
-                c.box(x - 65, top - 18, f + 29, x + 65, top - 12, f + 31, Mat.BIO_CYAN);
+                c.box(centre - 65, top - 18, fCentre + 29, centre + 65, top - 12, fCentre + 31, Mat.BIO_CYAN);
             } else if (i == 12) {
-                c.box(x - 34, top - 18, f + 29, x + 34, top - 12, f + 31, Mat.SEA_LANTERN);
+                c.box(centre - 34, top - 18, fCentre + 29, centre + 34, top - 12, fCentre + 31, Mat.SEA_LANTERN);
             } else if (i == 5 || i == 8) {
-                c.box(l + 12, top - 18, f + 29, l + 42, top - 12, f + 31, Mat.LAMP_RED);
+                c.box(l + 12, top - 18, fCentre + 29, l + 42, top - 12, fCentre + 31, Mat.LAMP_RED);
             }
         }
     }
