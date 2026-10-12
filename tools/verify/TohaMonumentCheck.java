@@ -1,6 +1,6 @@
 package blame.blamegen.core;
 
-/** Focused regression checks for the fixed Toha Heavy Industries monument. */
+/** Regression checks for Toha's narrow spire, enclosing machine valley, and access network. */
 public final class TohaMonumentCheck {
     private static int failures;
 
@@ -11,165 +11,105 @@ public final class TohaMonumentCheck {
         }
     }
 
+    private static Cube cubeAt(int x, int y, int z) {
+        return new Cube(Math.floorDiv(x, 16), Math.floorDiv(y, 16), Math.floorDiv(z, 16));
+    }
+
     public static void main(String[] args) {
-        Megastructure m = new Megastructure(0x424C414D45L);
-        Toha toha = m.toha;
+        Toha toha = new Megastructure(0x424C414D45L).toha;
         int czCube = Math.floorDiv(Toha.CZ, 16);
 
-        check(toha.overlaps(new Cube(0, 10, czCube)), "monument centre must be in footprint");
-        check(!toha.overlaps(new Cube(192, 10, czCube)), "footprint must end at X=3072");
-        check(!toha.overlaps(new Cube(0, 10, Math.floorDiv(Toha.Z1, 16))),
-                "footprint must end at Z=Toha.Z1");
+        check(toha.overlaps(cubeAt(0, 100, Toha.CZ)), "spire centre must be in monument bounds");
+        check(!toha.overlaps(new Cube(256, 10, czCube)), "monument X bound must end at +4096");
+        check(!toha.overlaps(cubeAt(0, 10, Toha.Z1)), "monument Z bound must end at its far edge");
 
-        Cube gate = new Cube(Math.floorDiv(-700, 16), Math.floorDiv(544, 16),
-                Math.floorDiv(Toha.CZ + 2600, 16));
-        toha.draw(gate);
-        check(Mat.isStructure(gate.get(-700, 544, Toha.CZ + 2600)),
-                "the south gate must have its monumental crosshead");
-        check(gate.get(0, 100, Toha.CZ + 2600) == Mat.AIR,
-                "the centre of the south gate must remain passable");
+        check(Toha.spireRadiusAtY(100) > 400,
+                "the lower spire must have a substantial industrial plinth");
+        check(Toha.spireRadiusAtY(1800) < 75,
+                "the crown must narrow to a spire, not remain a wide drum");
+        check(Toha.spireRadiusAtY(1800) < Toha.spireRadiusAtY(100) / 5.0,
+                "the monument silhouette must become dramatically narrower with height");
 
-        int shellZ = Toha.CZ + Toha.cylinderFrontOffset(2200, 1100) - 18;
-        Cube shell = new Cube(Math.floorDiv(1100, 16), Math.floorDiv(300, 16),
-                Math.floorDiv(shellZ, 16));
+        // Check a real shell sample through the thick outer skin and a true hollow interior.
+        int shellY = 400;
+        int shellZ = Toha.CZ + (int) Math.round(Toha.spireRadiusAtY(shellY)) - 10;
+        Cube shell = cubeAt(0, shellY, shellZ);
         toha.draw(shell);
-        check(Mat.isStructure(shell.get(1100, 300, shellZ)),
-                "the lower cylindrical hull must occupy its curved surface sample");
+        check(Mat.isStructure(shell.get(0, shellY, shellZ)),
+                "the tapered outer spire shell must occupy its authored surface");
+        Cube innerVoid = cubeAt(240, 500, Toha.CZ);
+        toha.draw(innerVoid);
+        check(innerVoid.get(240, 500, Toha.CZ) == Mat.AIR,
+                "the hollow spire must preserve open internal volume");
 
-        int markX = 1680, markY = 66;
+        // A valley cliff should frame the view from far below, with open negative space
+        // between the wall and the spire.
+        Cube cliff = cubeAt(-3240, 500, Toha.CZ + 150);
+        toha.draw(cliff);
+        check(Mat.isStructure(cliff.get(-3240, 500, Toha.CZ + 150)),
+                "the west megastructure valley wall must be a real cliff mass");
+        Cube valleyAir = cubeAt(1450, 100, Toha.CZ + 1700);
+        toha.draw(valleyAir);
+        check(valleyAir.get(1450, 100, Toha.CZ + 1700) == Mat.AIR,
+                "the canyon must remain open beyond the central machinery yards");
+
+        // Massive south gate masses leave a clear central portal and approach path.
+        int southZ = Toha.CZ + 3560;
+        Cube gatePier = cubeAt(-700, 544, southZ);
+        toha.draw(gatePier);
+        check(Mat.isStructure(gatePier.get(-700, 544, southZ)),
+                "the valley entrance must have a monumental gate pier");
+        Cube gateOpening = cubeAt(0, 100, southZ);
+        toha.draw(gateOpening);
+        check(gateOpening.get(0, 100, southZ) == Mat.AIR,
+                "the centre of the valley gate must remain passable");
+
+        // Each of the thirteen chambers must have a genuine surface opening, aligned to
+        // one of four different sides as the spire tapers.
+        int openCaves = 0;
+        for (int i = 0; i < Toha.CAVE_Y.length; i++) {
+            int x = Toha.caveCenterX(i);
+            int y = Toha.CAVE_Y[i];
+            int z = Toha.caveCenterZ(i);
+            int side = Toha.CAVE_DIR_FOR_CHECK[i];
+            if (side == 0) z += 4;
+            else if (side == 1) x += 4;
+            else if (side == 2) z -= 4;
+            else x -= 4;
+            Cube mouth = cubeAt(x, y, z);
+            toha.draw(mouth);
+            if (mouth.get(x, y, z) == Mat.AIR) openCaves++;
+            else check(false, "authored AI cave mouth " + i + " must remain open");
+        }
+        check(openCaves == 13, "all thirteen staggered AI chambers must remain traversable");
+
+        // Service circulation: helical treads and at least one transverse bridge must be
+        // made of actual half-height slabs, not decorative linework alone.
+        int stairY = 500;
+        int stairX = Toha.spiralXAtY(stairY), stairZ = Toha.spiralZAtY(stairY);
+        Cube stair = cubeAt(stairX, stairY, stairZ);
+        toha.draw(stair);
+        check(stair.get(stairX, stairY, stairZ) == Mat.SLAB_BOTTOM,
+                "the outer helix must have real slab treads at walkable elevations");
+
+        int bridgeY = 555;
+        Cube bridge = cubeAt(-2000, bridgeY, Toha.CZ);
+        toha.draw(bridge);
+        check(bridge.get(-2000, bridgeY, Toha.CZ) == Mat.SLAB_BOTTOM,
+                "cross-valley paths must connect the cliff infrastructure to the spire");
+
+        // Machine yard equipment must be block-real and richly detailed at human scale.
+        Cube yard = cubeAt(-930, 69, Toha.CZ + 520);
+        toha.draw(yard);
+        check(yard.get(-930, 69, Toha.CZ + 520) == Mat.SLAB_TOP,
+                "the machine yard must contain slab-topped service modules");
+
+        int markX = -6, markY = 274;
         int markZ = Toha.projectedFrontZ(markX, markY) - 12 + 2;
-        Cube inscription = new Cube(Math.floorDiv(markX, 16), Math.floorDiv(markY, 16),
-                Math.floorDiv(markZ, 16));
+        Cube inscription = cubeAt(markX, markY, markZ);
         toha.draw(inscription);
         check(inscription.get(markX, markY, markZ) == Mat.COAL,
-                "the exterior must carry the curved 東亜重工 hull inscription");
-
-        int galleryX = 1020, galleryY = 480, galleryZ = Toha.CZ + 2240;
-        Cube gallery = new Cube(Math.floorDiv(galleryX, 16), Math.floorDiv(galleryY, 16),
-                Math.floorDiv(galleryZ, 16));
-        toha.draw(gallery);
-        check(Mat.isStructure(gallery.get(galleryX, galleryY, galleryZ)),
-                "the front-east broken orbital gallery must be a real generated annular structure");
-        check(shell.get(1100, 300, Toha.CZ + 1340) == Mat.AIR,
-                "the cylindrical hull must remain hollow well inside its lower wall");
-
-        int tangentZ = Toha.CZ - 2199;
-        Cube roundEdge = new Cube(0, Math.floorDiv(300, 16), Math.floorDiv(tangentZ, 16));
-        toha.draw(roundEdge);
-        check(Mat.isStructure(roundEdge.get(0, 300, tangentZ)),
-                "the lower hull must reach its circular rear tangent");
-        Cube squareCorner = new Cube(Math.floorDiv(2400, 16), Math.floorDiv(300, 16), czCube);
-        toha.draw(squareCorner);
-        check(squareCorner.get(2400, 300, Toha.CZ) == Mat.AIR,
-                "the X/Z broad-phase bound must not fill a square corner outside the cylinder");
-        check(Toha.cylinderRadiusAtY(500) == 2200
-                        && Toha.cylinderRadiusAtY(800) == 1900
-                        && Toha.cylinderRadiusAtY(1200) == 1600,
-                "each major elevation must use its authored stepped radius");
-
-        Cube underDeck = new Cube(0, 1, czCube);
-        toha.draw(underDeck);
-        check(underDeck.get(0, 20, Toha.CZ) == Mat.AIR,
-                "the precinct must not be filled as a 64-block solid slab");
-        Cube deckSupport = new Cube(0, 3, czCube);
-        toha.draw(deckSupport);
-        check(Mat.isStructure(deckSupport.get(0, 52, Toha.CZ)),
-                "the thin deck must rest on its orthogonal girder grid");
-
-        Cube mouth = new Cube(0, Math.floorDiv(300, 16),
-                Math.floorDiv(Toha.CZ + 1286, 16));
-        toha.draw(mouth);
-        check(mouth.get(0, 300, Toha.CZ + 1286) == Mat.AIR,
-                "principal cave must remain open through the lower façade");
-
-        int openCaves = 0;
-        for (int i = 0; i < Toha.CAVE_X.length; i++) {
-            int x = Toha.CAVE_X[i];
-            int y = Toha.CAVE_Y[i] + Toha.CAVE_H[i] / 2;
-            // Sample just outside the intended exterior plane: behind-wall AIR is
-            // insufficient because a plinth or rib can still block the entrance.
-            int z = Toha.CZ + Toha.caveFrontAt(i, x) - 18;
-            Cube cave = new Cube(Math.floorDiv(x, 16), Math.floorDiv(y, 16), Math.floorDiv(z, 16));
-            toha.draw(cave);
-            if (cave.get(x, y, z) == Mat.AIR) openCaves++;
-            else check(false, "authored cave mouth " + i + " must remain open");
-        }
-        check(openCaves == 13, "all thirteen staggered cave mouths must remain traversable voids");
-
-        Cube nave = new Cube(0, Math.floorDiv(800, 16),
-                Math.floorDiv(Toha.CZ + 100, 16));
-        toha.draw(nave);
-        check(nave.get(0, 800, Toha.CZ + 100) == Mat.AIR,
-                "central nave must preserve a large open interior");
-
-        // The three fixed service flights must connect the existing partial floor levels
-        // without filling the central nave around the gravity furnace.
-        int stairX = 772, stairY = 600;
-        int stairZ = Toha.CZ + 160 - (stairY - 438) * 2;
-        Cube serviceStair = new Cube(Math.floorDiv(stairX, 16), Math.floorDiv(stairY, 16),
-                Math.floorDiv(stairZ, 16));
-        toha.draw(serviceStair);
-        check(serviceStair.get(stairX, stairY, stairZ) == Mat.S_TOHA_DECK,
-                "the east nave service stair must have a real tread between gallery floors");
-        int topStairY = 1300;
-        int topStairZ = Toha.CZ + 160 - (topStairY - 1158) * 2;
-        Cube upperStair = new Cube(Math.floorDiv(775, 16), Math.floorDiv(topStairY, 16),
-                Math.floorDiv(topStairZ, 16));
-        toha.draw(upperStair);
-        check(upperStair.get(772, topStairY, topStairZ) == Mat.S_TOHA_DECK,
-                "the upper service flight must continue toward the crown platform");
-
-        int slitX = -870, slitY = 390;
-        int slitZ = Toha.CZ + Toha.cylinderFrontOffset(2200, slitX) - 30;
-        Cube aperture = new Cube(Math.floorDiv(slitX, 16), Math.floorDiv(slitY, 16),
-                Math.floorDiv(slitZ, 16));
-        toha.draw(aperture);
-        check(aperture.get(slitX, slitY, slitZ) == Mat.AIR,
-                "the cylindrical facade needs a genuine, deep slit aperture");
-
-        int aiX = Toha.CAVE_X[2] + Toha.CAVE_W[2] / 2 - 22;
-        int aiY = Toha.CAVE_Y[2] + Math.max(22, Toha.CAVE_H[2] / 2 - 42) + 40;
-        int aiZ = Toha.CZ + Toha.CAVE_FRONT[2] - 202;
-        Cube aiPanel = new Cube(Math.floorDiv(aiX, 16), Math.floorDiv(aiY, 16),
-                Math.floorDiv(aiZ, 16));
-        toha.draw(aiPanel);
-        check(Mat.isStructure(aiPanel.get(aiX, aiY, aiZ)),
-                "the principal cave must contain its fixed AI control slab");
-
-        check(Toha.projectedFrontZ(0, 500) == Toha.CZ + Toha.cylinderFrontOffset(2200, 0),
-                "lower elevation must follow the circular hull at the centreline");
-        check(Toha.projectedFrontZ(800, 800) == Toha.CZ + Toha.cylinderFrontOffset(1900, 800),
-                "middle elevation must account for the cylinder's curved surface");
-        check(Toha.projectedFrontZ(1200, 1200) == Toha.CZ + Toha.cylinderFrontOffset(1600, 1200),
-                "upper elevation must follow the smaller cylindrical tier");
-
-        Cube transferMass = new Cube(Math.floorDiv(2520, 16), Math.floorDiv(800, 16),
-                Math.floorDiv(Toha.CZ + 100, 16));
-        toha.draw(transferMass);
-        check(Mat.isStructure(transferMass.get(2520, 800, Toha.CZ + 100)),
-                "the deliberately asymmetric eastern transfer wall must be present");
-        check(transferMass.get(2300, 800, Toha.CZ + 100) == Mat.AIR,
-                "the eastern transfer mass must remain hollow behind its wall");
-
-        Cube engine = new Cube(Math.floorDiv(260, 16), Math.floorDiv(500, 16),
-                Math.floorDiv(Toha.CZ - 560, 16));
-        toha.draw(engine);
-        check(Mat.isStructure(engine.get(260, 500, Toha.CZ - 560)),
-                "gravity furnace shell must be present");
-
-        int machineX = -1465, machineY = 310;
-        int machineZ = Toha.CZ + Toha.CAVE_FRONT[0] - 380;
-        Cube caveMachine = new Cube(Math.floorDiv(machineX, 16), Math.floorDiv(machineY, 16),
-                Math.floorDiv(machineZ, 16));
-        toha.draw(caveMachine);
-        check(Mat.isStructure(caveMachine.get(machineX, machineY, machineZ)),
-                "each subordinate cave must receive its fixed chamber machine");
-
-        Cube crownMast = new Cube(Math.floorDiv(2115, 16), Math.floorDiv(1900, 16),
-                Math.floorDiv(Toha.CZ - 900, 16));
-        toha.draw(crownMast);
-        check(Mat.isStructure(crownMast.get(2115, 1900, Toha.CZ - 900)),
-                "the off-axis service mast must rise close to the ceiling");
+                "the spire must retain the matte-black 東亜重工 hull mark");
 
         System.out.println(failures == 0
                 ? "TOHA MONUMENT CHECK PASS"
