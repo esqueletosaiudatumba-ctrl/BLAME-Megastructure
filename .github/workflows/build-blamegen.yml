@@ -43,9 +43,9 @@ jobs:
           # Wide hero and orthographic reference views retained from the original preview pass.
           timeout 75s java -Xmx1400m -cp build/pv Preview toha-persp toha-monument.png 0 760 400 180 -4 66 960 540 5600
           echo "wide silhouette render exit=$?"
-          timeout 60s java -Xmx1400m -cp build/pv Preview toha-persp toha-inscription.png 0 190  -4050 180 -2 55 960 540 1200
+          timeout 60s java -Xmx1400m -cp build/pv Preview toha-persp toha-inscription.png 0 190 -3700 180 -2 55 960 540 1400
           echo "hull inscription close-up exit=$?"
-          timeout 100s java -Xmx2g -cp build/pv Preview toha-section toha-cross-section.png -4608 0 1030 1400 2200 2
+          timeout 100s java -Xmx2g -cp build/pv Preview toha-section toha-cross-section.png -4608 0 1030 7000 2200 8
           echo "central cut render exit=$?"
           timeout 60s java -Xmx2g -cp build/pv Preview toha-section toha-elevation.png -4308 0 1030 1800 2100 2
           echo "front section render exit=$?"
@@ -59,9 +59,9 @@ jobs:
           echo "south low angle exit=$?"
           timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-gate-close.png 0 280 -1720 180 -3 58 640 360 3200
           echo "gate close-up exit=$?"
-          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-east-flank.png 3000 760 -4000 102 0 70 640 360 4300
+          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-east-flank.png 1800 760 -4000 108 -3 70 640 360 3200
           echo "east flank exit=$?"
-          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-west-flank.png -3000 760 -4000 258 0 70 640 360 4300
+          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-west-flank.png -1800 760 -4000 252 -3 70 640 360 3200
           echo "west flank exit=$?"
           timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-southeast-oblique.png 2200 800 -2808 129 -7 66 640 360 3800
           echo "southeast oblique exit=$?"
@@ -73,33 +73,33 @@ jobs:
           echo "north rear exit=$?"
           timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-high-overlook.png 2000 1800 -3008 129 14 68 640 360 4200
           echo "high overlook exit=$?"
-          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-crown-south.png 0 1640 -1700 180 -5 55 640 360 3000
+          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-crown-south.png 0 1640 -2800 180 -4 55 640 360 2400
           echo "crown south exit=$?"
           timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-spire-upper-ribs.png -1000 1450 -3900 241 -8 65 640 360 1700
           echo "mast detail exit=$?"
-          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-cargo-gantry.png 2900 300 -2100 240 -3 65 640 360 1800
+          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-cargo-gantry.png 2900 300 -2100 144 -3 65 640 360 1800
           echo "transfer mass exit=$?"
 
           # Interior views: the gravity furnace, nave, chamber machines and new maintenance stair.
           timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-furnace-view.png 0 650 -4508 180 0 72 640 360 1900
           echo "furnace from nave exit=$?"
-          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-furnace-upward.png 0 760 -4644 180 -32 68 640 360 1800
+          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-furnace-upward.png 0 760 -5030 0 -32 68 640 360 1800
           echo "furnace upward exit=$?"
           timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-nave-east.png 180 820 -4750 60 0 70 640 360 1200
           echo "east nave exit=$?"
           timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-service-stair.png 370 610 -4408 119 0 70 640 360 1100
           echo "service stair exit=$?"
-          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-main-ai-chamber.png -110 145 -4048 180 0 70 640 360 800
+          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-main-ai-chamber.png -110 145 -4000 180 0 70 640 360 850
           echo "main AI chamber exit=$?"
-          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-upper-ai-chamber.png 400 850 -4683 90 0 68 640 360 800
+          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-upper-ai-chamber.png 400 1280 -4683 90 -4 68 640 360 1000
           echo "upper AI chamber exit=$?"
 
           # Orbital-gallery and material-detail shots.
-          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-gallery-front.png 900 550 -3708 135 -2 70 640 360 1800
+          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-gallery-front.png 420 550 -3800 160 -2 70 640 360 1300
           echo "front orbital gallery exit=$?"
-          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-gallery-west.png -3050 950 -4608 270 -3 65 640 360 4000
+          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-gallery-west.png -360 846 -4598 270 -1 65 640 360 1800
           echo "west orbital gallery exit=$?"
-          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-gallery-east.png 3050 950 -4608 90 -3 65 640 360 4000
+          timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-gallery-east.png 360 846 -4598 90 -1 65 640 360 1800
           echo "east orbital gallery exit=$?"
           timeout 40s java -Xmx1200m -cp build/pv Preview toha-persp toha-hull-detail.png 220 260 -3788 180 -2 55 640 360 1200
           echo "hull detail exit=$?"
@@ -135,9 +135,9 @@ jobs:
           echo "west cliff catwalk exit=$?"
           timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-east-catwalk.png 3050 760 -4608 90 -2 70 640 360 4000
           echo "east cliff catwalk exit=$?"
-          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-base-ingress.png 0 100 -4190 180 0 70 640 360 900
+          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-base-ingress.png 0 100 -4000 180 0 70 640 360 1100
           echo "base ingress exit=$?"
-          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-north-ingress.png 0 105 -5080 0 0 70 640 360 950
+          timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-north-ingress.png 0 105 -5260 0 0 70 640 360 1100
           echo "north ingress exit=$?"
           timeout 45s java -Xmx1200m -cp build/pv Preview toha-persp toha-machine-yard.png -1800 155 -3608 241 -2 70 640 360 1800
           echo "machine yard exit=$?"
