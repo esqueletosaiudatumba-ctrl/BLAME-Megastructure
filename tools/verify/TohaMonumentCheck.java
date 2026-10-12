@@ -38,6 +38,19 @@ public final class TohaMonumentCheck {
         check(shell.get(1100, 300, Toha.CZ + 1340) == Mat.AIR,
                 "the cylindrical hull must remain hollow well inside its lower wall");
 
+        Cube roundEdge = new Cube(Math.floorDiv(2199, 16), Math.floorDiv(300, 16), czCube);
+        toha.draw(roundEdge);
+        check(Mat.isStructure(roundEdge.get(2199, 300, Toha.CZ)),
+                "the lower hull must reach its circular east tangent");
+        Cube squareCorner = new Cube(Math.floorDiv(2400, 16), Math.floorDiv(300, 16), czCube);
+        toha.draw(squareCorner);
+        check(squareCorner.get(2400, 300, Toha.CZ) == Mat.AIR,
+                "the X/Z broad-phase bound must not fill a square corner outside the cylinder");
+        check(Toha.cylinderRadiusAtY(500) == 2200
+                        && Toha.cylinderRadiusAtY(800) == 1900
+                        && Toha.cylinderRadiusAtY(1200) == 1600,
+                "each major elevation must use its authored stepped radius");
+
         Cube underDeck = new Cube(0, 1, czCube);
         toha.draw(underDeck);
         check(underDeck.get(0, 20, Toha.CZ) == Mat.AIR,
