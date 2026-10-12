@@ -194,37 +194,25 @@ public final class Toha {
     // ------------------------------------------------------------------
 
     private void drawMainShell(Cube c) {
-        // Immense shells are vertical wall envelopes, not solid rectangular volumes.
-        // The interior belongs to the nave, service bridges and cave chambers.
-        // A shallow rear plinth projects forward only below the entry tier. Above it,
-        // the main face steps back to the actual cave-mouth plane so the openings are real.
-        wallShell(c, -2050, 64, CZ - 2200, 2050, 128, CZ + 1600, 24, Mat.S_TOHA_PALE);
-        wallShell(c, -2100, 128, CZ - 2220, 2100, 200, CZ + 1350, 24, Mat.S_TOHA_PALE);
-        rectBand(c, 2100, -2220, 1350, 180, 236, Mat.S_TOHA_MASS);
+        // Toha's primary mass is a cylindrical hull, stepping inward at immense levels.
+        cylinderTier(c, 2200, 36, 64, 639, Mat.S_TOHA_MASS);
+        cylinderTier(c, 1900, 36, 640, 1019, Mat.S_TOHA_PALE);
+        cylinderTier(c, 1600, 36, 1020, 1449, Mat.S_TOHA_MASS);
+        cylinderTier(c, 1320, 36, 1450, 1759, Mat.S_TOHA_PALE);
+        cylinderTier(c, 1050, 32, 1760, 1919, Mat.S_TOHA_MASS);
+        cylinderTier(c, 820, 28, 1920, 1950, Mat.S_TOHA_PALE);
 
-        // The lower black body, broad shoulder, pale middle mass, and receding crown.
-        wallShell(c, -1850, 200, CZ - 1900, 1850, 640, CZ + 1350, 28, Mat.S_TOHA_MASS);
-        rectBand(c, 1940, -1980, 1420, 600, 632, Mat.S_TOHA_PALE);
+        // Massive horizontal collars break the silhouette into engineered cylindrical strata.
+        c.cylinder(CX + 0.5, CZ + 0.5, 2260, 2220, 1, 1, 250, 276, 0, 0, Mat.S_TOHA_PALE);
+        c.cylinder(CX + 0.5, CZ + 0.5, 1940, 1900, 1, 1, 810, 840, 0, 0, Mat.S_TOHA_RING);
+        c.cylinder(CX + 0.5, CZ + 0.5, 1640, 1600, 1, 1, 1210, 1240, 0, 0, Mat.S_TOHA_PALE);
+    }
 
-        wallShell(c, -1580, 640, CZ - 1700, 1580, 1020, CZ + 1130, 24, Mat.S_TOHA_PALE);
-        rectBand(c, 1660, -1770, 1200, 980, 1018, Mat.S_TOHA_MASS);
-
-        wallShell(c, -1320, 1020, CZ - 1440, 1320, 1450, CZ + 850, 24, Mat.S_TOHA_MASS);
-        rectBand(c, 1390, -1510, 920, 1408, 1448, Mat.S_TOHA_PALE);
-
-        wallShell(c, -1050, 1450, CZ - 1130, 1050, 1760, CZ + 630, 24, Mat.S_TOHA_PALE);
-        rectBand(c, 1150, -1230, 710, 1724, 1758, Mat.S_TOHA_MASS);
-        wallShell(c, -800, 1760, CZ - 900, 800, 1880, CZ + 430, 20, Mat.S_TOHA_MASS);
-
-        // A thin, dark crown lip, intentionally close to the immense ceiling above.
-        rectBand(c, 900, -1010, 530, 1870, 1895, Mat.S_TOHA_PALE);
-        wallShell(c, -620, 1895, CZ - 790, 620, 1920, CZ + 310, 16, Mat.S_TOHA_MASS);
-
-        // Rear counter-masses are similarly hollow wall envelopes; their offset
-        // position changes the silhouette without filling billions of blocks.
-        wallShell(c, -970, 440, CZ - 2240, 970, 1600, CZ - 1860, 24, Mat.S_TOHA_PALE);
-        rectBand(c, 1250, -2280, -1750, 760, 820, Mat.S_TOHA_MASS);
-        wallShell(c, -820, 1290, CZ - 2160, 820, 1760, CZ - 1810, 16, Mat.S_TOHA_MASS);
+    private void cylinderTier(Cube c, int outerRadius, int thickness, int y0, int y1, byte material) {
+        double x = CX + 0.5, z = CZ + 0.5;
+        // Clear the underlying city inside the shell, then write only the load-bearing wall annulus.
+        c.prism(x, z, outerRadius - thickness, 0, 0, false, 0, y0, y1, Mat.AIR);
+        c.shellPrism(x, z, outerRadius, outerRadius - thickness, y0, y1, material);
     }
 
     /**
