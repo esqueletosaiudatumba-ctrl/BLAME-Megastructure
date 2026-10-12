@@ -325,22 +325,23 @@ public final class Toha {
      * the shell so that the opening reads as a deep black slot from far away.
      */
     private void carveSlitApertures(Cube c) {
-        apertureTier(c, -1700, 1700, 270, 575, 1350, 240, 112, 9, 46);
-        apertureTier(c, -1460, 1460, 700, 940, 1130, 220, 120, 9, 40);
-        apertureTier(c, -1200, 1200, 1080, 1360, 850, 200, 128, 8, 44);
-        apertureTier(c, -950, 950, 1500, 1690, 630, 180, 120, 7, 36);
+        apertureTier(c, -1850, 1850, 270, 575, 2200, 280, 128, 9, 46);
+        apertureTier(c, -1540, 1540, 700, 940, 1900, 260, 136, 9, 40);
+        apertureTier(c, -1240, 1240, 1080, 1360, 1600, 240, 136, 8, 44);
+        apertureTier(c, -1000, 1000, 1500, 1690, 1320, 220, 120, 7, 36);
     }
 
     private void apertureTier(Cube c, int xMin, int xMax, int yMin, int yMax,
-                              int front, int pitch, int rowPitch, int width, int height) {
+                              int radius, int pitch, int rowPitch, int width, int height) {
         int index = 0;
         for (int x = xMin + pitch / 2; x <= xMax - pitch / 2; x += pitch, index++) {
             int phase = (index & 1) == 0 ? 0 : rowPitch / 3;
+            int front = CZ + cylinderFrontOffset(radius, x);
             for (int y = yMin + rowPitch / 2 + phase; y + height <= yMax; y += rowPitch) {
-                if (!c.hits(x - width / 2, y, CZ + front - 84,
-                            x + width / 2, y + height, CZ + front + 1)) continue;
-                c.box(x - width / 2, y, CZ + front - 84,
-                      x + width / 2, y + height, CZ + front + 1, Mat.AIR);
+                if (!c.hits(x - width / 2, y, front - 84,
+                            x + width / 2, y + height, front + 1)) continue;
+                c.box(x - width / 2, y, front - 84,
+                      x + width / 2, y + height, front + 1, Mat.AIR);
             }
         }
     }
@@ -356,10 +357,16 @@ public final class Toha {
 
     private void carveCaves(Cube c) {
         for (int i = 0; i < CAVE_X.length; i++) {
-            int x = CAVE_X[i], y = CAVE_Y[i], w = CAVE_W[i], h = CAVE_H[i];
-            int front = CZ + CAVE_FRONT[i];
-            int back = CZ + CAVE_FRONT[i] - 1200;
-            c.box(x - w / 2, y, back, x + w / 2, y + h, front, Mat.AIR);
+            int centre = CAVE_X[i], y = CAVE_Y[i], w = CAVE_W[i], h = CAVE_H[i];
+            int left = centre - w / 2, right = centre + w / 2;
+            if (!c.hits(left, y, CZ + CAVE_FRONT[i] - 2320,
+                        right, y + h, CZ + CAVE_FRONT[i] + 16)) continue;
+            // Cut each x-column to its own point on the cylindrical surface and deep
+            // enough to enter the hollow hull, rather than leaving a blind facade tunnel.
+            for (int x = Math.max(left, c.x0); x <= Math.min(right, c.x0 + 15); x++) {
+                int front = CZ + caveFrontAt(i, x);
+                c.box(x, y, front - 2300, x, y + h, front, Mat.AIR);
+            }
         }
     }
 
