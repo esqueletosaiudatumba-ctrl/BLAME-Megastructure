@@ -122,6 +122,13 @@ public final class TohaMonumentCheck {
         check(yard.get(-930, machineRoofY, Toha.CZ + 520) == Mat.SLAB_BOTTOM,
                 "the machine yard must use slab-clad machinery roofs");
 
+        int plateX = -25, plateY = 190;
+        int plateZ = Toha.projectedFrontZ(plateX, plateY) - 12;
+        Cube inlay = cubeAt(plateX, plateY, plateZ);
+        toha.draw(inlay);
+        check(inlay.get(plateX, plateY, plateZ) == Mat.S_TOHA_PALE,
+                "the hull mark must have a curved pale inlay for contrast");
+
         int markX = -6, markY = 274;
         int markZ = Toha.projectedFrontZ(markX, markY) - 12 + 2;
         Cube inscription = cubeAt(markX, markY, markZ);
