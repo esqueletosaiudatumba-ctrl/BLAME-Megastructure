@@ -92,6 +92,12 @@ public class BlameCubeGenerator implements ICubeGenerator {
         s[Mat.VENT] = Blocks.IRON_BARS.getDefaultState(); // ventilation grills
         s[Mat.REBAR] = Blocks.IRON_BARS.getDefaultState(); // exposed rebar
         s[Mat.GLASS_REINFORCED] = Blocks.STAINED_GLASS.getDefaultState().withProperty(BlockColored.COLOR, EnumDyeColor.BLACK); // dark reinforced
+        s[Mat.MACHINE_DISPENSER] = Blocks.DISPENSER.getDefaultState();
+        s[Mat.MACHINE_HOPPER] = Blocks.HOPPER.getDefaultState();
+        s[Mat.MACHINE_PISTON] = Blocks.PISTON.getDefaultState();
+        s[Mat.IRON_TRAPDOOR] = Blocks.IRON_TRAPDOOR.getDefaultState();
+        s[Mat.RAIL] = Blocks.RAIL.getDefaultState();
+        s[Mat.STONE_BRICK_STAIRS] = Blocks.STONE_BRICK_STAIRS.getDefaultState();
         for (int i = 0; i < s.length; i++) {
             if (s[i] == null) throw new IllegalStateException("No block state for material " + i);
         }
