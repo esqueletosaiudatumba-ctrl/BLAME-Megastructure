@@ -572,7 +572,7 @@ public final class Toha {
     // ------------------------------------------------------------------
 
     private void drawExteriorSpines(Cube c) {
-        // Six fixed machine spines sit tangent to the rounded hull, at different heights.
+        // Six fixed machine spines sit tangent to the cylindrical hull at different heights.
         drawSpine(c, -1990, CZ - 1150, 1140, 150, 64);
         drawSpine(c, -2270, CZ - 100, 1510, 165, 64);
         drawSpine(c, -1990, CZ + 1150, 920, 130, 58);
@@ -580,20 +580,19 @@ public final class Toha {
         drawSpine(c, 2270, CZ - 100, 1630, 165, 60);
         drawSpine(c, 1990, CZ + 1150, 1030, 130, 55);
 
-        // An off-axis mast rises close to the ceiling and is tied back with huge braces.
+        // An off-axis mast rises near the ceiling and is pinned back by huge braces.
         drawSpine(c, 2040, CZ - 900, 1975, 210, 78);
         c.beam(2160, 690, CZ + 600, 2040, 1810, CZ - 900, 30, Mat.S_TOHA_PALE);
         c.beam(2300, 1060, CZ + 80, 2040, 1910, CZ - 900, 16, Mat.S_TOHA_RING);
         c.beam(2040, 1840, CZ - 900, 900, 1780, CZ - 790, 24, Mat.S_TOHA_MASS);
         c.box(2020, 1940, CZ - 920, 2060, 1952, CZ - 880, Mat.BIO_CYAN);
 
-        // Two heavy diagonals carry the outside spines into the hull collars.
+        // Heavy diagonals carry the external spines into the middle hull collars.
         c.beam(-2270, 250, CZ + 200, -1500, 1110, CZ - 820, 34, Mat.S_TOHA_MASS);
         c.beam(2270, 250, CZ + 200, 1500, 1110, CZ - 820, 34, Mat.S_TOHA_MASS);
         c.beam(-1960, 670, CZ - 1420, -1050, 1490, CZ - 600, 25, Mat.S_TOHA_PALE);
         c.beam(1960, 670, CZ - 1420, 1050, 1490, CZ - 600, 25, Mat.S_TOHA_PALE);
 
-        // Two exposed circular galleries follow the hull at fixed elevations.
         c.cylinder(CX + 0.5, CZ + 0.5, 1970, 1945, 1, 1, 850, 880, 0, 0, Mat.S_TOHA_RING);
         c.cylinder(CX + 0.5, CZ + 0.5, 1670, 1644, 1, 1, 1325, 1348, 0, 0, Mat.S_TOHA_RING);
     }
