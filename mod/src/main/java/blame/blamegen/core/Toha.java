@@ -489,6 +489,11 @@ public final class Toha {
             if (dir == 3) ix += Math.max(24, CAVE_DEPTH[i] - 24);
             c.box(ix - Math.max(4, halfW / 4), CAVE_Y[i] - 16, iz - 3,
                   ix + Math.max(4, halfW / 4), CAVE_Y[i] + 16, iz + 3, Mat.IRON_BLOCK);
+            int consoleHalf = Math.max(2, Math.min(5, halfW / 6));
+            c.box(ix - consoleHalf, CAVE_Y[i] - 5, iz - 4,
+                  ix + consoleHalf, CAVE_Y[i] + 5, iz + 4, Mat.MACHINE_DISPENSER);
+            c.box(ix - consoleHalf - 5, CAVE_Y[i] - 6, iz - 3,
+                  ix - consoleHalf - 1, CAVE_Y[i] + 6, iz + 3, Mat.IRON_TRAPDOOR);
             c.box(ix - 3, CAVE_Y[i] + 20, iz - 2, ix + 3, CAVE_Y[i] + 27, iz + 2,
                   i == 0 || i == 12 ? Mat.BIO_CYAN : Mat.COAL);
             c.box(ix - 10, CAVE_Y[i] + 24, iz - 2, ix - 6, CAVE_Y[i] + 27, iz + 2,
@@ -773,6 +778,7 @@ public final class Toha {
         if (kind % 4 == 0) {
             for (int sx : new int[] {-width / 4, width / 4}) {
                 int tx = x + sx, tz = z;
+                c.box(tx - 10, y0 + 2, tz - 10, tx + 10, y0 + 7, tz + 10, Mat.MACHINE_HOPPER);
                 c.cylinder(tx, tz, Math.min(42, width / 5), Math.min(28, width / 7), 1, 1,
                         y0 + 8, y1 - 10, 0, 0, Mat.S_TOHA_TANK);
                 c.cylinder(tx, tz, Math.min(46, width / 4), Math.min(28, width / 7), 1, 1,
@@ -789,6 +795,10 @@ public final class Toha {
                 c.box(x0 + 12, yy, z0 + 12, x1 - 12, yy + 3, z1 - 12, Mat.SLAB_BOTTOM);
                 c.box(x0 + 12, yy + 4, z0 + 12, x0 + 16, yy + 20, z0 + 16, Mat.IRON_BARS);
                 c.box(x1 - 16, yy + 4, z1 - 16, x1 - 12, yy + 20, z1 - 12, Mat.IRON_BARS);
+                if ((yy - y0) % 56 == 24) {
+                    c.box(x0 + 22, yy + 4, z1 + 2, x0 + 40, yy + 7, z1 + 8,
+                          Mat.STONE_BRICK_STAIRS);
+                }
             }
             c.box(x0 + 12, y0 + 20, z0 - 2, x1 - 12, y1 - 18, z0 + 3, Mat.GLASS_REINFORCED);
         } else {
@@ -802,6 +812,8 @@ public final class Toha {
         c.box(x0 - 38, y0 + 32, z, x0 + 8, y0 + 40, z + 8, Mat.COPPER_PATINA);
         c.box(x1 - 8, y0 + 52, z - 8, x1 + 44, y0 + 60, z, Mat.COPPER_RAW);
         c.box(x, y1 + 14, z0 - 28, x + 8, y1 + 22, z1 + 28, Mat.VENT);
+        c.box(x - 7, y0 + 28, z0 - 3, x + 7, y0 + 40, z0 + 3, Mat.MACHINE_DISPENSER);
+        c.box(x - 11, y1 - 12, z0 - 12, x + 11, y1 - 8, z0 - 8, Mat.IRON_TRAPDOOR);
     }
 
     private void drawHullInscription(Cube c) {
