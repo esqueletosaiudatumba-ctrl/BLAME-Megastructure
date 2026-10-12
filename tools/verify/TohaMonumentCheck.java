@@ -66,22 +66,33 @@ public final class TohaMonumentCheck {
 
         // Each of the thirteen chambers must have a genuine surface opening, aligned to
         // one of four different sides as the spire tapers.
-        int openCaves = 0;
+        int openCaves = 0, hollowWallCuts = 0;
         for (int i = 0; i < Toha.CAVE_Y.length; i++) {
-            int x = Toha.caveCenterX(i);
+            int wallX = Toha.caveCenterX(i);
+            int wallZ = Toha.caveCenterZ(i);
+            int x = wallX, z = wallZ;
             int y = Toha.CAVE_Y[i];
-            int z = Toha.caveCenterZ(i);
             int side = Toha.caveDirection(i);
-            if (side == 0) z += 4;
-            else if (side == 1) x += 4;
-            else if (side == 2) z -= 4;
-            else x -= 4;
+            int innerX = wallX, innerZ = wallZ;
+            // One sample checks the exterior threshold; another checks that the cave
+            // actually cuts through the shell wall, instead of merely exposing its outside.
+            if (side == 0) { z += 4; innerZ -= 6; }
+            else if (side == 1) { x += 4; innerX -= 6; }
+            else if (side == 2) { z -= 4; innerZ += 6; }
+            else { x -= 4; innerX += 6; }
+
             Cube mouth = cubeAt(x, y, z);
             toha.draw(mouth);
             if (mouth.get(x, y, z) == Mat.AIR) openCaves++;
-            else check(false, "authored AI cave mouth " + i + " must remain open");
+            else check(false, "authored AI cave mouth " + i + " must remain open at its outer threshold");
+
+            Cube cut = cubeAt(innerX, y, innerZ);
+            toha.draw(cut);
+            if (cut.get(innerX, y, innerZ) == Mat.AIR) hollowWallCuts++;
+            else check(false, "authored AI cave mouth " + i + " must cut through the shell wall");
         }
-        check(openCaves == 13, "all thirteen staggered AI chambers must remain traversable");
+        check(openCaves == 13, "all thirteen staggered AI chambers must remain accessible from the valley");
+        check(hollowWallCuts == 13, "all thirteen AI chamber openings must pass through the hollow shell");
 
         // Service circulation: helical treads and at least one transverse bridge must be
         // made of actual half-height slabs, not decorative linework alone.
