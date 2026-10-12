@@ -27,14 +27,33 @@ public final class Toha {
      * Front-facing orthographic review plane for each deliberately stepped shell.
      * The tiers recede in depth, so a single fixed-Z slice cannot show the elevation.
      */
-    public static int projectedFrontZ(int y) {
-        if (y < 640) return CZ + 1350;
-        if (y < 1020) return CZ + 1130;
-        if (y < 1450) return CZ + 850;
-        if (y < 1760) return CZ + 630;
-        if (y < 1880) return CZ + 430;
-        if (y < 1895) return CZ + 530;
-        return CZ + 310;
+    private static final int[] SHELL_Y = {64, 640, 1020, 1450, 1760, 1920};
+    private static final int[] SHELL_R = {2200, 1900, 1600, 1320, 1050, 820};
+
+    static int cylinderRadiusAtY(int y) {
+        if (y < 640) return 2200;
+        if (y < 1020) return 1900;
+        if (y < 1450) return 1600;
+        if (y < 1760) return 1320;
+        if (y < 1920) return 1050;
+        return 820;
+    }
+
+    static int cylinderFrontOffset(int radius, int x) {
+        double dx = x + 0.5 - CX;
+        return (int) Math.ceil(Math.sqrt(Math.max(0.0, radius * (double) radius - dx * dx))) + 12;
+    }
+
+    static int caveRadius(int i) {
+        return i < 5 ? 2200 : i < 9 ? 1900 : i < 12 ? 1600 : 1320;
+    }
+
+    static int caveFrontAt(int i, int x) {
+        return cylinderFrontOffset(caveRadius(i), x);
+    }
+
+    public static int projectedFrontZ(int x, int y) {
+        return CZ + cylinderFrontOffset(cylinderRadiusAtY(y), x);
     }
     private static final int NAVE_X = 1050;
     private static final int NAVE_BACK = -1050;
@@ -67,10 +86,10 @@ public final class Toha {
         240
     };
     static final int[] CAVE_FRONT = {
-        1350, 1350, 1350, 1350, 1350,
-        1130, 1130, 1130, 1130,
-        850, 850, 850,
-        630
+        1622, 2121, 2212, 2066, 1612,
+        1540, 1881, 1845, 1509,
+        1387, 1608, 1409,
+        1319
     };
 
     Toha(Megastructure m) {
