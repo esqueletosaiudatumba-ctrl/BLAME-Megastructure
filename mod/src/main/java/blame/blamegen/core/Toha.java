@@ -174,6 +174,7 @@ public final class Toha {
         drawCliffEquipment(c);
         drawMachineYard(c);
         drawApproachCauseway(c);
+        drawYardTransitAndGantries(c);
         drawHullInscription(c);
     }
 
@@ -725,7 +726,13 @@ public final class Toha {
             {-930, 520, 250, 170, 220}, {870, 560, 220, 200, 280},
             {-1120, -510, 260, 210, 310}, {1050, -650, 190, 240, 205},
             {-640, 1120, 170, 210, 170}, {710, 1260, 230, 160, 240},
-            {-1370, -1210, 180, 180, 155}, {1340, 890, 180, 170, 185}
+            {-1370, -1210, 180, 180, 155}, {1340, 890, 180, 170, 185},
+            {-2080, -1040, 210, 180, 260}, {2150, -1210, 185, 235, 195},
+            {-2290, 420, 170, 210, 170}, {2230, 180, 235, 175, 295},
+            {-1860, 1580, 240, 210, 230}, {1900, -1740, 210, 230, 300},
+            {-1560, 2380, 190, 190, 190}, {1730, -2510, 220, 180, 255},
+            {-2410, -2310, 180, 220, 175}, {2390, 2210, 195, 205, 220},
+            {-780, 2100, 150, 190, 145}, {920, -2270, 160, 180, 180}
         };
         for (int i = 0; i < modules.length; i++) {
             drawMachineModule(c, modules[i][0], CZ + modules[i][1],
@@ -746,6 +753,76 @@ public final class Toha {
                 c.box(x - 60, GROUND, z - 38, x + 60, GROUND + 1, z + 38, Mat.SLAB_BOTTOM);
                 c.box(x - 54, GROUND + 1, z - 32, x + 54, GROUND + 5, z - 28, Mat.COAL);
             }
+        }
+    }
+
+    /**
+     * Ground-level cargo tracks, raised utility conveyors and overhead service gantries.
+     * The routes tie several machine clusters together so the valley reads as a facility,
+     * not individual props sitting on an empty floor.
+     */
+    private void drawYardTransitAndGantries(Cube c) {
+        int z0 = CZ - 2760, z1 = CZ + 2760;
+        // Paired minecart/service rails sit on block-slab foundations. Where the valley
+        // floor is broken, short elevated decks carry the route across drainage trenches.
+        int[] railX = {-2280, -1180, 1170, 2260};
+        for (int line = 0; line < railX.length; line++) {
+            int x = railX[line];
+            if (!c.hits(x - 18, GROUND, z0, x + 18, GROUND + 10, z1)) continue;
+            c.box(x - 24, GROUND, z0, x + 24, GROUND, z1, Mat.SLAB_BOTTOM);
+            c.box(x - 16, GROUND + 1, z0, x - 12, GROUND + 1, z1, Mat.RAIL);
+            c.box(x + 12, GROUND + 1, z0, x + 16, GROUND + 1, z1, Mat.RAIL);
+            c.box(x - 34, GROUND + 1, z0, x - 28, GROUND + 3, z1, Mat.IRON_BARS);
+            c.box(x + 28, GROUND + 1, z0, x + 34, GROUND + 3, z1, Mat.IRON_BARS);
+            // Evenly spaced sleepers; their bounds are limited to the current cube slice.
+            int zz0 = Math.max(z0, c.z0 - 16), zz1 = Math.min(z1, c.z0 + 31);
+            for (int z = zz0; z <= zz1; z++) {
+                if (Math.floorMod(z - z0, 16) == 0) {
+                    c.box(x - 20, GROUND, z - 1, x + 20, GROUND, z + 1, Mat.S_TOHA_RING);
+                }
+            }
+        }
+
+        // Elevated conveyor spines carry sealed cargo trays between the machine rows.
+        int[] conveyorY = {190, 365, 545, 720};
+        int[] conveyorZ = {-1820, -820, 640, 1740};
+        for (int i = 0; i < conveyorY.length; i++) {
+            int y = conveyorY[i], z = CZ + conveyorZ[i];
+            int left = (i % 2 == 0) ? -2380 : -1920;
+            int right = (i % 2 == 0) ? 2050 : 2410;
+            if (!c.hits(left - 24, y - 60, z - 40, right + 24, y + 34, z + 40)) continue;
+            c.box(left, y, z - 20, right, y + 4, z + 20, Mat.S_TOHA_MASS);
+            c.box(left + 8, y + 4, z - 13, right - 8, y + 7, z + 13, Mat.MACHINE_HOPPER);
+            c.box(left + 8, y + 7, z - 15, right - 8, y + 9, z - 12, Mat.IRON_BLOCK);
+            c.box(left + 8, y + 7, z + 12, right - 8, y + 9, z + 15, Mat.IRON_BLOCK);
+            for (int x = left + 160; x < right; x += 320) {
+                if (!c.hits(x - 8, y - 60, z - 28, x + 8, y, z + 28)) continue;
+                c.box(x - 8, y - 58, z - 8, x + 8, y - 3, z + 8, Mat.S_TOHA_RING);
+                c.box(x - 13, y - 58, z - 13, x + 13, y - 52, z + 13, Mat.COPPER_PATINA);
+                c.box(x - 15, y - 2, z - 24, x + 15, y + 1, z + 24, Mat.SLAB_TOP);
+                c.box(x - 10, y + 10, z - 10, x + 10, y + 18, z + 10, Mat.MACHINE_PISTON);
+            }
+            // Slab service walk beside each conveyor, with intermittent guard rails.
+            c.box(left + 24, y - 4, z + 24, right - 24, y - 3, z + 54, Mat.SLAB_BOTTOM);
+            c.box(left + 24, y - 3, z + 51, right - 24, y + 4, z + 54, Mat.IRON_BARS);
+        }
+
+        // Two huge loading gantries frame a transfer yard. Crossheads are deliberately
+        // offset and suspended on paired legs rather than forming a regular grid.
+        int[][] cranes = {{-2050, -1450, 280, 780}, {2040, 1330, 340, 980}, {-1480, 2380, 220, 610}};
+        for (int i = 0; i < cranes.length; i++) {
+            int x = cranes[i][0], z = CZ + cranes[i][1], width = cranes[i][2], height = cranes[i][3];
+            if (!c.hits(x - width - 20, GROUND, z - 40, x + width + 20, GROUND + height + 30, z + 40)) continue;
+            int yTop = GROUND + height;
+            c.box(x - width, GROUND, z - 20, x - width + 24, yTop, z + 20, Mat.S_TOHA_RING);
+            c.box(x + width - 24, GROUND, z - 20, x + width, yTop - 60, z + 20, Mat.S_TOHA_MASS);
+            c.box(x - width - 10, yTop - 18, z - 34, x + width + 10, yTop + 2, z + 34, Mat.S_TOHA_PALE);
+            c.box(x - width + 12, yTop - 14, z - 22, x + width - 12, yTop - 9, z + 22, Mat.SLAB_BOTTOM);
+            c.box(x - 8, yTop - 95, z - 4, x - 4, yTop - 16, z + 4, Mat.CABLE);
+            c.box(x + 4, yTop - 110, z - 4, x + 8, yTop - 16, z + 4, Mat.CABLE);
+            c.box(x - 26, yTop - 130, z - 28, x + 26, yTop - 102, z + 28, Mat.MACHINE_HOPPER);
+            c.box(x - 30, yTop - 135, z - 32, x + 30, yTop - 128, z + 32, Mat.IRON_TRAPDOOR);
+            c.box(x - 14, yTop - 101, z - 16, x + 14, yTop - 92, z + 16, Mat.BIO_CYAN);
         }
     }
 
