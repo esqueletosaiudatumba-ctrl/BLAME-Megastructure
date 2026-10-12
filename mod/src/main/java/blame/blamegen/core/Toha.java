@@ -769,9 +769,9 @@ public final class Toha {
         for (int line = 0; line < railX.length; line++) {
             int x = railX[line];
             if (!c.hits(x - 18, GROUND, z0, x + 18, GROUND + 10, z1)) continue;
-            c.box(x - 24, GROUND, z0, x + 24, GROUND, z1, Mat.SLAB_BOTTOM);
-            c.box(x - 16, GROUND + 1, z0, x - 12, GROUND + 1, z1, Mat.RAIL);
-            c.box(x + 12, GROUND + 1, z0, x + 16, GROUND + 1, z1, Mat.RAIL);
+            c.box(x - 24, GROUND, z0, x + 24, GROUND, z1, Mat.S_TOHA_DECK);
+            c.box(x - 14, GROUND + 1, z0, x - 14, GROUND + 1, z1, Mat.RAIL);
+            c.box(x + 14, GROUND + 1, z0, x + 14, GROUND + 1, z1, Mat.RAIL);
             c.box(x - 34, GROUND + 1, z0, x - 28, GROUND + 3, z1, Mat.IRON_BARS);
             c.box(x + 28, GROUND + 1, z0, x + 34, GROUND + 3, z1, Mat.IRON_BARS);
             // Evenly spaced sleepers; their bounds are limited to the current cube slice.
