@@ -176,7 +176,7 @@ public final class Toha {
      * cue before the larger factory mass comes into view.
      */
     private void drawGatePortal(Cube c) {
-        int z0 = CZ + 2520, z1 = CZ + 2770;
+        int z0 = CZ + 2470, z1 = CZ + 2710;
         c.box(-725, GROUND, z0, -655, GROUND + 520, z1, Mat.S_TOHA_MASS);
         c.box(655, GROUND, z0, 725, GROUND + 520, z1, Mat.S_TOHA_MASS);
         c.box(-725, GROUND + 460, z0, 725, GROUND + 520, z1, Mat.S_TOHA_PALE);
