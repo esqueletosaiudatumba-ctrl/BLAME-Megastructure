@@ -1,154 +1,86 @@
 package blame.blamegen.core;
 
 /**
- * TOHA HEAVY INDUSTRIES — authored monument, not a district generator.
+ * TOHA HEAVY INDUSTRIES — fixed, coordinate-authored spire inside a megastructure valley.
  *
- * A single deterministic architectural composition centred at (0, -4608):
- * a 5.6 km circular precinct, a 4.4 km-diameter lower hull with concentric
- * stepped cylindrical tiers, a 2 km gravity-furnace stack, thirteen surface-
- * curved cave mouths with fixed AI machinery, a hollow nave, a near-ceiling
- * service mast, exterior spines, and a monumental processional causeway.
- * All proportions and placements are fixed. Only material weathering resolved
- * by Cube remains seed-dependent.
+ * The earlier wide, terraced drum has been replaced by a narrow, tapered industrial
+ * mast. A several-kilometre canyon of stratified walls, lift shafts and broken galleries
+ * frames it; the valley floor has a service causeway, machine yards and a route that
+ * spirals around the spire. The inside is a real hollow space containing partial floors,
+ * an eccentric gravity furnace, thirteen AI chambers and linked maintenance paths.
  *
- * The forms are designed for Minecraft-scale sightlines: a huge circular hull,
- * broad annular shoulders, pale ruled shells, black setback bands, deep cave
- * mouths, slit apertures, enormous structural braces, and sparse local lights.
- * There is no random cell grid, random
- * district selection, random tower placement, or illuminated billboard.
+ * All geometry is fixed and deterministic. Material weathering is resolved by Cube.
  */
 public final class Toha {
     public static final int CX = 0, CZ = -4608;
-    public static final int HALF = 3072;
+
+    /** The Toha owner deliberately reserves a broad canyon volume, not the building outline. */
+    public static final int HALF = 4096;
     public static final int X0 = CX - HALF, X1 = CX + HALF;
     public static final int Z0 = CZ - HALF, Z1 = CZ + HALF;
 
     private static final int GROUND = 64;
     public static final int TOP = 2030;
+    private static final int VALLEY_HALF = 3200;
+    private static final int VALLEY_LENGTH = 3560;
+    private static final double TAU = Math.PI * 2.0;
 
-    /**
-     * Front-facing orthographic review plane for each deliberately stepped shell.
-     * The tiers recede in depth, so a single fixed-Z slice cannot show the elevation.
-     */
-    private static final int[] SHELL_Y = {64, 640, 1020, 1450, 1760, 1920};
-    private static final int[] SHELL_R = {2200, 1900, 1600, 1320, 1050, 820};
+    // Thirteen authored AI chambers. CAVE_X is a local tangent offset; CAVE_DIR is
+    // south/east/north/west. Entries shrink with the spire instead of making a window grid.
+    static final int[] CAVE_X = {-110, 38, 120, -55, 150, -75, 35, 12, -28, 22, -8, 12, 0};
+    static final int[] CAVE_Y = {120, 260, 405, 545, 690, 835, 990, 1145, 1300, 1455, 1608, 1780, 1912};
+    static final int[] CAVE_W = {88, 64, 92, 70, 66, 58, 58, 48, 42, 36, 32, 28, 22};
+    static final int[] CAVE_H = {112, 96, 120, 102, 92, 94, 92, 76, 70, 62, 52, 44, 34};
+    static final int[] CAVE_FRONT = {410, 380, 350, 323, 295, 266, 235, 206, 176, 146, 116, 78, 42};
+    private static final int[] CAVE_DIR = {0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 0, 2};
+    private static final int[] CAVE_DEPTH = {100, 88, 92, 84, 82, 78, 76, 70, 66, 62, 54, 48, 38};
 
-    // Fixed angular segments for the broken orbital galleries. Gaps are authored,
-    // not selected from a seed, and the south-facing approach is kept visibly open.
-    private static final int[] LOWER_GALLERY_ARCS = {24, 66, 116, 154, 210, 274, 330};
-    private static final int[] MIDDLE_GALLERY_ARCS = {18, 61, 128, 174, 224, 292, 337};
-    private static final int[] UPPER_GALLERY_ARCS = {16, 64, 132, 193, 244, 306, 348};
-    private static final int[] CROWN_GALLERY_ARCS = {35, 143, 208, 282, 326};
-
-    // Hand-authored facade apertures: x, bottom Y, width, height, tier radius, cut depth.
-    // Unequal spacing and dimensions intentionally reject an apartment/window-grid read.
-    private static final int[][] SOUTH_SLITS = {
-        {-1840, 290, 12, 82, 2200, 96},
-        {-1610, 430, 18, 116, 2200, 108},
-        {-1210, 340, 10, 62, 2200, 86},
-        {-870, 330, 18, 110, 2200, 104},
-        {-560, 465, 12, 74, 2200, 96},
-        {370, 290, 12, 58, 2200, 88},
-        {610, 438, 16, 94, 2200, 100},
-        {1280, 325, 10, 80, 2200, 90},
-        {1810, 405, 20, 126, 2200, 112},
-        {-1660, 720, 12, 98, 1900, 92},
-        {-1420, 875, 16, 70, 1900, 104},
-        {-780, 760, 10, 110, 1900, 88},
-        {-90, 902, 12, 64, 1900, 100},
-        {340, 815, 18, 96, 1900, 102},
-        {925, 690, 10, 74, 1900, 96},
-        {1450, 820, 18, 112, 1900, 96},
-        {-1310, 1095, 12, 88, 1600, 92},
-        {-530, 1160, 10, 74, 1600, 88},
-        {390, 1315, 12, 84, 1600, 100},
-        {1010, 1078, 16, 118, 1600, 96},
-        {1370, 1250, 10, 68, 1600, 90},
-        {-1110, 1530, 10, 72, 1320, 96},
-        {-640, 1660, 12, 58, 1320, 88},
-        {620, 1570, 14, 78, 1320, 96},
-        {980, 1690, 10, 64, 1320, 86},
-        {-890, 1800, 10, 84, 1050, 92},
-        {760, 1840, 12, 55, 1050, 88}
-    };
-
-    // Canonical hull mark from the manga: four vertical, block-engraved glyphs.
-    // Rows are top-to-bottom in reading order, 東亜重工. Each bit becomes a small
-    // raised strip that follows the real circular shell instead of a flat sign.
+    // Vertical block-raster mark 東亜重工, welded to the south-east-facing skin.
+    // A compact cell size keeps the complete mark on the narrow lower spire.
     private static final String[][] HULL_INSCRIPTION = {
-        { // 東
-            "00000110000000",
-            "00000110000000",
-            "11111111111111",
-            "00000110000000",
-            "00011111111000",
-            "00000110000000",
-            "11111111111111",
-            "00000110000000",
-            "00111111111100",
-            "00100110001000",
-            "01100110001100",
-            "10000110000010",
-            "00000110000000",
-            "00000110000000"
+        {
+            "00000110000000", "00000110000000", "11111111111111", "00000110000000",
+            "00011111111000", "00000110000000", "11111111111111", "00000110000000",
+            "00111111111100", "00100110001000", "01100110001100", "10000110000010",
+            "00000110000000", "00000110000000"
         },
-        { // 亜
-            "00111111111100",
-            "00100000000100",
-            "00100000000100",
-            "00111111111100",
-            "00000111100000",
-            "00000110100000",
-            "11111111111111",
-            "00100110100100",
-            "00100110100100",
-            "00100110100100",
-            "00111111111100",
-            "00000110100000",
-            "00000110100000",
-            "00111111111100"
+        {
+            "00111111111100", "00100000000100", "00100000000100", "00111111111100",
+            "00000111100000", "00000110100000", "11111111111111", "00100110100100",
+            "00100110100100", "00100110100100", "00111111111100", "00000110100000",
+            "00000110100000", "00111111111100"
         },
-        { // 重
-            "00011111111000",
-            "00000110000000",
-            "11111111111111",
-            "00000110000000",
-            "00111111111100",
-            "00000110000000",
-            "11111111111111",
-            "00100110001000",
-            "00111111111100",
-            "00100110001000",
-            "00111111111100",
-            "00100110001000",
-            "00111111111100",
-            "11111111111111"
+        {
+            "00011111111000", "00000110000000", "11111111111111", "00000110000000",
+            "00111111111100", "00000110000000", "11111111111111", "00100110001000",
+            "00111111111100", "00100110001000", "00111111111100", "00100110001000",
+            "00111111111100", "11111111111111"
         },
-        { // 工
-            "11111111111111",
-            "00000011000000",
-            "00000011000000",
-            "00000011000000",
-            "00000011000000",
-            "00000011000000",
-            "00000011000000",
-            "00000011000000",
-            "00000011000000",
-            "00000011000000",
-            "00000011000000",
-            "00000011000000",
-            "00000011000000",
-            "11111111111111"
+        {
+            "11111111111111", "00000011000000", "00000011000000", "00000011000000",
+            "00000011000000", "00000011000000", "00000011000000", "00000011000000",
+            "00000011000000", "00000011000000", "00000011000000", "00000011000000",
+            "00000011000000", "11111111111111"
         }
     };
 
+    Toha(Megastructure m) {
+        // The monument layout is authored and independent of the world seed.
+    }
+
+    /** Slowly taper the 840-block base into a thin crown; no broad upper drums. */
+    static double spireRadiusAtY(int y) {
+        double t = Math.max(0.0, Math.min(1.0, (double) (y - GROUND) / (TOP - GROUND)));
+        return 420.0 + (18.0 - 420.0) * t;
+    }
+
+    static double furnaceRadiusAtY(int y) {
+        double t = Math.max(0.0, Math.min(1.0, (double) (y - 130) / (TOP - 130)));
+        return 118.0 + (13.0 - 118.0) * t;
+    }
+
     static int cylinderRadiusAtY(int y) {
-        if (y < 640) return 2200;
-        if (y < 1020) return 1900;
-        if (y < 1450) return 1600;
-        if (y < 1760) return 1320;
-        if (y < 1920) return 1050;
-        return 820;
+        return (int) Math.round(spireRadiusAtY(y));
     }
 
     static int cylinderFrontOffset(int radius, int x) {
@@ -157,7 +89,7 @@ public final class Toha {
     }
 
     static int caveRadius(int i) {
-        return i < 5 ? 2200 : i < 9 ? 1900 : i < 12 ? 1600 : 1320;
+        return cylinderRadiusAtY(CAVE_Y[i]);
     }
 
     static int caveFrontAt(int i, int x) {
@@ -167,48 +99,45 @@ public final class Toha {
     public static int projectedFrontZ(int x, int y) {
         return CZ + cylinderFrontOffset(cylinderRadiusAtY(y), x);
     }
-    private static final int NAVE_X = 1050;
-    private static final int NAVE_BACK = -1050;
-    private static final int NAVE_FRONT = 250;
 
-    // Thirteen fixed chambers: five at the foot, four in the second tier,
-    // three in the third, and one isolated chamber in the crown.
-    static final int[] CAVE_X = {
-        -1500, -630, 0, 790, 1510,
-        -1130, -345, 500, 1170,
-        -820, 120, 780,
-        190
-    };
-    static final int[] CAVE_Y = {
-        160, 220, 130, 175, 190,
-        700, 680, 730, 650,
-        1070, 1000, 1130,
-        1505
-    };
-    static final int[] CAVE_W = {
-        220, 190, 480, 300, 160,
-        230, 260, 320, 190,
-        230, 460, 280,
-        280
-    };
-    static final int[] CAVE_H = {
-        300, 220, 500, 310, 240,
-        240, 280, 250, 310,
-        290, 330, 260,
-        240
-    };
-    static final int[] CAVE_FRONT = {
-        1622, 2121, 2212, 2066, 1612,
-        1540, 1881, 1845, 1509,
-        1387, 1608, 1409,
-        1319
-    };
-
-    Toha(Megastructure m) {
-        // Intentionally no random geometry seed. The monument has one authored layout.
+    static int caveCenterX(int i) {
+        int r = caveRadius(i);
+        int tangent = CAVE_X[i];
+        int normal = (int) Math.round(Math.sqrt(Math.max(0.0, r * (double) r - tangent * (double) tangent)));
+        switch (CAVE_DIR[i]) {
+            case 1: return CX + normal;
+            case 3: return CX - normal;
+            default: return CX + tangent;
+        }
     }
 
-    /** The authored precinct replaces the old 150 km procedural field. */
+    static int caveCenterZ(int i) {
+        int r = caveRadius(i);
+        int tangent = CAVE_X[i];
+        int normal = (int) Math.round(Math.sqrt(Math.max(0.0, r * (double) r - tangent * (double) tangent)));
+        switch (CAVE_DIR[i]) {
+            case 0: return CZ + normal;
+            case 2: return CZ - normal;
+            default: return CZ + tangent;
+        }
+    }
+
+    /** The external spiral advances about three blocks around the shell per vertical block. */
+    static double spiralAngleAtY(int y) {
+        double r = Math.max(18.0, spireRadiusAtY(y));
+        return 14.2 * Math.log(420.0 / r);
+    }
+
+    static int spiralXAtY(int y) {
+        double r = spireRadiusAtY(y) + 7.0, a = spiralAngleAtY(y);
+        return CX + (int) Math.round(Math.sin(a) * r);
+    }
+
+    static int spiralZAtY(int y) {
+        double r = spireRadiusAtY(y) + 7.0, a = spiralAngleAtY(y);
+        return CZ + (int) Math.round(Math.cos(a) * r);
+    }
+
     boolean overlaps(Cube c) {
         return c.x0 + 15 >= X0 && c.x0 < X1
                 && c.z0 + 15 >= Z0 && c.z0 < Z1;
@@ -217,781 +146,603 @@ public final class Toha {
     void draw(Cube c) {
         if (c.y0 > TOP + 16 || c.y0 + 15 < 0) return;
 
-        drawFoundation(c);
-        drawOuterWalls(c);
-        drawGatePortal(c);
-        drawMainShell(c);
-        drawAsymmetricTransferMass(c);
-        drawFacade(c);
-        drawTerraceBands(c);
-        drawMonumentalAccretions(c);
-        carveSlitApertures(c);
-        carveNave(c);
-        carveCaves(c);
-        drawNaveStructure(c);
-        drawGravityFurnace(c);
-        drawCaveMachines(c);
-        drawCaveFrames(c);
-        drawCaveAIControls(c);
-        drawExteriorSpines(c);
-        drawApproach(c);
-        drawCourtyardPylons(c);
+        drawValleyWalls(c);
+        drawValleyEndMasses(c);
+        drawBaseApron(c);
+        drawSpireShell(c);
+        drawSpireRibsAndCourses(c);
+        carveCaveMouths(c);
+        drawCaveFramesAndMachines(c);
+        drawFurnaceAndInnerPlatforms(c);
+        drawSpiralWalkway(c);
+        drawCrossValleyLinks(c);
+        drawCliffEquipment(c);
+        drawMachineYard(c);
+        drawApproachCauseway(c);
         drawHullInscription(c);
     }
 
-    // ------------------------------------------------------------------
-    // The precinct: a finite floor and low enclosure, leaving negative space
-    // between the boundary and the main mass so the building reads as a whole.
-    // ------------------------------------------------------------------
+    // ---------------------------------------------------------------- valley walls
+    // These are the enclosing megastructure, not decoration around a freestanding tower.
+    // Their inner faces carry long broken ledges, deep shaft mouths and giant service ribs.
+    private void drawValleyWalls(Cube c) {
+        int z0 = CZ - VALLEY_LENGTH, z1 = CZ + VALLEY_LENGTH;
+        int[] slotZ = {-2720, -1500, -320, 920, 2240, 3100};
+        int[] slotY = {250, 420, 760, 340, 880, 520};
+        int[] slotH = {250, 360, 300, 420, 330, 250};
 
-    /**
-     * The outside is literally marked 東亜重工 in BLAME!. Reproduce that identifying
-     * mark as block strokes welded to the curved hull. A tight broad phase keeps this
-     * small authored detail from adding work to unrelated world-generation cubes.
-     */
+        for (int side : new int[] {-1, 1}) {
+            int wallOuter = side < 0 ? -3300 : 3180;
+            int wallInner = side < 0 ? -3180 : 3300;
+            int innerEdge = side < 0 ? -2940 : 2940;
+            int outerLo = Math.min(wallOuter, wallInner), outerHi = Math.max(wallOuter, wallInner);
+            if (!c.hits(outerLo - 140, GROUND, z0, outerHi + 140, TOP, z1)) continue;
+
+            c.box(outerLo, GROUND, z0, outerHi, TOP - 22, z1, Mat.S_TOHA_MASS);
+
+            // Deep openings interrupt the cliff at irregular intervals. Their lintels
+            // are enormous, their reveals dark, and their interiors hold machinery.
+            for (int i = 0; i < slotZ.length; i++) {
+                int zc = CZ + slotZ[i] + (side < 0 ? 0 : (i % 2 == 0 ? 170 : -140));
+                int bottom = slotY[i], top = bottom + slotH[i];
+                c.box(outerLo - 2, bottom, zc - 62, outerHi + 2, top, zc + 62, Mat.AIR);
+                c.box(outerLo - 4, bottom - 10, zc - 76, outerHi + 4, bottom - 2, zc + 76, Mat.COAL);
+                c.box(outerLo - 4, top, zc - 78, outerHi + 4, top + 15, zc + 78, Mat.S_TOHA_PALE);
+                c.box(outerLo - 4, bottom, zc - 78, outerHi + 4, top, zc - 67, Mat.S_TOHA_RING);
+                c.box(outerLo - 4, bottom, zc + 67, outerHi + 4, top, zc + 78, Mat.S_TOHA_RING);
+            }
+
+            // Unequal cliff ribs rise into the artificial roof; some are load paths,
+            // others are exposed vertical shafts carrying pipes and lift cages.
+            int[] ribZ = {-3350, -2850, -2260, -1660, -940, -210, 540, 1280, 2060, 2740, 3390};
+            int[] ribTop = {1640, 1980, 1410, 1900, 1740, 2020, 1480, 1890, 1610, 2000, 1780};
+            for (int i = 0; i < ribZ.length; i++) {
+                int zc = CZ + ribZ[i];
+                int halfW = 32 + (i % 4) * 16;
+                int inward = side < 0 ? innerEdge : innerEdge;
+                int ribIn = side < 0 ? inward + 80 : inward - 80;
+                c.box(Math.min(ribIn, innerEdge), GROUND, zc - halfW,
+                       Math.max(ribIn, innerEdge), ribTop[i], zc + halfW, Mat.S_TOHA_RING);
+                c.box(Math.min(ribIn, innerEdge), ribTop[i] - 28, zc - halfW - 7,
+                       Math.max(ribIn, innerEdge), ribTop[i] - 18, zc + halfW + 7, Mat.S_TOHA_PALE);
+                c.box(Math.min(ribIn, innerEdge) + 8, GROUND + 24, zc - 3,
+                       Math.max(ribIn, innerEdge) - 8, ribTop[i] - 40, zc + 3, Mat.COAL);
+            }
+
+            // Six levels of service path cling to the cliff, broken by deliberate gaps.
+            int[] ledgeY = {210, 455, 735, 1015, 1300, 1585, 1870};
+            for (int level = 0; level < ledgeY.length; level++) {
+                int y = ledgeY[level];
+                int lx0 = side < 0 ? -3190 : 2940;
+                int lx1 = side < 0 ? -2940 : 3190;
+                c.box(lx0, y, z0 + 40, lx1, y, z1 - 40, Mat.SLAB_BOTTOM);
+                // Deliberate broken spans make this a dangerous service route rather
+                // than a smooth, decorative ring around the valley.
+                int[] breaks = {-3000, -1880, -520, 840, 2180, 3060};
+                for (int gap = 0; gap < breaks.length; gap++) {
+                    if ((gap + level + (side < 0 ? 0 : 1)) % 3 != 0) continue;
+                    int gz = CZ + breaks[gap];
+                    c.box(lx0 - 2, y, gz - 56, lx1 + 2, y + 1, gz + 56, Mat.AIR);
+                }
+                int railX = side < 0 ? -2936 : 2936;
+                c.box(railX - 2, y + 1, z0 + 40, railX + 2, y + 8, z1 - 40, Mat.IRON_BARS);
+                for (int gap = 0; gap < breaks.length; gap++) {
+                    if ((gap + level + (side < 0 ? 0 : 1)) % 3 != 0) continue;
+                    int gz = CZ + breaks[gap];
+                    c.box(railX - 3, y + 1, gz - 60, railX + 3, y + 9, gz + 60, Mat.AIR);
+                }
+                // Wall brackets repeat at long intervals, not as fine noise.
+                for (int k = -3; k <= 3; k++) {
+                    int sz = CZ + k * 900 + (level % 2) * 180;
+                    if (c.hits(lx0 - 100, y - 24, sz - 14, lx1 + 100, y - 4, sz + 14)) {
+                        int bx0 = side < 0 ? -3260 : 3000;
+                        int bx1 = side < 0 ? -3080 : 3260;
+                        c.box(bx0, y - 26, sz - 10, bx1, y - 4, sz + 10, Mat.S_TOHA_MASS);
+                        c.box(bx0, y - 5, sz - 13, bx1, y - 2, sz + 13, Mat.IRON_BLOCK);
+                    }
+                }
+            }
+        }
+    }
+
+    private void drawValleyEndMasses(Cube c) {
+        int northZ = CZ - VALLEY_LENGTH, southZ = CZ + VALLEY_LENGTH;
+        if (c.hits(X0, GROUND, southZ - 150, X1, TOP, southZ + 150)) {
+            // The southern canyon mouth is a monumental break in the megastructure.
+            c.box(-3320, GROUND, southZ - 120, -520, 1510, southZ + 120, Mat.S_TOHA_MASS);
+            c.box(520, GROUND, southZ - 120, 3320, 1700, southZ + 120, Mat.S_TOHA_MASS);
+            c.box(-620, 1450, southZ - 160, 620, 1610, southZ + 160, Mat.S_TOHA_RING);
+            c.box(-540, GROUND, southZ - 95, -390, 1530, southZ + 95, Mat.S_TOHA_PALE);
+            c.box(390, GROUND, southZ - 95, 540, 1710, southZ + 95, Mat.S_TOHA_PALE);
+            c.box(-520, 1530, southZ - 100, 520, 1540, southZ + 100, Mat.SLAB_BOTTOM);
+            for (int x : new int[] {-2800, -1800, -900, 900, 1800, 2800}) {
+                int h = 750 + Math.abs(x) / 2;
+                c.box(x - 55, GROUND, southZ - 170, x + 55, h, southZ + 170, Mat.S_TOHA_RING);
+                c.box(x - 80, h - 20, southZ - 186, x + 80, h - 7, southZ + 186, Mat.S_TOHA_PALE);
+            }
+        }
+        if (c.hits(X0, GROUND, northZ - 150, X1, TOP, northZ + 150)) {
+            // The far wall is fractured and higher; its gaps imply further strata beyond.
+            for (int i = 0; i < 9; i++) {
+                int x = -3300 + i * 825;
+                int h = 960 + (i % 4) * 250;
+                if (i == 4 || i == 7) continue;
+                c.box(x, GROUND, northZ - 140, x + 280 + (i % 3) * 60, h, northZ + 140, Mat.S_TOHA_MASS);
+                c.box(x - 28, h - 22, northZ - 160, x + 308 + (i % 3) * 60, h - 6, northZ + 160, Mat.S_TOHA_PALE);
+            }
+            c.box(-3320, 1570, northZ - 100, -1150, 1700, northZ + 100, Mat.S_TOHA_RING);
+            c.box(1200, 1260, northZ - 100, 3320, 1400, northZ + 100, Mat.S_TOHA_RING);
+        }
+    }
+
+    // ------------------------------------------------------------------- central spire
+    private void drawBaseApron(Cube c) {
+        if (!c.hits(CX - 760, 48, CZ - 760, CX + 760, 115, CZ + 760)) return;
+        c.cylinder(CX + 0.5, CZ + 0.5, 710, 455, 1, 1, 64, 76,
+                Math.PI / 2 + 0.26, 0.58, Mat.S_TOHA_MASS);
+        c.cylinder(CX + 0.5, CZ + 0.5, 735, 700, 1, 1, 64, 67,
+                0, 0, Mat.S_TOHA_PALE);
+        c.cylinder(CX + 0.5, CZ + 0.5, 470, 445, 1, 1, 76, 82,
+                Math.PI / 2 + 0.26, 0.58, Mat.S_TOHA_RING);
+        // Four radial machine aprons interrupt the ring; the south one receives the road.
+        for (int deg : new int[] {0, 90, 180, 270}) {
+            double a = Math.toRadians(deg);
+            int ex = (int) Math.round(Math.sin(a) * 680);
+            int ez = (int) Math.round(Math.cos(a) * 680);
+            c.box(Math.min(CX, CX + ex) - 15, 70, Math.min(CZ, CZ + ez) - 15,
+                   Math.max(CX, CX + ex) + 15, 73, Math.max(CZ, CZ + ez) + 15, Mat.SLAB_BOTTOM);
+        }
+        for (int y : new int[] {92, 104}) {
+            c.cylinder(CX + 0.5, CZ + 0.5, 455, 438, 1, 1, y, y + 4,
+                    0, 0.75, Mat.COPPER_PATINA);
+        }
+    }
+
+    private void drawSpireShell(Cube c) {
+        c.taper(CX + 0.5, CZ + 0.5, 420, 18, GROUND, TOP, 8, Mat.S_TOHA_MASS);
+        // The annular wall leaves a genuine, tall interior void.
+        c.taper(CX + 0.5, CZ + 0.5, 384, 3, GROUND + 6, TOP - 4, 8, Mat.AIR);
+    }
+
+    private void drawSpireRibsAndCourses(Cube c) {
+        if (!c.hits(CX - 475, GROUND, CZ - 475, CX + 475, TOP, CZ + 475)) return;
+
+        // Six major ribs climb the narrowing silhouette. Segmented spans avoid expensive
+        // kilometre-long beam bounds in unrelated cubes.
+        double[] angles = {0.20, 1.12, 2.15, 3.02, 3.85, 4.80, 5.55};
+        int firstY = Math.max(GROUND, GROUND + Math.floorDiv(Math.max(0, c.y0 - GROUND) - 96, 96) * 96);
+        int lastY = Math.min(TOP, c.y0 + 15 + 96);
+        for (int y = firstY; y < lastY; y += 96) {
+            int y1 = Math.min(TOP, y + 96);
+            double r0 = spireRadiusAtY(y) + 4;
+            double r1 = spireRadiusAtY(y1) + 4;
+            for (int i = 0; i < angles.length; i++) {
+                double a = angles[i];
+                double x0 = CX + Math.sin(a) * r0, z0 = CZ + Math.cos(a) * r0;
+                double x1 = CX + Math.sin(a) * r1, z1 = CZ + Math.cos(a) * r1;
+                c.beam(x0, y, z0, x1, y1, z1, (i % 3 == 0 ? 12 : 7),
+                        i % 2 == 0 ? Mat.S_TOHA_PALE : Mat.S_TOHA_RING);
+            }
+        }
+
+        // Broken orbital maintenance rings, each a different arc and radius.
+        int[] galleryY = {146, 224, 326, 442, 568, 704, 846, 1002, 1165, 1326, 1488, 1645, 1796, 1926};
+        int[] gallerySpan = {215, 150, 190, 138, 210, 132, 196, 148, 180, 122, 156, 118, 130, 88};
+        for (int i = 0; i < galleryY.length; i++) {
+            int y = galleryY[i];
+            if (y < c.y0 - 18 || y > c.y0 + 32) continue;
+            double radius = spireRadiusAtY(y) + 30 + (i % 3) * 10;
+            double start = Math.toRadians((i * 71 + 18) % 360);
+            drawArc(c, radius + 12, Math.max(8, radius - 12), y, y + (i % 2 == 0 ? 7 : 4),
+                    start, Math.toRadians(gallerySpan[i]),
+                    i % 3 == 0 ? Mat.S_TOHA_PALE : Mat.S_TOHA_RING);
+            if (i % 2 == 0) {
+                double a = start + Math.toRadians(gallerySpan[i] * 0.65);
+                double r0 = spireRadiusAtY(y) - 18, r1 = radius + 6;
+                c.beam(CX + Math.sin(a) * r0, y - 20, CZ + Math.cos(a) * r0,
+                       CX + Math.sin(a) * r1, y + 2, CZ + Math.cos(a) * r1, 4, Mat.S_TOHA_MASS);
+            }
+        }
+
+        // Short black/pale screentone courses keep the surface from reading as a smooth tube.
+        int[] seamY = {92, 186, 290, 390, 505, 642, 790, 950, 1110, 1270, 1440, 1600, 1755, 1890, 1992};
+        for (int y : seamY) {
+            if (y < c.y0 - 6 || y > c.y0 + 22) continue;
+            double r = spireRadiusAtY(y) + 1;
+            c.cylinder(CX + 0.5, CZ + 0.5, r + 3, Math.max(2, r - 3), 1, 1,
+                    y, y + 2, 0, 0, (y % 3 == 0) ? Mat.S_TOHA_PALE : Mat.COAL);
+        }
+    }
+
+    private void drawArc(Cube c, double outer, double inner, int y0, int y1,
+                         double start, double span, byte mat) {
+        if (span <= 0 || span >= TAU) {
+            c.cylinder(CX + 0.5, CZ + 0.5, outer, inner, 1, 1, y0, y1, 0, 0, mat);
+            return;
+        }
+        // Cube.cylinder omits a gap sector. The complement of this gap is the requested arc.
+        double end = start + span;
+        c.cylinder(CX + 0.5, CZ + 0.5, outer, inner, 1, 1, y0, y1,
+                end, TAU - span, mat);
+    }
+
+    // ------------------------------------------------------------------- AI cave mouths
+    private void carveCaveMouths(Cube c) {
+        for (int i = 0; i < CAVE_Y.length; i++) {
+            int x = caveCenterX(i), z = caveCenterZ(i), y0 = CAVE_Y[i] - CAVE_H[i] / 2;
+            int y1 = CAVE_Y[i] + CAVE_H[i] / 2;
+            int halfW = CAVE_W[i] / 2;
+            int depth = CAVE_DEPTH[i];
+            int side = CAVE_DIR[i];
+            if (side == 0) {
+                c.box(x - halfW, y0, z - depth, x + halfW, y1, z + 9, Mat.AIR);
+            } else if (side == 2) {
+                c.box(x - halfW, y0, z - 9, x + halfW, y1, z + depth, Mat.AIR);
+            } else if (side == 1) {
+                c.box(x - depth, y0, z - halfW, x + 9, y1, z + halfW, Mat.AIR);
+            } else {
+                c.box(x - 9, y0, z - halfW, x + depth, y1, z + halfW, Mat.AIR);
+            }
+        }
+    }
+
+    private void drawCaveFramesAndMachines(Cube c) {
+        for (int i = 0; i < CAVE_Y.length; i++) {
+            int x = caveCenterX(i), z = caveCenterZ(i), y0 = CAVE_Y[i] - CAVE_H[i] / 2;
+            int y1 = CAVE_Y[i] + CAVE_H[i] / 2;
+            int halfW = CAVE_W[i] / 2, dir = CAVE_DIR[i];
+            int leftX = x - halfW - 7, rightX = x + halfW + 7;
+            int nearZ = z - halfW - 7, farZ = z + halfW + 7;
+            if (dir == 0 || dir == 2) {
+                int faceZ = dir == 0 ? z + 2 : z - 2;
+                c.box(leftX, y0, faceZ - 3, leftX + 7, y1 + 4, faceZ + 3, Mat.S_TOHA_PALE);
+                c.box(rightX - 7, y0, faceZ - 3, rightX, y1 + 4, faceZ + 3, Mat.S_TOHA_PALE);
+                c.box(leftX, y1, faceZ - 6, rightX, y1 + 10, faceZ + 6, Mat.S_TOHA_RING);
+                if (y0 > GROUND + 6)
+                    c.box(leftX, y0 - 5, faceZ - 5, rightX, y0 + 1, faceZ + 5, Mat.SLAB_TOP);
+            } else {
+                int faceX = dir == 1 ? x + 2 : x - 2;
+                c.box(faceX - 3, y0, nearZ, faceX + 3, y1 + 4, nearZ + 7, Mat.S_TOHA_PALE);
+                c.box(faceX - 3, y0, farZ - 7, faceX + 3, y1 + 4, farZ, Mat.S_TOHA_PALE);
+                c.box(faceX - 6, y1, nearZ, faceX + 6, y1 + 10, farZ, Mat.S_TOHA_RING);
+            }
+
+            // Recessed control surface and two small indicators sit inside each chamber.
+            int ix = x, iz = z;
+            if (dir == 0) iz -= Math.max(24, CAVE_DEPTH[i] - 24);
+            if (dir == 2) iz += Math.max(24, CAVE_DEPTH[i] - 24);
+            if (dir == 1) ix -= Math.max(24, CAVE_DEPTH[i] - 24);
+            if (dir == 3) ix += Math.max(24, CAVE_DEPTH[i] - 24);
+            c.box(ix - Math.max(4, halfW / 4), CAVE_Y[i] - 16, iz - 3,
+                  ix + Math.max(4, halfW / 4), CAVE_Y[i] + 16, iz + 3, Mat.IRON_BLOCK);
+            c.box(ix - 3, CAVE_Y[i] + 20, iz - 2, ix + 3, CAVE_Y[i] + 27, iz + 2,
+                  i == 0 || i == 12 ? Mat.BIO_CYAN : Mat.COAL);
+            c.box(ix - 10, CAVE_Y[i] + 24, iz - 2, ix - 6, CAVE_Y[i] + 27, iz + 2,
+                  i == 0 ? Mat.LAMP_RED : Mat.COPPER_PATINA);
+
+            drawCaveMachine(c, i, ix, CAVE_Y[i], iz, dir, halfW);
+        }
+    }
+
+    private void drawCaveMachine(Cube c, int index, int x, int y, int z, int dir, int halfW) {
+        int tangent = Math.max(20, halfW - 12);
+        int inwardX = dir == 1 ? -1 : dir == 3 ? 1 : 0;
+        int inwardZ = dir == 0 ? -1 : dir == 2 ? 1 : 0;
+        int mx = x + inwardX * 42, mz = z + inwardZ * 42;
+
+        switch (index % 4) {
+            case 0:
+                for (int s : new int[] {-1, 1}) {
+                    int tx = mx + (dir == 0 || dir == 2 ? s * tangent / 2 : 0);
+                    int tz = mz + (dir == 1 || dir == 3 ? s * tangent / 2 : 0);
+                    c.cylinder(tx, tz, 13, 8, 1, 1, y - 25, y + 28, 0, 0, Mat.COPPER_RAW);
+                    c.cylinder(tx, tz, 19, 13, 1, 1, y - 23, y - 17, 0, 0, Mat.S_TOHA_PALE);
+                    c.cylinder(tx, tz, 19, 13, 1, 1, y + 18, y + 24, 0, 0, Mat.S_TOHA_RING);
+                }
+                break;
+            case 1:
+                c.ring(mx, mz, 38, 25, y - 22, y - 12, 7, Mat.COPPER_PATINA);
+                c.ring(mx, mz, 38, 25, y + 7, y + 17, 7, Mat.S_TOHA_RING);
+                c.beam(mx - 42, y - 2, mz, mx + 42, y - 2, mz, 3, Mat.IRON_BLOCK);
+                c.beam(mx, y - 2, mz - 29, mx, y - 2, mz + 29, 3, Mat.IRON_BLOCK);
+                break;
+            case 2:
+                c.box(mx - 30, y - 34, mz - 26, mx - 24, y + 38, mz + 26, Mat.IRON_BARS);
+                c.box(mx + 24, y - 34, mz - 26, mx + 30, y + 38, mz + 26, Mat.IRON_BARS);
+                c.box(mx - 30, y + 30, mz - 26, mx + 30, y + 36, mz + 26, Mat.S_TOHA_MASS);
+                c.tube(mx - 18, y - 30, mz, mx + 18, y + 24, mz, 6, 3, Mat.COPPER_WEATHERED);
+                break;
+            default:
+                c.taper(mx, mz, 26, 14, y - 36, y + 42, 8, Mat.S_TOHA_RING);
+                c.taper(mx, mz, 17, 7, y - 34, y + 40, 8, Mat.AIR);
+                c.cylinder(mx, mz, 32, 24, 1, 1, y + 6, y + 12, 0, 0, Mat.S_TOHA_PALE);
+                break;
+        }
+    }
+
+    // ------------------------------------------------------------------ gravity furnace and hollow nave
+    private void drawFurnaceAndInnerPlatforms(Cube c) {
+        if (!c.hits(CX - 430, GROUND, CZ - 430, CX + 430, TOP, CZ + 430)) return;
+        c.taper(CX + 0.5, CZ - 36 + 0.5, 118, 13, 118, TOP - 12, 10, Mat.S_TOHA_RING);
+        c.taper(CX + 0.5, CZ - 36 + 0.5, 89, 3, 124, TOP - 18, 10, Mat.AIR);
+
+        int[] levels = {150, 286, 430, 580, 735, 890, 1045, 1200, 1350, 1490, 1630, 1765, 1885, 1970};
+        for (int i = 0; i < levels.length; i++) {
+            int y = levels[i];
+            if (y < c.y0 - 6 || y > c.y0 + 25) continue;
+            double bodyR = spireRadiusAtY(y);
+            double coreR = furnaceRadiusAtY(y);
+            c.cylinder(CX + 0.5, CZ - 36 + 0.5, coreR + 18, Math.max(3, coreR - 8),
+                    1, 1, y, y + 8, 0, 0, i % 2 == 0 ? Mat.S_TOHA_PALE : Mat.S_TOHA_RING);
+            if (bodyR > coreR + 82) {
+                // Partial ring floors instead of complete slabs. Their mouths alternate
+                // around the chamber, producing a real circulation path around the core.
+                double outer = bodyR - 12, inner = coreR + 46;
+                double gapStart = Math.toRadians((i * 83 + 28) % 360);
+                drawArc(c, outer, inner, y, y + 2, gapStart, Math.toRadians(286),
+                        Mat.SLAB_BOTTOM);
+                if (i % 2 == 0) {
+                    c.box(-((int) outer), y + 3, CZ - 4, -(int) (inner), y + 8, CZ + 4, Mat.IRON_BARS);
+                    c.box((int) inner, y + 3, CZ - 4, (int) outer, y + 8, CZ + 4, Mat.IRON_BARS);
+                }
+                // Short spokes are actual supports for the partial platforms.
+                c.box(-(int) outer, y - 18, CZ - 4, -(int) inner, y - 5, CZ + 4, Mat.S_TOHA_MASS);
+                c.box((int) inner, y - 18, CZ - 4, (int) outer, y - 5, CZ + 4, Mat.S_TOHA_MASS);
+                c.box(CX - 4, y - 18, CZ - (int) outer, CX + 4, y - 5, CZ - (int) inner, Mat.S_TOHA_MASS);
+                c.box(CX - 4, y - 18, CZ + (int) inner, CX + 4, y - 5, CZ + (int) outer, Mat.S_TOHA_MASS);
+            }
+        }
+
+        // The furnace is wrapped in exposed pressure lines, supports and suspended machinery.
+        for (int y = Math.max(180, c.y0 - 12); y <= Math.min(TOP - 40, c.y0 + 15); y += 12) {
+            int r = (int) Math.round(furnaceRadiusAtY(y) + 22);
+            if (y % 48 == 12) {
+                c.box(-r, y, CZ - 36 - 3, r, y + 2, CZ - 36 + 3, Mat.COPPER_PATINA);
+            }
+        }
+        int[] armY = {250, 690, 1110, 1510, 1840};
+        for (int y : armY) {
+            if (y < c.y0 - 6 || y > c.y0 + 22) continue;
+            int r = (int) Math.round(furnaceRadiusAtY(y));
+            c.beam(-r - 35, y, CZ - 36, r + 35, y, CZ - 36, 8, Mat.S_TOHA_MASS);
+            c.beam(0, y, CZ - 36 - r - 35, 0, y, CZ - 36 + r + 35, 5, Mat.S_TOHA_PALE);
+            c.box(-r - 8, y + 2, CZ - 36 - 9, -r + 8, y + 11, CZ - 36 + 9, Mat.IRON_BLOCK);
+            c.box(r - 8, y + 2, CZ - 36 - 9, r + 8, y + 11, CZ - 36 + 9, Mat.IRON_BLOCK);
+        }
+    }
+
+    // --------------------------------------------------------------------- paths
+    private void drawSpiralWalkway(Cube c) {
+        if (!c.hits(CX - 470, GROUND, CZ - 470, CX + 470, TOP, CZ + 470)) return;
+        int firstY = Math.max(GROUND + 2, c.y0 - 1);
+        int lastY = Math.min(TOP - 3, c.y0 + 15);
+        for (int y = firstY; y <= lastY; y++) {
+            double a = spiralAngleAtY(y);
+            double r = spireRadiusAtY(y) + 7.0;
+            int x = CX + (int) Math.round(Math.sin(a) * r);
+            int z = CZ + (int) Math.round(Math.cos(a) * r);
+            // Bottom slabs overlap from tread to tread so this reads as one climbable helix.
+            c.tiltSlab(x, y, z, 25, 18, a, Mat.SLAB_BOTTOM);
+            if (y % 32 == 0) {
+                int railX = CX + (int) Math.round(Math.sin(a) * (r + 12));
+                int railZ = CZ + (int) Math.round(Math.cos(a) * (r + 12));
+                c.box(railX - 2, y + 1, railZ - 2, railX + 2, y + 9, railZ + 2, Mat.IRON_BARS);
+                c.box(railX - 5, y + 8, railZ - 5, railX + 5, y + 10, railZ + 5,
+                      y % 64 == 0 ? Mat.COPPER_PATINA : Mat.IRON_BARS);
+            }
+            if (y % 64 == 0) {
+                int lightX = CX + (int) Math.round(Math.sin(a) * (r - 5));
+                int lightZ = CZ + (int) Math.round(Math.cos(a) * (r - 5));
+                c.box(lightX - 1, y + 1, lightZ - 1, lightX + 1, y + 2, lightZ + 1, Mat.BIO_CYAN);
+            }
+        }
+    }
+
+    private void drawCrossValleyLinks(Cube c) {
+        int[] levels = {285, 555, 840, 1135, 1430, 1725, 1920};
+        for (int i = 0; i < levels.length; i++) {
+            int y = levels[i], r = (int) spireRadiusAtY(y);
+            if (!c.hits(-VALLEY_HALF, y - 150, CZ - 50, VALLEY_HALF, y + 16, CZ + 50)) continue;
+            int innerEnd = (int) Math.round(furnaceRadiusAtY(y) + 42);
+            int leftEnd = -innerEnd, rightStart = innerEnd;
+
+            // Two staggered bridges land on the internal ring platform at each level.
+            c.box(-3050, y, CZ - 20, leftEnd, y + 1, CZ + 20, Mat.SLAB_BOTTOM);
+            c.box(rightStart, y, CZ - 20, 3050, y + 1, CZ + 20, Mat.SLAB_BOTTOM);
+            c.box(-3050, y + 2, CZ - 22, leftEnd, y + 10, CZ - 19, Mat.IRON_BARS);
+            c.box(-3050, y + 2, CZ + 19, leftEnd, y + 10, CZ + 22, Mat.IRON_BARS);
+            c.box(rightStart, y + 2, CZ - 22, 3050, y + 10, CZ - 19, Mat.IRON_BARS);
+            c.box(rightStart, y + 2, CZ + 19, 3050, y + 10, CZ + 22, Mat.IRON_BARS);
+
+            // Heavy diagonals are split into short truss spans to keep cube generation cheap.
+            for (int x = -2880; x < -innerEnd; x += 320) {
+                int x1 = Math.min(-innerEnd, x + 320);
+                int y0 = y - 72 + (int) ((double) (x + 2880) / (2880 - innerEnd) * 48);
+                int y1 = y - 72 + (int) ((double) (x1 + 2880) / (2880 - innerEnd) * 48);
+                c.beam(x, y0, CZ, x1, y1, CZ, 5, Mat.S_TOHA_MASS);
+            }
+            for (int x = innerEnd; x < 2880; x += 320) {
+                int x1 = Math.min(2880, x + 320);
+                int y0 = y - 72 + (int) ((double) (x - innerEnd) / (2880 - innerEnd) * 48);
+                int y1 = y - 72 + (int) ((double) (x1 - innerEnd) / (2880 - innerEnd) * 48);
+                c.beam(x, y0, CZ, x1, y1, CZ, 5, Mat.S_TOHA_MASS);
+            }
+            // The external route is joined to a short service porch at the tower wall.
+            if (r > innerEnd + 25) {
+                c.cylinder(CX + 0.5, CZ + 0.5, r - 8, Math.max(innerEnd, r - 40),
+                        1, 1, y - 2, y + 1, Math.toRadians(25 + i * 31), Math.toRadians(0.8),
+                        Mat.SLAB_TOP);
+            }
+        }
+    }
+
+    private void drawApproachCauseway(Cube c) {
+        int startZ = CZ + VALLEY_LENGTH + 220;
+        int endZ = CZ + 350;
+        if (!c.hits(-100, GROUND - 8, endZ - 20, 100, GROUND + 24, startZ + 20)) return;
+
+        c.box(-56, GROUND, endZ, 56, GROUND, startZ, Mat.SLAB_BOTTOM);
+        c.box(-72, GROUND - 3, endZ, -62, GROUND + 1, startZ, Mat.S_TOHA_MASS);
+        c.box(62, GROUND - 3, endZ, 72, GROUND + 1, startZ, Mat.S_TOHA_MASS);
+        c.box(-16, GROUND + 1, endZ, 16, GROUND + 1, startZ, Mat.COAL);
+
+        // Cross-ties, underslung load members and rare route lamps provide readable scale.
+        int minZ = Math.max(endZ, c.z0 - 16);
+        int maxZ = Math.min(startZ, c.z0 + 31);
+        for (int z = minZ; z <= maxZ; z++) {
+            if (Math.floorMod(z - endZ, 96) == 0) {
+                c.box(-92, GROUND - 18, z - 7, 92, GROUND - 8, z + 7, Mat.S_TOHA_RING);
+                c.box(-74, GROUND + 1, z - 3, -61, GROUND + 4, z + 3, Mat.COPPER_PATINA);
+                c.box(61, GROUND + 1, z - 3, 74, GROUND + 4, z + 3, Mat.COPPER_PATINA);
+            }
+            if (Math.floorMod(z - endZ, 320) == 0) {
+                c.box(-78, GROUND + 1, z - 3, -72, GROUND + 8, z + 3, Mat.SEA_LANTERN);
+                c.box(72, GROUND + 1, z - 3, 78, GROUND + 8, z + 3, Mat.SEA_LANTERN);
+            }
+        }
+
+        // A low underpass at the canyon mouth makes the path feel continuous with the valley.
+        c.box(-140, GROUND - 3, startZ - 28, -124, GROUND + 50, startZ + 28, Mat.S_TOHA_MASS);
+        c.box(124, GROUND - 3, startZ - 28, 140, GROUND + 50, startZ + 28, Mat.S_TOHA_MASS);
+        c.box(-150, GROUND + 48, startZ - 34, 150, GROUND + 58, startZ + 34, Mat.S_TOHA_RING);
+    }
+
+    // ---------------------------------------------------------------- machinery in the valley
+    private void drawCliffEquipment(Cube c) {
+        int[] zOffsets = {-2860, -2050, -840, 460, 1740, 2840};
+        int[] heights = {1180, 1820, 1480, 2000, 1640, 1940};
+        for (int side : new int[] {-1, 1}) {
+            for (int i = 0; i < zOffsets.length; i++) {
+                int x = side * 3050, z = CZ + zOffsets[i], h = heights[i];
+                if (!c.hits(x - 130, GROUND, z - 130, x + 130, h, z + 130)) continue;
+                c.taper(x, z, 84 + (i % 2) * 16, 34, GROUND, h, 16, Mat.S_TOHA_RING);
+                c.taper(x, z, 62 + (i % 2) * 16, 20, GROUND + 8, h - 8, 16, Mat.AIR);
+                for (int y = Math.max(GROUND, c.y0 - 16); y <= Math.min(h, c.y0 + 15); y += 48) {
+                    int r = (int) Math.round(84 + (i % 2) * 16
+                            + (34 - (84 + (i % 2) * 16)) * ((double) (y - GROUND) / (h - GROUND)));
+                    c.cylinder(x, z, r + 6, Math.max(4, r - 4), 1, 1, y, y + 3,
+                            0, 0, y % 96 == 0 ? Mat.COPPER_PATINA : Mat.S_TOHA_PALE);
+                    c.box(x - 3, y + 4, z - 3, x + 3, y + 13, z + 3, Mat.IRON_BARS);
+                }
+                c.box(x - 18, h - 38, z - 18, x + 18, h - 32, z + 18, Mat.SLAB_TOP);
+                c.box(x - 6, h - 50, z - 6, x + 6, h - 20, z + 6, Mat.COPPER_RAW);
+            }
+        }
+    }
+
+    private void drawMachineYard(Cube c) {
+        // Machine positions are authored by hand and deliberately non-mirrored.
+        int[][] modules = {
+            {-930, 520, 250, 170, 220}, {870, 560, 220, 200, 280},
+            {-1120, -510, 260, 210, 310}, {1050, -650, 190, 240, 205},
+            {-640, 1120, 170, 210, 170}, {710, 1260, 230, 160, 240},
+            {-1370, -1210, 180, 180, 155}, {1340, 890, 180, 170, 185}
+        };
+        for (int i = 0; i < modules.length; i++) {
+            drawMachineModule(c, modules[i][0], CZ + modules[i][1],
+                    modules[i][2], modules[i][3], modules[i][4], i);
+        }
+
+        // Surface pipe trenches, maintenance tracks and slab walks stitch the modules together.
+        if (c.hits(-1520, GROUND, CZ - 1350, 1520, GROUND + 12, CZ + 1350)) {
+            c.box(-1450, GROUND, CZ - 80, -580, GROUND, CZ - 64, Mat.SLAB_TOP);
+            c.box(610, GROUND, CZ + 190, 1430, GROUND, CZ + 206, Mat.SLAB_TOP);
+            c.box(-1250, GROUND, CZ + 930, -1234, GROUND, CZ + 1390, Mat.SLAB_BOTTOM);
+            c.box(1215, GROUND, CZ - 1250, 1231, GROUND, CZ - 740, Mat.SLAB_BOTTOM);
+            c.box(-1260, GROUND + 1, CZ - 86, -1248, GROUND + 4, CZ + 940, Mat.COPPER_PATINA);
+            c.box(1227, GROUND + 1, CZ - 1260, 1239, GROUND + 4, CZ + 198, Mat.COPPER_RAW);
+            for (int i = 0; i < 9; i++) {
+                int x = -1320 + i * 330;
+                int z = CZ + ((i % 2 == 0) ? 1000 : -1020);
+                c.box(x - 60, GROUND, z - 38, x + 60, GROUND + 1, z + 38, Mat.SLAB_BOTTOM);
+                c.box(x - 54, GROUND + 1, z - 32, x + 54, GROUND + 5, z - 28, Mat.COAL);
+            }
+        }
+    }
+
+    private void drawMachineModule(Cube c, int x, int z, int width, int depth, int height, int kind) {
+        int x0 = x - width / 2, x1 = x + width / 2;
+        int z0 = z - depth / 2, z1 = z + depth / 2;
+        int y0 = GROUND + 2, y1 = GROUND + height;
+        if (!c.hits(x0 - 24, GROUND - 2, z0 - 24, x1 + 24, y1 + 36, z1 + 24)) return;
+
+        c.box(x0 - 16, GROUND, z0 - 16, x1 + 16, GROUND + 4, z1 + 16, Mat.S_TOHA_RING);
+        c.box(x0 - 6, GROUND + 4, z0 - 6, x1 + 6, GROUND + 7, z1 + 6, Mat.SLAB_TOP);
+        c.box(x0, y0, z0, x1, y0 + 20, z1, Mat.S_TOHA_MASS);
+
+        // Four exposed corner legs and a high crosshead form the service frame.
+        int leg = 7 + kind % 4;
+        for (int dx : new int[] {x0 + 10, x1 - 10}) {
+            for (int dz : new int[] {z0 + 10, z1 - 10}) {
+                c.box(dx - leg, y0, dz - leg, dx + leg, y1, dz + leg,
+                      kind % 2 == 0 ? Mat.S_TOHA_PALE : Mat.S_TOHA_RING);
+                c.box(dx - leg - 2, y1 - 24, dz - leg - 2, dx + leg + 2, y1 - 19, dz + leg + 2, Mat.COPPER_PATINA);
+            }
+        }
+        c.box(x0 - 8, y1, z0 - 8, x1 + 8, y1 + 12, z1 + 8, Mat.S_TOHA_MASS);
+        c.box(x0 + 10, y1 + 12, z0 + 10, x1 - 10, y1 + 13, z1 - 10, Mat.SLAB_BOTTOM);
+
+        // Each module has a different fixed grammar: pressure vessels, a rotor cage,
+        // a vent rack, or a transformer stack.
+        if (kind % 4 == 0) {
+            for (int sx : new int[] {-width / 4, width / 4}) {
+                int tx = x + sx, tz = z;
+                c.cylinder(tx, tz, Math.min(42, width / 5), Math.min(28, width / 7), 1, 1,
+                        y0 + 8, y1 - 10, 0, 0, Mat.S_TOHA_TANK);
+                c.cylinder(tx, tz, Math.min(46, width / 4), Math.min(28, width / 7), 1, 1,
+                        y1 - 20, y1 - 13, 0, 0, Mat.COPPER_RAW);
+                c.sphere(tx, y1 - 10, tz, Math.min(28, width / 7), Math.max(8, Math.min(18, width / 10)), Mat.COPPER_PATINA);
+            }
+        } else if (kind % 4 == 1) {
+            c.ring(x, z, width / 3.0, depth / 3.0, y0 + 25, y0 + 48, 8, Mat.COPPER_RAW);
+            c.beam(x - width / 3, y0 + 36, z, x + width / 3, y0 + 36, z, 4, Mat.IRON_BLOCK);
+            c.beam(x, y0 + 36, z - depth / 3, x, y0 + 36, z + depth / 3, 4, Mat.IRON_BLOCK);
+            c.box(x - 6, y0 + 20, z - 6, x + 6, y1 - 20, z + 6, Mat.VENT);
+        } else if (kind % 4 == 2) {
+            for (int yy = y0 + 24; yy < y1 - 18; yy += 28) {
+                c.box(x0 + 12, yy, z0 + 12, x1 - 12, yy + 3, z1 - 12, Mat.SLAB_BOTTOM);
+                c.box(x0 + 12, yy + 4, z0 + 12, x0 + 16, yy + 20, z0 + 16, Mat.IRON_BARS);
+                c.box(x1 - 16, yy + 4, z1 - 16, x1 - 12, yy + 20, z1 - 12, Mat.IRON_BARS);
+            }
+            c.box(x0 + 12, y0 + 20, z0 - 2, x1 - 12, y1 - 18, z0 + 3, Mat.GLASS_REINFORCED);
+        } else {
+            c.box(x0 + 16, y0 + 16, z0 + 16, x1 - 16, y1 - 16, z1 - 16, Mat.COAL);
+            c.box(x0 + 24, y0 + 30, z0 + 24, x1 - 24, y1 - 30, z1 - 24, Mat.IRON_BLOCK);
+            c.box(x - 7, y1 - 46, z1 + 2, x + 7, y1 - 28, z1 + 8, Mat.BIO_CYAN);
+            c.box(x - 18, y1 - 52, z1 + 2, x - 11, y1 - 40, z1 + 8, Mat.LAMP_RED);
+        }
+
+        // Pipe manifolds deliberately go to a second module or the cliff, never nowhere.
+        c.box(x0 - 38, y0 + 32, z, x0 + 8, y0 + 40, z + 8, Mat.COPPER_PATINA);
+        c.box(x1 - 8, y0 + 52, z - 8, x1 + 44, y0 + 60, z, Mat.COPPER_RAW);
+        c.box(x, y1 + 14, z0 - 28, x + 8, y1 + 22, z1 + 28, Mat.VENT);
+    }
+
     private void drawHullInscription(Cube c) {
-        final int cell = 10, gap = 8, span = 14 * cell, stride = span + gap;
-        final int centreX = 1680, x0 = centreX - span / 2, x1 = x0 + span - 1;
-        final int bottomY = 64, topY = bottomY + 4 * span + 3 * gap - 1;
-        if (c.x0 + 15 < x0 || c.x0 > x1 || c.y0 + 15 < bottomY || c.y0 > topY) return;
+        final int cell = 3, gap = 3, span = 14 * cell, stride = span + gap;
+        final int x0 = -span / 2, x1 = x0 + span - 1;
+        final int bottomY = 100, topY = bottomY + 4 * span + 3 * gap + 3;
+        if (!c.hits(x0, bottomY, CZ + 250, x1, topY, CZ + 460)) return;
 
         int xA = Math.max(x0, c.x0), xB = Math.min(x1, c.x0 + 15);
         int yA = Math.max(bottomY, c.y0), yB = Math.min(topY, c.y0 + 15);
-        int minFront = Integer.MAX_VALUE, maxFront = Integer.MIN_VALUE;
-        // The hull radius steps inward at tier boundaries; bound all four X/Y
-        // corners of this slice rather than reusing the lower-tier front plane.
-        int[] sampleX = {xA, xB}, sampleY = {yA, yB};
-        for (int sx : sampleX) {
-            for (int sy : sampleY) {
-                int front = projectedFrontZ(sx, sy) - 12;
-                minFront = Math.min(minFront, front);
-                maxFront = Math.max(maxFront, front);
-            }
-        }
-        if (c.z0 + 15 < minFront + 1 || c.z0 > maxFront + 4) return;
-
-        for (int glyphIndex = 0; glyphIndex < HULL_INSCRIPTION.length; glyphIndex++) {
-            int glyphBottom = bottomY + (HULL_INSCRIPTION.length - 1 - glyphIndex) * stride;
-            if (c.y0 + 15 < glyphBottom || c.y0 > glyphBottom + span - 1) continue;
-            String[] glyph = HULL_INSCRIPTION[glyphIndex];
+        for (int g = 0; g < HULL_INSCRIPTION.length; g++) {
+            int glyphBottom = bottomY + (HULL_INSCRIPTION.length - 1 - g) * stride;
+            String[] glyph = HULL_INSCRIPTION[g];
             for (int row = 0; row < 14; row++) {
                 int y = glyphBottom + (13 - row) * cell;
-                if (y > c.y0 + 15 || y + cell - 1 < c.y0) continue;
+                if (y > yB || y + cell - 1 < yA) continue;
                 for (int col = 0; col < 14; col++) {
                     if (glyph[row].charAt(col) != '1') continue;
                     int px0 = x0 + col * cell;
-                    int lo = Math.max(px0, c.x0), hi = Math.min(px0 + cell - 1, c.x0 + 15);
+                    int lo = Math.max(px0, xA), hi = Math.min(px0 + cell - 1, xB);
                     if (lo > hi) continue;
                     for (int x = lo; x <= hi; x++) {
                         int front = projectedFrontZ(x, y) - 12;
-                        if (front + 4 < c.z0 || front + 1 > c.z0 + 15) continue;
-                        c.box(x, y, front + 1, x, y + cell - 1, front + 4, Mat.COAL);
+                        for (int z = front + 1; z <= front + 3; z++) c.set(x, y, z, Mat.COAL);
                     }
                 }
             }
         }
-    }
-
-    private void drawFoundation(Cube c) {
-        // Round four-block plate under the cylindrical hull.
-        c.prism(CX + 0.5, CZ + 0.5, 2800, 0, 0, false, 0, 60, 63, Mat.S_TOHA_DECK);
-
-        // Concentric girders and radial spokes carry the deck instead of a solid slab.
-        if (c.hitsY(48, 59)) {
-            int[] radii = {2700, 2200, 1700, 1200, 700};
-            for (int radius : radii) {
-                c.cylinder(CX + 0.5, CZ + 0.5, radius + 10, radius - 10,
-                        1, 1, 48, 59, 0, 0, Mat.S_TOHA_MASS);
-            }
-            for (int deg = 0; deg < 360; deg += 30) {
-                double a = Math.toRadians(deg);
-                int ex = (int) Math.round(Math.sin(a) * 2700);
-                int ez = (int) Math.round(Math.cos(a) * 2700);
-                c.beam(CX, 54, CZ, CX + ex, 54, CZ + ez, 10, Mat.S_TOHA_MASS);
-            }
-        }
-        c.cylinder(CX + 0.5, CZ + 0.5, 2790, 2768, 1, 1, 63, 63, 0, 0, Mat.S_DARK);
-    }
-
-    private void drawOuterWalls(Cube c) {
-        // Circular retaining wall with a wide opening aligned to the south portal.
-        c.cylinder(CX + 0.5, CZ + 0.5, 2760, 2720, 1, 1,
-                GROUND, 350, Math.PI / 2 - 0.28, 0.56, Mat.S_TOHA_PALE);
-        c.cylinder(CX + 0.5, CZ + 0.5, 2780, 2760, 1, 1,
-                350, 378, Math.PI / 2 - 0.28, 0.56, Mat.S_TOHA_MASS);
-
-        // Sparse buttresses around the ring. The front gate sector remains clear.
-        int[] degrees = {35, 65, 115, 145, 200, 230, 270, 310, 340};
-        for (int deg : degrees) {
-            double a = Math.toRadians(deg);
-            int x0 = (int) Math.round(Math.sin(a) * 2735);
-            int z0 = CZ + (int) Math.round(Math.cos(a) * 2735);
-            int x1 = (int) Math.round(Math.sin(a) * 2800);
-            int z1 = CZ + (int) Math.round(Math.cos(a) * 2800);
-            c.beam(x0, GROUND + 20, z0, x1, 390, z1, 24, Mat.S_TOHA_MASS);
-        }
-    }
-
-    /**
-     * The south perimeter opening is a portal, not a hole in a fence: two
-     * deep side piers and a massive crosshead form the first compressed scale
-     * cue before the larger factory mass comes into view.
-     */
-    private void drawGatePortal(Cube c) {
-        int z0 = CZ + 2470, z1 = CZ + 2710;
-        c.box(-725, GROUND, z0, -655, GROUND + 520, z1, Mat.S_TOHA_MASS);
-        c.box(655, GROUND, z0, 725, GROUND + 520, z1, Mat.S_TOHA_MASS);
-        c.box(-725, GROUND + 460, z0, 725, GROUND + 520, z1, Mat.S_TOHA_PALE);
-        c.box(-700, GROUND + 438, z0 + 14, 700, GROUND + 452, z1 - 14, Mat.S_TOHA_MASS);
-
-        // Two recessed vertical seams and one restrained central index mark.
-        c.box(-711, GROUND + 70, z0 + 24, -705, GROUND + 420, z0 + 30, Mat.S_TOHA_RING);
-        c.box(705, GROUND + 70, z0 + 24, 711, GROUND + 420, z0 + 30, Mat.S_TOHA_RING);
-        c.box(-48, GROUND + 480, z1 + 1, 48, GROUND + 486, z1 + 3, Mat.BIO_CYAN);
-    }
-
-    // ------------------------------------------------------------------
-    // Primary silhouette. These are authored volumes, nested and stepped,
-    // with no per-cell district selection.
-    // ------------------------------------------------------------------
-
-    private void drawMainShell(Cube c) {
-        // Toha's primary mass is a cylindrical hull, stepping inward at immense levels.
-        cylinderTier(c, 2200, 36, 64, 639, Mat.S_TOHA_MASS);
-        cylinderTier(c, 1900, 36, 640, 1019, Mat.S_TOHA_PALE);
-        cylinderTier(c, 1600, 36, 1020, 1449, Mat.S_TOHA_MASS);
-        cylinderTier(c, 1320, 36, 1450, 1759, Mat.S_TOHA_PALE);
-        cylinderTier(c, 1050, 32, 1760, 1919, Mat.S_TOHA_MASS);
-        cylinderTier(c, 820, 28, 1920, 1950, Mat.S_TOHA_PALE);
-
-        // Massive horizontal collars break the silhouette into engineered cylindrical strata.
-        c.cylinder(CX + 0.5, CZ + 0.5, 2260, 2220, 1, 1, 250, 276, 0, 0, Mat.S_TOHA_PALE);
-        c.cylinder(CX + 0.5, CZ + 0.5, 1940, 1900, 1, 1, 810, 840, 0, 0, Mat.S_TOHA_RING);
-        c.cylinder(CX + 0.5, CZ + 0.5, 1640, 1600, 1, 1, 1210, 1240, 0, 0, Mat.S_TOHA_PALE);
-    }
-
-    private void cylinderTier(Cube c, int outerRadius, int thickness, int y0, int y1, byte material) {
-        double x = CX + 0.5, z = CZ + 0.5;
-        // Clear the underlying city inside the shell, then write only the load-bearing wall annulus.
-        c.prism(x, z, outerRadius - thickness, 0, 0, false, 0, y0, y1, Mat.AIR);
-        c.shellPrism(x, z, outerRadius, outerRadius - thickness, y0, y1, material);
-    }
-
-    /**
-     * One-sided service massing is intentional: the main shell is immense, but it
-     * must not read as a mirrored palace. This eastern transfer buttress and the
-     * western upper cantilever break the symmetry with functional industrial bulk.
-     */
-    private void drawAsymmetricTransferMass(Cube c) {
-        // East-side transfer machinery projects through the cylindrical hull in two stages.
-        wallShell(c, 2040, 720, CZ - 1450, 2530, 1110, CZ + 720, 32, Mat.S_TOHA_MASS);
-        c.box(2050, 1036, CZ - 1420, 2580, 1074, CZ + 760, Mat.S_TOHA_PALE);
-        wallShell(c, 2160, 1160, CZ - 1180, 2620, 1460, CZ + 520, 28, Mat.S_TOHA_MASS);
-
-        // Deep vertical service trench in the exposed outer end wall.
-        c.box(2516, 790, CZ + 220, 2524, 1040, CZ + 650, Mat.AIR);
-        c.box(2516, 1075, CZ + 220, 2524, 1092, CZ + 650, Mat.S_TOHA_PALE);
-        c.beam(2440, 770, CZ + 680, 2050, 1190, CZ - 1380, 42, Mat.S_TOHA_PALE);
-        c.beam(2480, 820, CZ + 640, 2100, 1110, CZ - 1320, 18, Mat.S_TOHA_RING);
-
-        // Opposite side: a single upper cantilever breaks the cylinder asymmetrically.
-        wallShell(c, -1770, 1480, CZ - 1080, -1040, 1560, CZ + 420, 16, Mat.S_TOHA_MASS);
-        c.box(-1840, 1510, CZ - 980, -1764, 1550, CZ + 360, Mat.S_TOHA_PALE);
-        c.beam(-1710, 1485, CZ + 380, -1090, 1670, CZ - 900, 28, Mat.S_TOHA_RING);
-    }
-
-    /**
-     * Draw four vertical perimeter walls for an enormous architectural envelope.
-     * Top/bottom surfaces are deliberately omitted: the interior stays hollow and
-     * is crossed by authored girders, service platforms and machine components.
-     */
-    private void wallShell(Cube c, int x0, int y0, int z0, int x1, int y1, int z1,
-                           int thickness, byte material) {
-        int t = Math.max(1, thickness);
-        c.box(x0, y0, z0, x1, y1, z0 + t - 1, material);
-        c.box(x0, y0, z1 - t + 1, x1, y1, z1, material);
-        c.box(x0, y0, z0 + t, x0 + t - 1, y1, z1 - t, material);
-        c.box(x1 - t + 1, y0, z0 + t, x1, y1, z1 - t, material);
-    }
-
-    private void drawFacade(Cube c) {
-        drawAxialRibs(c);
-    }
-
-    private void drawAxialRibs(Cube c) {
-        // Eight fixed, oversized ribs follow the hull's changing radius. They
-        // sit between cave groups rather than repeating as apartment-like stripes.
-        int[] degrees = {-160, -125, -90, -55, 55, 90, 125, 160};
-        for (int deg : degrees) {
-            double a = Math.toRadians(deg);
-            for (int i = 0; i < SHELL_Y.length - 1; i++) {
-                int y0 = SHELL_Y[i], y1 = SHELL_Y[i + 1];
-                int r0 = SHELL_R[i] + 34, r1 = SHELL_R[i + 1] + 34;
-                double x0 = CX + Math.sin(a) * r0, z0 = CZ + Math.cos(a) * r0;
-                double x1 = CX + Math.sin(a) * r1, z1 = CZ + Math.cos(a) * r1;
-                c.tube(x0, y0, z0, x1, y1, z1, 30, 16, Mat.S_TOHA_MASS);
-                c.tube(x0, y0, z0, x1, y1, z1, 7, 0, Mat.S_TOHA_PALE);
-            }
-        }
-    }
-
-    private void frontRibs(Cube c, int[] xs, int yMin, int yMax, int front, int[] widths) {
-        for (int i = 0; i < xs.length; i++) {
-            int x = xs[i], w = widths[i];
-            if (!c.hits(x - w / 2, yMin, CZ + front + 1,
-                        x + w / 2, yMax, CZ + front + 96)) continue;
-            c.box(x - w / 2, yMin, CZ + front + 1,
-                  x + w / 2, yMax, CZ + front + 72, Mat.S_TOHA_MASS);
-            // A narrow pale arris gives each rib a concrete edge rather than stripes.
-            c.box(x - 2, yMin + 24, CZ + front + 73,
-                  x + 2, yMax - 24, CZ + front + 84, Mat.S_TOHA_PALE);
-        }
-    }
-
-    private void flankSlots(Cube c, int halfWidth, int front, int yMin, int yMax) {
-        int xL = -halfWidth, xR = halfWidth;
-        for (int z = c.z0; z < c.z0 + 16; z++) {
-            int dz = z - CZ;
-            if (dz < -front - 200 || dz > front) continue;
-            if (Math.floorMod(dz + 2200, 192) >= 18) continue;
-            c.box(xL - 1, yMin + 45, z, xL + 3, yMax - 45, z + 1, Mat.COAL);
-            c.box(xR - 3, yMin + 45, z, xR + 1, yMax - 45, z + 1, Mat.COAL);
-        }
-    }
-
-    private void drawTerraceBands(Cube c) {
-        // Circumferential collars create enormous ledges where the hull steps inward.
-        ringCourse(c, 2300, 1840, 610, 650, Mat.S_TOHA_MASS);
-        ringCourse(c, 2320, 2288, 620, 644, Mat.S_TOHA_PALE);
-        ringCourse(c, 2000, 1540, 995, 1035, Mat.S_TOHA_RING);
-        ringCourse(c, 1700, 1260, 1425, 1465, Mat.S_TOHA_MASS);
-        ringCourse(c, 1400, 1000, 1735, 1775, Mat.S_TOHA_RING);
-        ringCourse(c, 1110, 785, 1898, 1932, Mat.S_TOHA_PALE);
-    }
-
-    private void ringCourse(Cube c, int outerR, int innerR, int y0, int y1, byte material) {
-        c.cylinder(CX + 0.5, CZ + 0.5, outerR, innerR, 1, 1, y0, y1, 0, 0, material);
-    }
-
-    /**
-     * Fractured orbital galleries, attached facade plates and diagonal load paths
-     * break the otherwise perfect concentric silhouette. These are authored elements,
-     * not randomized dressing or a procedural selection of tower types.
-     */
-    private void drawMonumentalAccretions(Cube c) {
-        drawSegmentedCourse(c, 2520, 2376, 466, 491, LOWER_GALLERY_ARCS, 34, Mat.S_TOHA_MASS);
-        drawSegmentedCourse(c, 2185, 2042, 910, 940, MIDDLE_GALLERY_ARCS, 29, Mat.S_TOHA_RING);
-        drawSegmentedCourse(c, 1810, 1685, 1365, 1395, UPPER_GALLERY_ARCS, 33, Mat.S_TOHA_MASS);
-        drawSegmentedCourse(c, 1495, 1372, 1630, 1658, CROWN_GALLERY_ARCS, 25, Mat.S_TOHA_PALE);
-
-        // Short, thick outriggers join the galleries to the load-bearing shell.
-        radialSupport(c, 26, 2190, 414, 2425, 468, 28, Mat.S_TOHA_RING);
-        radialSupport(c, 151, 2190, 365, 2425, 468, 32, Mat.S_TOHA_PALE);
-        radialSupport(c, 230, 2190, 405, 2425, 468, 26, Mat.S_TOHA_MASS);
-        radialSupport(c, 326, 2190, 345, 2425, 468, 30, Mat.S_TOHA_PALE);
-
-        radialSupport(c, 52, 1890, 865, 2090, 920, 24, Mat.S_TOHA_PALE);
-        radialSupport(c, 176, 1890, 830, 2090, 920, 28, Mat.S_TOHA_MASS);
-        radialSupport(c, 292, 1890, 880, 2090, 920, 22, Mat.S_TOHA_PALE);
-
-        radialSupport(c, 58, 1590, 1310, 1740, 1380, 22, Mat.S_TOHA_RING);
-        radialSupport(c, 198, 1590, 1280, 1740, 1380, 25, Mat.S_TOHA_PALE);
-        radialSupport(c, 306, 1590, 1325, 1740, 1380, 21, Mat.S_TOHA_MASS);
-
-        // Curved, almost-flat wall fins catch light at widely separated elevations.
-        // Each x-column follows the tier's real circular surface instead of a flat Z plane.
-        frontFlankPlate(c, -1995, 2200, 220, 615, 30, 116, Mat.S_TOHA_MASS, Mat.S_TOHA_PALE);
-        frontFlankPlate(c, 2020, 2200, 300, 625, 26, 96, Mat.S_TOHA_RING, Mat.S_TOHA_PALE);
-        frontFlankPlate(c, -1740, 1900, 665, 1000, 32, 120, Mat.S_TOHA_PALE, Mat.S_TOHA_MASS);
-        frontFlankPlate(c, 1705, 1900, 725, 985, 24, 104, Mat.S_TOHA_MASS, Mat.S_TOHA_PALE);
-        frontFlankPlate(c, -1400, 1600, 1075, 1425, 28, 112, Mat.S_TOHA_MASS, Mat.S_TOHA_PALE);
-        frontFlankPlate(c, 1430, 1600, 1110, 1440, 24, 126, Mat.S_TOHA_RING, Mat.S_TOHA_PALE);
-        frontFlankPlate(c, -1170, 1320, 1500, 1730, 20, 100, Mat.S_TOHA_PALE, Mat.S_TOHA_RING);
-        frontFlankPlate(c, 1000, 1050, 1770, 1905, 20, 90, Mat.S_TOHA_MASS, Mat.S_TOHA_PALE);
-
-        // Four major diagonal compression members stitch tiers at non-mirrored angles.
-        diagonalMember(c, 25, 2165, 285, 34, 1880, 1030, 64, 22, Mat.S_TOHA_MASS);
-        diagonalMember(c, 155, 2160, 330, 143, 1585, 1440, 72, 26, Mat.S_TOHA_PALE);
-        diagonalMember(c, 222, 1895, 710, 239, 1310, 1735, 56, 20, Mat.S_TOHA_RING);
-        diagonalMember(c, 319, 2160, 190, 302, 1580, 1215, 80, 30, Mat.S_TOHA_MASS);
-    }
-
-    /**
-     * Draw only the angular portion of an annulus that survives the supplied gap.
-     * Segment-specific broad-phase checks prevent a short arc from raster-testing the
-     * entire square bounding box of a several-kilometre cylinder.
-     */
-    private void drawSegmentedCourse(Cube c, int outerRadius, int innerRadius,
-                                     int y0, int y1, int[] centresDegrees,
-                                     int spanDegrees, byte material) {
-        double half = Math.toRadians(spanDegrees / 2.0);
-        for (int degrees : centresDegrees) {
-            double centre = Math.toRadians(degrees);
-            double start = centre - half, end = centre + half;
-            if (!arcBoundsHit(c, outerRadius, start, end, y0, y1)) continue;
-            c.cylinder(CX + 0.5, CZ + 0.5, outerRadius, innerRadius, 1, 1,
-                    y0, y1, end, 2 * Math.PI - 2 * half, material);
-        }
-    }
-
-    private boolean arcBoundsHit(Cube c, int radius, double start, double end, int y0, int y1) {
-        double minX = Math.min(CX + 0.5 + radius * Math.cos(start),
-                               CX + 0.5 + radius * Math.cos(end));
-        double maxX = Math.max(CX + 0.5 + radius * Math.cos(start),
-                               CX + 0.5 + radius * Math.cos(end));
-        double minZ = Math.min(CZ + 0.5 + radius * Math.sin(start),
-                               CZ + 0.5 + radius * Math.sin(end));
-        double maxZ = Math.max(CZ + 0.5 + radius * Math.sin(start),
-                               CZ + 0.5 + radius * Math.sin(end));
-        double quarter = Math.PI / 2.0;
-        int first = (int) Math.ceil(start / quarter);
-        int last = (int) Math.floor(end / quarter);
-        for (int k = first; k <= last; k++) {
-            double a = k * quarter;
-            double x = CX + 0.5 + radius * Math.cos(a);
-            double z = CZ + 0.5 + radius * Math.sin(a);
-            minX = Math.min(minX, x); maxX = Math.max(maxX, x);
-            minZ = Math.min(minZ, z); maxZ = Math.max(maxZ, z);
-        }
-        int pad = 3; // account for voxel-centre sampling and primitive rounding
-        return c.hits((int) Math.floor(minX) - pad, y0, (int) Math.floor(minZ) - pad,
-                      (int) Math.ceil(maxX) + pad, y1, (int) Math.ceil(maxZ) + pad);
-    }
-
-    private void radialSupport(Cube c, double degrees, int innerRadius, int innerY,
-                               int outerRadius, int outerY, int halfWidth, byte material) {
-        double a = Math.toRadians(degrees);
-        double x0 = CX + 0.5 + Math.cos(a) * innerRadius;
-        double z0 = CZ + 0.5 + Math.sin(a) * innerRadius;
-        double x1 = CX + 0.5 + Math.cos(a) * outerRadius;
-        double z1 = CZ + 0.5 + Math.sin(a) * outerRadius;
-        c.beam(x0, innerY, z0, x1, outerY, z1, halfWidth, material);
-    }
-
-    private void frontFlankPlate(Cube c, int centreX, int radius, int y0, int y1,
-                                 int halfWidth, int depth, byte material, byte edgeMaterial) {
-        int centreFront = CZ + cylinderFrontOffset(radius, centreX);
-        int reach = halfWidth * 7 + depth + 24;
-        if (!c.hits(centreX - halfWidth, y0, centreFront - reach,
-                    centreX + halfWidth, y1, centreFront + depth + reach)) return;
-        for (int x = Math.max(centreX - halfWidth, c.x0);
-             x <= Math.min(centreX + halfWidth, c.x0 + 15); x++) {
-            int front = CZ + cylinderFrontOffset(radius, x);
-            c.box(x, y0, front - 14, x, y1, front + depth, material);
-        }
-        int ridgeX = centreX + Math.max(-halfWidth + 3, halfWidth / 2);
-        int ridgeFront = CZ + cylinderFrontOffset(radius, ridgeX);
-        c.box(ridgeX - 2, y0 + 18, ridgeFront + depth - 2,
-              ridgeX + 2, y1 - 18, ridgeFront + depth + 4, edgeMaterial);
-    }
-
-    private void diagonalMember(Cube c, double startDegrees, int startRadius, int startY,
-                                double endDegrees, int endRadius, int endY,
-                                double outerWidth, double innerWidth, byte material) {
-        double a0 = Math.toRadians(startDegrees), a1 = Math.toRadians(endDegrees);
-        c.tube(CX + 0.5 + Math.cos(a0) * startRadius, startY,
-               CZ + 0.5 + Math.sin(a0) * startRadius,
-               CX + 0.5 + Math.cos(a1) * endRadius, endY,
-               CZ + 0.5 + Math.sin(a1) * endRadius,
-               outerWidth, innerWidth, material);
-    }
-
-
-    private void rectBand(Cube c, int halfX, int back, int front, int y0, int y1, byte material) {
-        int t = 24;
-        c.box(-halfX, y0, CZ + back, -halfX + t, y1, CZ + front, material);
-        c.box(halfX - t, y0, CZ + back, halfX, y1, CZ + front, material);
-        c.box(-halfX, y0, CZ + back, halfX, y1, CZ + back + t, material);
-        c.box(-halfX, y0, CZ + front - t, halfX, y1, CZ + front, material);
-    }
-
-    /**
-     * Real, narrow apertures in the south elevation. The x pitch and alternating
-     * row offsets are hand-set, not randomized. Each cut travels 84 blocks into
-     * the shell so that the opening reads as a deep black slot from far away.
-     */
-    private void carveSlitApertures(Cube c) {
-        for (int[] slit : SOUTH_SLITS) {
-            int x = slit[0], y = slit[1], width = slit[2], height = slit[3];
-            int radius = slit[4], depth = slit[5];
-            int front = CZ + cylinderFrontOffset(radius, x);
-            if (!c.hits(x - width / 2, y, front - depth,
-                        x + width / 2, y + height, front + 1)) continue;
-            c.box(x - width / 2, y, front - depth,
-                  x + width / 2, y + height, front + 1, Mat.AIR);
-        }
-    }
-
-    // ------------------------------------------------------------------
-    // The interior is a single engineered nave, not empty solid blocks.
-    // The cave mouths open into the deep chamber or terminate in side chambers.
-    // ------------------------------------------------------------------
-
-    private void carveNave(Cube c) {
-        c.box(-NAVE_X, 190, CZ + NAVE_BACK, NAVE_X, 1720, CZ + NAVE_FRONT, Mat.AIR);
-    }
-
-    private void carveCaves(Cube c) {
-        for (int i = 0; i < CAVE_X.length; i++) {
-            int centre = CAVE_X[i], y = CAVE_Y[i], w = CAVE_W[i], h = CAVE_H[i];
-            int left = centre - w / 2, right = centre + w / 2;
-            if (!c.hits(left, y, CZ + CAVE_FRONT[i] - 2320,
-                        right, y + h, CZ + CAVE_FRONT[i] + 16)) continue;
-            // Cut each x-column to its own point on the cylindrical surface and deep
-            // enough to enter the hollow hull, rather than leaving a blind facade tunnel.
-            for (int x = Math.max(left, c.x0); x <= Math.min(right, c.x0 + 15); x++) {
-                int front = CZ + caveFrontAt(i, x);
-                c.box(x, y, front - 2300, x, y + h, front, Mat.AIR);
-            }
-        }
-    }
-
-    private void drawNaveStructure(Cube c) {
-        // Four structural piers, visible from each of the lower cave mouths.
-        int[] px = {-1000, -1000, 1000, 1000};
-        int[] pz = {-800, 120, -800, 120};
-        for (int i = 0; i < px.length; i++) {
-            int x = px[i], z = CZ + pz[i];
-            c.box(x - 28, 200, z - 28, x + 28, 1650, z + 28, Mat.S_TOHA_MASS);
-            for (int y = 320; y < 1600; y += 160) {
-                c.box(x - 44, y, z - 44, x + 44, y + 12, z + 44, Mat.S_TOHA_RING);
-            }
-        }
-
-        // Narrow half-platforms, leaving a long uninterrupted void around the engine.
-        int[] floors = {430, 790, 1150, 1490};
-        for (int y : floors) {
-            c.box(-920, y, CZ - 850, -570, y + 8, CZ + 180, Mat.S_TOHA_DECK);
-            c.box(570, y, CZ - 850, 920, y + 8, CZ + 180, Mat.S_TOHA_DECK);
-            c.box(-1020, y + 9, CZ - 850, -1012, y + 34, CZ + 180, Mat.IRON_BARS);
-            c.box(1012, y + 9, CZ - 850, 1020, y + 34, CZ + 180, Mat.IRON_BARS);
-        }
-
-        // A narrow maintenance stair links each of the partial east-side platforms.
-        // It zigzags through the nave and stays well clear of the gravity furnace sightline.
-        drawInteriorTransferStairs(c);
-
-        // Two enormous inclined braces and hanging service lines in the open volume.
-        c.beam(-1010, 330, CZ + 170, -620, 1540, CZ - 850, 26, Mat.S_TOHA_MASS);
-        c.beam(1010, 330, CZ + 170, 620, 1540, CZ - 850, 26, Mat.S_TOHA_MASS);
-        c.beam(-870, 1640, CZ - 830, -820, 630, CZ - 720, 2, Mat.CABLE);
-        c.beam(870, 1640, CZ - 830, 820, 630, CZ - 720, 2, Mat.CABLE);
-    }
-
-    /**
-     * Fixed three-flight service stair. Each tread rises one block for every two blocks
-     * of travel, with the upper and lower treads flush with the partial nave platforms.
-     * The open stair follows the east wall of the nave; it is intentionally narrow and
-     * leaves the central furnace and most of the vertical void unobstructed.
-     */
-    private void drawInteriorTransferStairs(Cube c) {
-        drawServiceStair(c, 770, 774, 438, 798, CZ + 160, -1);
-        drawServiceStair(c, 770, 774, 798, 1158, CZ - 560, 1);
-        drawServiceStair(c, 770, 774, 1158, 1498, CZ + 160, -1);
-    }
-
-    private void drawServiceStair(Cube c, int x0, int x1, int startTopY, int endTopY,
-                                  int startZ, int direction) {
-        int rise = endTopY - startTopY;
-        int finishZ = startZ + direction * rise * 2;
-        int minZ = Math.min(startZ, finishZ) - 2;
-        int maxZ = Math.max(startZ, finishZ) + 2;
-        if (!c.hits(x0 - 4, startTopY, minZ, x1 + 4, endTopY + 5, maxZ)) return;
-
-        // Segment the cable rails into short spans. Long diagonal beams otherwise have a
-        // large Y/Z bounding box and would make unrelated cubes along the whole flight pay
-        // the raster cost even when they are far from the actual rail.
-        for (int y = startTopY; y < endTopY;) {
-            int nextY = Math.min(endTopY, y + 24);
-            double zA = startZ + direction * (y - startTopY) * 2.0 + 0.5;
-            double zB = startZ + direction * (nextY - startTopY) * 2.0 + 0.5;
-            c.beam(x0 - 3, y + 3, zA, x0 - 3, nextY + 3, zB, 1, Mat.CABLE);
-            c.beam(x1 + 3, y + 3, zA, x1 + 3, nextY + 3, zB, 1, Mat.CABLE);
-            y = nextY;
-        }
-
-        // Restrict raster work to the current cube's Y slice; a flight spans hundreds of
-        // blocks, but a cube can intersect only a small handful of individual treads.
-        int firstStep = Math.max(0, c.y0 - startTopY - 4);
-        int lastStep = Math.min(rise, c.y0 + 15 - startTopY);
-        for (int i = firstStep; i <= lastStep; i++) {
-            int y = startTopY + i;
-            int z = startZ + direction * i * 2;
-            c.box(x0, y, z, x1, y, z + 1, Mat.S_TOHA_DECK);
-
-            // Sparse guard posts are enough to imply a maintenance route at this scale.
-            if (i == 0 || i == rise || i % 48 == 0) {
-                c.box(x0 - 2, y + 1, z, x0 - 2, y + 4, z + 1, Mat.IRON_BARS);
-                c.box(x1 + 2, y + 1, z, x1 + 2, y + 4, z + 1, Mat.IRON_BARS);
-            }
-        }
-    }
-
-    private void drawGravityFurnace(Cube c) {
-        double x = CX + 0.5, z = CZ - 560 + 0.5;
-        // One continuous, hollow tapered furnace/spine nearly touches the ceiling.
-        c.taper(x, z, 320, 92, 210, TOP, 32, Mat.S_TOHA_RING);
-        c.taper(x, z, 274, 52, 230, TOP - 14, 32, Mat.AIR);
-
-        int[] ys = {410, 760, 1110, 1460, 1780, 1980};
-        int[] rs = {425, 390, 340, 290, 220, 125};
-        for (int i = 0; i < ys.length; i++) {
-            int y = ys[i], r = rs[i];
-            c.cylinder(x, z, r, r - 26, 1, 1, y, y + 18, 0, 0, Mat.S_TOHA_PALE);
-            c.cylinder(x, z, r + 5, r, 1, 1, y + 19, y + 26, 0, 0, Mat.S_TOHA_MASS);
-        }
-
-        // Four fixed radial service arms frame the crown without becoming a fantasy ornament.
-        c.beam(-600, 1770, CZ - 560, 600, 1770, CZ - 560, 24, Mat.S_TOHA_MASS);
-        c.beam(0, 1810, CZ - 1120, 0, 1810, CZ + 30, 22, Mat.S_TOHA_MASS);
-        c.box(-80, 1882, CZ - 650, 80, 1902, CZ - 470, Mat.BIO_CYAN);
-        c.box(-18, 1972, CZ - 582, 18, 2004, CZ - 546, Mat.SEA_LANTERN);
-    }
-
-    /**
-     * Twelve cave AIs have their own chamber machine, and the principal cave
-     * frames the gravity furnace rather than obscuring it. These are fixed,
-     * authored mechanisms with different silhouettes, not a random prop set.
-     */
-    private void drawCaveMachines(Cube c) {
-        for (int i = 0; i < CAVE_X.length; i++) {
-            int x = CAVE_X[i];
-            int y = CAVE_Y[i] + CAVE_H[i] / 2;
-            int front = CZ + CAVE_FRONT[i];
-            int z = front - 380;
-            int r = Math.max(30, Math.min(110, CAVE_W[i] / 4));
-            int halfY = Math.max(48, CAVE_H[i] / 3);
-            int y0 = Math.max(CAVE_Y[i] + 16, y - halfY);
-            int y1 = Math.min(CAVE_Y[i] + CAVE_H[i] - 16, y + halfY);
-
-            if (i == 2) {
-                // The primary cave is a sightline to the central gravity furnace.
-                // Two side frames mark its AI's machinery while the middle stays open.
-                for (int side : new int[] {-1, 1}) {
-                    double sx = x + side * 150.5;
-                    c.taper(sx, z + 0.5, 30, 22, y0, y1, 24, Mat.S_TOHA_MASS);
-                    c.taper(sx, z + 0.5, 18, 12, y0 + 16, y1 - 16, 24, Mat.AIR);
-                    c.beam((int) sx, y0 + 12, z + 36, (int) sx, y1 - 10, z - 60, 7, Mat.CABLE);
-                    c.cylinder(sx, z + 0.5, 38, 30, 1, 1, y + 20, y + 28, 0, 0, Mat.S_TOHA_RING);
-                }
-                c.beam(x - 200, y + halfY - 8, z, x + 200, y + halfY - 8, z, 12, Mat.S_TOHA_PALE);
-                continue;
-            }
-
-            switch (i % 4) {
-                case 0: {
-                    // Tall tapered spindle with two heavy bearing collars.
-                    c.taper(x + 0.5, z + 0.5, r, Math.max(18, r * 0.55), y0, y1, 24, Mat.S_TOHA_MASS);
-                    c.taper(x + 0.5, z + 0.5, Math.max(12, r - 12),
-                            Math.max(8, r * 0.55 - 10), y0 + 12, y1 - 12, 24, Mat.AIR);
-                    c.cylinder(x + 0.5, z + 0.5, r + 18, r + 5, 1, 1, y0, y0 + 9, 0, 0, Mat.S_TOHA_PALE);
-                    c.cylinder(x + 0.5, z + 0.5, r + 14, r + 4, 1, 1, y1 - 8, y1, 0, 0, Mat.S_TOHA_RING);
-                    c.beam(x - r - 24, y, z + 40, x + r + 24, y, z + 40, 8, Mat.S_TOHA_MASS);
-                    break;
-                }
-                case 1: {
-                    // An exposed gyro-ring, held by two narrow load-bearing arms.
-                    c.cylinder(x + 0.5, z + 0.5, r + 24, r + 10, 1, 1, y - 18, y - 9, 0, 0, Mat.S_TOHA_PALE);
-                    c.cylinder(x + 0.5, z + 0.5, r + 30, r + 14, 1, 1, y + 8, y + 18, 0, 0, Mat.S_TOHA_RING);
-                    for (int side : new int[] {-1, 1}) {
-                        c.taper(x + side * (r + 10) + 0.5, z + 0.5, 18, 14,
-                                y0, y1, 20, Mat.S_TOHA_MASS);
-                        c.beam(x + side * (r + 10), y, z + 24,
-                                x + side * (r + 10), y, z - 80, 6, Mat.CABLE);
-                    }
-                    break;
-                }
-                case 2: {
-                    // Suspended rectangular service cage, open at the top and bottom.
-                    wallShell(c, x - r, y0, z - 42, x + r, y1, z + 42, 8, Mat.S_TOHA_MASS);
-                    c.box(x - r - 20, y0 + 12, z - 8, x - r - 12, y1 - 12, z + 8, Mat.S_TOHA_PALE);
-                    c.box(x + r + 12, y0 + 12, z - 8, x + r + 20, y1 - 12, z + 8, Mat.S_TOHA_PALE);
-                    c.beam(x - r, y1 + 36, z, x + r, y1 + 36, z, 10, Mat.S_TOHA_RING);
-                    c.beam(x - r - 8, y1 + 30, z, x - r - 8, y1 + 68, z - 48, 3, Mat.CABLE);
-                    c.beam(x + r + 8, y1 + 30, z, x + r + 8, y1 + 68, z - 48, 3, Mat.CABLE);
-                    break;
-                }
-                default: {
-                    // Paired pressure vessels linked by a low service bridge.
-                    int vesselR = Math.max(16, r * 35 / 100);
-                    for (int side : new int[] {-1, 1}) {
-                        double sx = x + side * r * 3.0 / 5.0 + 0.5;
-                        c.taper(sx, z + 0.5, vesselR + 8, vesselR, y0, y1, 24, Mat.S_TOHA_RING);
-                        c.taper(sx, z + 0.5, Math.max(8, vesselR - 8),
-                                Math.max(6, vesselR - 13), y0 + 10, y1 - 10, 24, Mat.AIR);
-                        c.cylinder(sx, z + 0.5, vesselR + 12, vesselR + 4, 1, 1,
-                                y - 6, y + 2, 0, 0, Mat.S_TOHA_PALE);
-                    }
-                    c.box(x - r, y - 10, z + 34, x + r, y - 2, z + 58, Mat.S_TOHA_MASS);
-                    c.beam(x - r, y + 16, z - 4, x + r, y + 16, z - 4, 6, Mat.CABLE);
-                    break;
-                }
-            }
-        }
-    }
-
-    private void drawCaveFrames(Cube c) {
-        for (int i = 0; i < CAVE_X.length; i++) {
-            int centre = CAVE_X[i], y = CAVE_Y[i], w = CAVE_W[i], h = CAVE_H[i];
-            int l = centre - w / 2, r = centre + w / 2, top = y + h;
-            if (!c.hits(l - 28, y - 22, CZ + CAVE_FRONT[i] - 220,
-                        r + 28, top + 28, CZ + CAVE_FRONT[i] + 36)) continue;
-
-            // The jambs and lintel follow the rounded hull surface column by column.
-            for (int x = Math.max(l - 28, c.x0); x <= Math.min(r + 28, c.x0 + 15); x++) {
-                int f = CZ + caveFrontAt(i, x);
-                if (x >= l - 28 && x <= l - 8)
-                    c.box(x, y - 22, f + 3, x, top + 22, f + 28, Mat.S_TOHA_PALE);
-                if (x >= r + 8 && x <= r + 28)
-                    c.box(x, y - 22, f + 3, x, top + 22, f + 28, Mat.S_TOHA_PALE);
-                if (x >= l - 20 && x <= r + 20)
-                    c.box(x, top + 8, f + 3, x, top + 28, f + 28, Mat.S_TOHA_MASS);
-                if (x >= l - 16 && x <= r + 16)
-                    c.box(x, y - 14, f + 3, x, y + 5, f + 28, Mat.S_TOHA_MASS);
-                if (x >= l - 7 && x <= l + 6)
-                    c.box(x, y, f - 10, x, top, f - 2, Mat.COAL);
-                if (x >= r - 6 && x <= r + 7)
-                    c.box(x, y, f - 10, x, top, f - 2, Mat.COAL);
-                if (x >= l && x <= r)
-                    c.box(x, top - 8, f - 10, x, top + 4, f - 2, Mat.S_DARK);
-            }
-
-            int fCentre = CZ + caveFrontAt(i, centre);
-            if (i == 2) {
-                c.box(centre - 65, top - 18, fCentre + 29, centre + 65, top - 12, fCentre + 31, Mat.BIO_CYAN);
-            } else if (i == 12) {
-                c.box(centre - 34, top - 18, fCentre + 29, centre + 34, top - 12, fCentre + 31, Mat.SEA_LANTERN);
-            } else if (i == 5 || i == 8) {
-                c.box(l + 12, top - 18, fCentre + 29, l + 42, top - 12, fCentre + 31, Mat.LAMP_RED);
-            }
-        }
-    }
-
-    /**
-     * Each of Toha's thirteen cave AIs gets a fixed control slab recessed on the
-     * right-hand side of its chamber. The panels are identical enough to belong
-     * to one system, but only the primary and crown chambers retain a live cyan
-     * indicator: colour remains scarce and the black-and-white silhouette leads.
-     */
-    private void drawCaveAIControls(Cube c) {
-        for (int i = 0; i < CAVE_X.length; i++) {
-            int x = CAVE_X[i] + CAVE_W[i] / 2 - 22;
-            int y = CAVE_Y[i] + Math.max(22, CAVE_H[i] / 2 - 42);
-            int z = CZ + CAVE_FRONT[i] - 200;
-            if (!c.hits(x - 12, y, z - 18, x + 12, y + 92, z + 3)) continue;
-
-            c.box(x - 12, y, z - 18, x + 12, y + 92, z, Mat.S_TOHA_MASS);
-            c.box(x - 7, y + 12, z + 1, x - 5, y + 76, z + 3, Mat.S_DARK);
-            c.box(x + 3, y + 18, z + 1, x + 7, y + 34, z + 3, Mat.ANDESITE);
-            c.box(x + 3, y + 42, z + 1, x + 7, y + 48, z + 3, Mat.COAL);
-            c.box(x + 3, y + 56, z + 1, x + 7, y + 62, z + 3, Mat.COAL);
-
-            if (i == 2) {
-                c.box(x + 1, y + 68, z + 1, x + 7, y + 74, z + 3, Mat.BIO_CYAN);
-            } else if (i == 12) {
-                c.box(x + 1, y + 68, z + 1, x + 7, y + 74, z + 3, Mat.SEA_LANTERN);
-            } else if (i == 5 || i == 8) {
-                c.box(x + 1, y + 68, z + 1, x + 7, y + 74, z + 3, Mat.LAMP_RED);
-            }
-        }
-    }
-
-    // ------------------------------------------------------------------
-    // Exterior stacks and ribs create a recognisable long-range skyline.
-    // ------------------------------------------------------------------
-
-    private void drawExteriorSpines(Cube c) {
-        // Six fixed machine spines sit tangent to the cylindrical hull at different heights.
-        drawSpine(c, -1990, CZ - 1150, 1140, 150, 64);
-        drawSpine(c, -2270, CZ - 100, 1510, 165, 64);
-        drawSpine(c, -1990, CZ + 1150, 920, 130, 58);
-        drawSpine(c, 1990, CZ - 1150, 1240, 150, 62);
-        drawSpine(c, 2270, CZ - 100, 1630, 165, 60);
-        drawSpine(c, 1990, CZ + 1150, 1030, 130, 55);
-
-        // An off-axis mast rises near the ceiling and is pinned back by huge braces.
-        drawSpine(c, 2040, CZ - 900, 1975, 210, 78);
-        c.beam(2160, 690, CZ + 600, 2040, 1810, CZ - 900, 30, Mat.S_TOHA_PALE);
-        c.beam(2300, 1060, CZ + 80, 2040, 1910, CZ - 900, 16, Mat.S_TOHA_RING);
-        c.beam(2040, 1840, CZ - 900, 900, 1780, CZ - 790, 24, Mat.S_TOHA_MASS);
-        c.box(2020, 1940, CZ - 920, 2060, 1952, CZ - 880, Mat.BIO_CYAN);
-
-        // Heavy diagonals carry the external spines into the middle hull collars.
-        c.beam(-2270, 250, CZ + 200, -1500, 1110, CZ - 820, 34, Mat.S_TOHA_MASS);
-        c.beam(2270, 250, CZ + 200, 1500, 1110, CZ - 820, 34, Mat.S_TOHA_MASS);
-        c.beam(-1960, 670, CZ - 1420, -1050, 1490, CZ - 600, 25, Mat.S_TOHA_PALE);
-        c.beam(1960, 670, CZ - 1420, 1050, 1490, CZ - 600, 25, Mat.S_TOHA_PALE);
-
-        c.cylinder(CX + 0.5, CZ + 0.5, 1970, 1945, 1, 1, 850, 880, 0, 0, Mat.S_TOHA_RING);
-        c.cylinder(CX + 0.5, CZ + 0.5, 1670, 1644, 1, 1, 1325, 1348, 0, 0, Mat.S_TOHA_RING);
-    }
-
-    private void drawSpine(Cube c, int x, int z, int height, int r0, int r1) {
-        c.taper(x + 0.5, z + 0.5, r0, r1, GROUND, height, 32, Mat.S_TOHA_MASS);
-        c.taper(x + 0.5, z + 0.5, r0 - 22, Math.max(12, r1 - 14), GROUND + 24, height - 18, 32, Mat.AIR);
-        for (int y = GROUND + 160; y < height; y += 160) {
-            if (!c.hitsY(y, y + 5)) continue;
-            double t = (double) (y - GROUND) / (height - GROUND);
-            double r = r0 + (r1 - r0) * t;
-            c.cylinder(x + 0.5, z + 0.5, r + 16, r + 5, 1, 1, y, y + 5, 0, 0, Mat.S_TOHA_PALE);
-        }
-    }
-
-    // ------------------------------------------------------------------
-    // The south approach is a deliberate sequence of gateways. Its scale
-    // compresses the player before revealing the cave façade.
-    // ------------------------------------------------------------------
-
-    private void drawApproach(Cube c) {
-        int zBack = CZ + 2660, zFront = CZ + 1360;
-        c.box(-640, 63, zFront, 640, 82, zBack, Mat.S_TOHA_DECK);
-        c.box(-580, 83, zFront, -565, 86, zBack, Mat.S_TOHA_MASS);
-        c.box(565, 83, zFront, 580, 86, zBack, Mat.S_TOHA_MASS);
-        c.box(-12, 83, zFront, 12, 84, zBack, Mat.CONC_BLACK);
-
-        int[] offsets = {2630, 2350, 2070, 1790, 1580};
-        int[] spans = {1000, 1260, 1510, 1760, 1980};
-        int[] heights = {310, 420, 555, 710, 900};
-        for (int i = 0; i < offsets.length; i++) {
-            approachFrame(c, offsets[i], spans[i], heights[i], i);
-        }
-
-        // Two deep feed channels and crossheads parallel the road, not a decorative plaza.
-        c.box(-930, 28, CZ + 1720, -830, 60, CZ + 2590, Mat.S_TOHA_MASS);
-        c.box(830, 28, CZ + 1720, 930, 60, CZ + 2590, Mat.S_TOHA_MASS);
-        for (int z = CZ + 1790; z <= CZ + 2540; z += 150) {
-            c.box(-965, 60, z, -800, 65, z + 10, Mat.S_TOHA_RING);
-            c.box(800, 60, z, 965, 65, z + 10, Mat.S_TOHA_RING);
-        }
-    }
-
-    private void approachFrame(Cube c, int offset, int span, int height, int index) {
-        int z = CZ + offset;
-        int post = Math.max(28, span / 28);
-        c.box(-span / 2, GROUND, z - 26, -span / 2 + post, GROUND + height, z + 26, Mat.S_TOHA_MASS);
-        c.box(span / 2 - post, GROUND, z - 26, span / 2, GROUND + height, z + 26, Mat.S_TOHA_MASS);
-        c.box(-span / 2, GROUND + height - 32, z - 38, span / 2, GROUND + height + 28, z + 38, Mat.S_TOHA_PALE);
-        c.box(-span / 2 + 14, GROUND + height - 12, z - 39, span / 2 - 14, GROUND + height - 6, z - 37, Mat.S_DARK);
-        if (index == 3 || index == 4) {
-            c.box(-span / 2 + 50, GROUND + height - 7, z + 39, span / 2 - 50, GROUND + height - 2, z + 40, Mat.BIO_CYAN);
-        }
-
-        // The frames are connected to the ground by restrained diagonal braces.
-        c.beam(-span / 2 + post, GROUND + height - 40, z, -span / 2 + post + 120, GROUND + height - 150, z, 8, Mat.S_TOHA_RING);
-        c.beam(span / 2 - post, GROUND + height - 40, z, span / 2 - post - 120, GROUND + height - 150, z, 8, Mat.S_TOHA_RING);
-    }
-
-    private void drawCourtyardPylons(Cube c) {
-        // Four isolated pylons align to the circular perimeter; none blocks the southern portal.
-        drawSpine(c, -2200, CZ - 1500, 600, 155, 85);
-        drawSpine(c, 2200, CZ - 1500, 540, 145, 80);
-        drawSpine(c, -2200, CZ + 1500, 510, 135, 75);
-        drawSpine(c, 2200, CZ + 1500, 640, 170, 82);
-
-        // Two tall transfer columns sit on the side arcs of the empty approach ring.
-        c.taper(-2320.5, CZ - 200.5, 82, 45, GROUND, 770, 24, Mat.S_TOHA_PALE);
-        c.taper(2320.5, CZ - 200.5, 82, 45, GROUND, 710, 24, Mat.S_TOHA_PALE);
-        c.cylinder(-2320.5, CZ - 200.5, 105, 82, 1, 1, 420, 434, 0, 0, Mat.S_TOHA_RING);
-        c.cylinder(2320.5, CZ - 200.5, 105, 82, 1, 1, 420, 434, 0, 0, Mat.S_TOHA_RING);
     }
 }
