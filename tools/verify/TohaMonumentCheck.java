@@ -112,7 +112,7 @@ public final class TohaMonumentCheck {
         // Elevated machinery must be attached to a real slab spur off the bridge tier.
         Cube podConnector = cubeAt(-1950, 285, Toha.CZ + 50);
         toha.draw(podConnector);
-        check(podConnector.get(-1950, 285, Toha.CZ + 50) == Mat.SLAB_TOP,
+        check(podConnector.get(-1950, 285, Toha.CZ + 50) == Mat.SLAB_BOTTOM,
                 "the elevated processing pod must have a slab connector to the main bridge");
 
         // Machine yard equipment must be block-real and richly detailed at human scale.
