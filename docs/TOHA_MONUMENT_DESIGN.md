@@ -2,7 +2,7 @@
 
 ## Design goal
 
-Generator v19 replaces the previous broad, stepped cylinder with a **narrow hollow spire inside a megastructure-scale canyon**. The tower is the central silhouette, but the valley supplies the scale: stratified walls rise beside it, equipment bays are cut into the cliffs, interrupted catwalks climb the walls, and slab-backed routes pass through yards, gantries, lift towers and chambers. The space should feel like a cross-section through an immense, older machine city rather than a freestanding skyscraper on a round plaza.
+Generator v20 replaces the previous broad, stepped cylinder with a **narrow hollow spire inside a megastructure-scale canyon**. It adds twelve elevated processing pods docked to the cross-valley bridges at six heights, populating the middle and upper canyon with slab landings, rail spurs, load frames and distinct machine types. The tower is the central silhouette, but the valley supplies the scale: stratified walls rise beside it, equipment bays are cut into the cliffs, interrupted catwalks climb the walls, and slab-backed routes pass through yards, gantries, lift towers and chambers. The space should feel like a cross-section through an immense, older machine city rather than a freestanding skyscraper on a round plaza.
 
 The design uses the visual language of *BLAME!* without reproducing individual manga panels: a thin tapering black mass, huge pale structural cuts, severe dark concrete, long vertical voids, asymmetrical bridges, irregular caverns, small cold indicator lights and machine assemblies that seem to have an industrial purpose. For Minecraft-scale detailing, the authored palette now also uses slabs, stairs, iron trapdoors, rails, pistons, dispensers and hoppers alongside tanks, vent grills, pipework, bars and cables. These are structural and mechanical details, not decorative scatter.
 
@@ -39,7 +39,7 @@ The central body is a single hollow, tapered mast, not a stack of wide drums. It
 
 Thin course marks punctuate the height. Broken orbital maintenance decks step outward from the skin at unequal intervals, with different angular spans and elevations. Their arcs never become complete, continuous balconies. Short brackets transfer load back to the shell, and some platforms are attached to the external helix or to one of the bridge landings.
 
-The south-east-facing lower spire carries the matte-black `東亜重工` mark in compact 3-block raster cells, projected to the local tapered surface. The mark remains small and part of the architecture; it is not a floating sign.
+The south-east-facing lower spire carries the matte-black `東亜重工` mark in compact 3-block raster cells, projected to the local tapered surface. A narrow pale curved inlay behind the glyphs gives them enough contrast against the dark shell while remaining part of the skin; it is not a floating sign.
 
 ### 3. Hollow interior and gravity furnace
 
@@ -75,7 +75,7 @@ A south causeway and a north causeway terminate at separate low portals through 
 
 ### Machine yard, cargo and gantries
 
-Twenty fixed machine modules form several non-mirrored clusters around the spire. Each module has a footing, four load-bearing legs, a crosshead, a slab-topped service landing and visible connections to a second module or a service route. Equipment types include pressure-tank pairs, rotor rings, framed vent racks, transformer stacks, dispenser-like control blocks, hopper-like feeders, trapdoor covers and rare cyan status lamps.
+Twenty fixed ground machine modules form several non-mirrored clusters around the spire. Twelve additional elevated processing pods attach to six transverse bridge tiers at Y=285, 555, 840, 1135, 1430 and 1725. Each module has a footing, four load-bearing legs, a crosshead, a slab-topped service landing and visible connections to a second module or a service route. Equipment types include pressure-tank pairs, rotor rings, framed vent racks, transformer stacks, dispenser-like control blocks, hopper-like feeders, trapdoor covers and rare cyan status lamps.
 
 Four ground-level paired cargo rails cross the valley along slab foundations. Raised conveyors at multiple elevations carry tray-like channels between machine rows. Their repeated supports have copper collars and piston-like details. Two large and one smaller loading gantries suspend hopper-like lifting heads on cables; their offset legs and crossheads avoid a perfectly symmetrical frame. Access walks cling to each conveyor at a different height.
 
